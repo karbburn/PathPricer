@@ -87,6 +87,14 @@ input[type="date"] {
     min-height: 44px;
     min-width: 44px;
   }
+  input[type="range"]::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 /* ── Page transitions ── */
