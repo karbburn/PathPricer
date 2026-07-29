@@ -1,11 +1,39 @@
-"""FastAPI main application entrypoint."""
+"""FastAPI main application entrypoint.
+
+Registers API routers under /api/v1 prefix, configures CORS,
+and wires dependency injection.
+"""
+
+import os
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from .api import market, pricing, report
 
 app = FastAPI(title="PathPricer API", version="0.1.0")
 
+# CORS — env-driven allowed origins, with localhost fallback for dev
+_cors_origins_raw = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000")
+_cors_origins = [origin.strip() for origin in _cors_origins_raw.split(",") if origin.strip()]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Health check (outside /api/v1 — used by Render and keep-alive workflow)
 @app.get("/health")
 def health_check() -> dict[str, str]:
     """Health check endpoint for keep-alive and monitoring."""
     return {"status": "ok"}
+
+
+# Register API routers under /api/v1 prefix
+app.include_router(market.router, prefix="/api/v1")
+app.include_router(pricing.router, prefix="/api/v1")
+app.include_router(report.router, prefix="/api/v1")

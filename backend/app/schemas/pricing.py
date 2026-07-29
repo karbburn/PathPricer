@@ -1,3 +1,232 @@
-"""Pydantic schemas for pricing requests and responses stub."""
+"""Pydantic schemas for API request/response models.
 
-pass
+Mirrors Doc 6 API Specification JSON shapes exactly. Preview and Full
+response types are deliberately distinct to enforce the two-tier compute
+model at the schema level.
+"""
+
+from __future__ import annotations
+
+from datetime import date
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+
+# ---------------------------------------------------------------------------
+# Shared request schema
+# ---------------------------------------------------------------------------
+
+
+class PricingRequestSchema(BaseModel):
+    """Pricing request shared by preview and full endpoints."""
+
+    ticker: str
+    market: Literal["US", "IN"]
+    spot_override: float | None = None
+    strike: float = Field(..., gt=0)
+    expiry_date: date
+    option_type: Literal["call", "put"]
+    volatility: float = Field(..., gt=0)
+    risk_free_rate: float
+    dividend_yield: float | None = None
+    n_simulations: int = Field(..., ge=1)
+    seed: int = 42
+    variance_reduction: Literal[
+        "standard", "antithetic", "control_variate", "antithetic_cv", "all"
+    ] = "all"
+    convergence_grid: list[int] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Sub-models for response composition
+# ---------------------------------------------------------------------------
+
+
+class BSPreviewResult(BaseModel):
+    """Black-Scholes result subset for preview tier (price + delta/gamma only)."""
+
+    price: float
+    delta: float
+    gamma: float
+
+
+class MCPreviewResult(BaseModel):
+    """Standard MC result subset for preview tier (price + delta/gamma only)."""
+
+    price: float
+    delta: float
+    gamma: float
+
+
+class BSGreeks(BaseModel):
+    """Full analytical Greeks block."""
+
+    delta: float
+    gamma: float
+    vega: float
+    theta: float
+    rho: float
+
+
+class BSFullResult(BaseModel):
+    """Black-Scholes result for full tier (price + full Greeks)."""
+
+    price: float
+    greeks: BSGreeks
+
+
+class MCResultItem(BaseModel):
+    """Single MC estimator result in full response."""
+
+    method: str
+    price: float
+    standard_error: float
+    ci_lower: float
+    ci_upper: float
+    runtime_ms: float
+    n_effective: int
+    paths_per_second: float
+
+
+class FDGreeksResult(BaseModel):
+    """Finite-difference Greeks result in full response."""
+
+    delta: float
+    gamma: float
+    vega: float
+    theta: float
+    rho: float
+    bump_size_used: dict[str, float]
+
+
+class ConvergencePoint(BaseModel):
+    """Single (N, SE) data point for convergence chart."""
+
+    n: int
+    standard_error: float
+
+
+class ConvergenceFit(BaseModel):
+    """Log-log regression fit of SE vs N."""
+
+    slope: float
+    r_squared: float
+
+
+class DiagnosticsBlock(BaseModel):
+    """Diagnostics block in full response."""
+
+    expected_payoff: float
+    discount_factor: float
+    terminal_mean: float
+    terminal_std: float
+    relative_error_vs_bs: float
+
+
+# ---------------------------------------------------------------------------
+# Preview response — deliberately smaller, distinct type
+# ---------------------------------------------------------------------------
+
+
+class PricingPreviewResponse(BaseModel):
+    """Preview-tier pricing response. Deliberately omits SE/CI/full diagnostics."""
+
+    black_scholes: BSPreviewResult
+    monte_carlo_standard: MCPreviewResult
+    tier: Literal["preview"] = "preview"
+    n_simulations: int
+    compute_ms: float
+
+
+# ---------------------------------------------------------------------------
+# Full response — all estimators, Greeks, convergence, diagnostics
+# ---------------------------------------------------------------------------
+
+
+class PricingFullResponse(BaseModel):
+    """Full-tier pricing response with all MC estimators, Greeks, convergence, and diagnostics."""
+
+    tier: Literal["full"] = "full"
+    request_echo: PricingRequestSchema
+    black_scholes: BSFullResult
+    mc_results: list[MCResultItem]
+    greeks_fd: FDGreeksResult
+    convergence_data: list[ConvergencePoint]
+    convergence_fit: ConvergenceFit
+    diagnostics: DiagnosticsBlock
+    terminal_distribution_sample: list[float]
+    compute_ms: float
+
+
+# ---------------------------------------------------------------------------
+# Market quote response
+# ---------------------------------------------------------------------------
+
+
+class MarketQuoteResponse(BaseModel):
+    """Market data quote response model."""
+
+    ticker: str
+    market: str
+    resolved_symbol: str
+    spot_price: float
+    daily_return: float
+    historical_volatility: dict[str, float]
+    dividend_yield: float
+    market_cap: float | None
+    currency: str
+    last_updated: str
+    data_warnings: list[str]
+
+
+# ---------------------------------------------------------------------------
+# Validation summary response — CI-time artifact, served statically
+# ---------------------------------------------------------------------------
+
+
+class CICoverageBlock(BaseModel):
+    """CI coverage check result block."""
+
+    trials: int
+    nominal_confidence: float
+    observed_coverage: float | None
+    last_run: str | None
+
+
+class EdgeCasesBlock(BaseModel):
+    """Edge-case test result block."""
+
+    total: int
+    passed: int
+    last_run: str | None
+
+
+class GreeksValidationBlock(BaseModel):
+    """Greeks validation result block."""
+
+    total: int
+    passed: int
+    tolerances: dict[str, float]
+
+
+class ValidationSummaryResponse(BaseModel):
+    """Static validation summary served from CI artifacts."""
+
+    ci_coverage: CICoverageBlock
+    edge_cases: EdgeCasesBlock
+    greeks_validation: GreeksValidationBlock
+
+
+# ---------------------------------------------------------------------------
+# Error response
+# ---------------------------------------------------------------------------
+
+
+class ErrorResponse(BaseModel):
+    """Structured error response for 400/404/500 errors."""
+
+    error: str
+    message: str
+    field: str | None = None
+    fallback_available: bool | None = None
