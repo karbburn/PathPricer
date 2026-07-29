@@ -189,69 +189,78 @@ export default function MarketOverviewPage() {
 
       {/* 404 Error State & Manual Fallback Form */}
       {!loading && error && (
-        <div className="bg-red-950/40 border border-red-800 rounded-lg p-6 mb-8">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="p-2 bg-red-900/60 rounded text-red-400 font-bold text-sm">
-              ⚠ 404 / Error
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-red-200">Market Data Resolution Failure</h3>
-              <p className="text-sm text-red-300 mt-1">{error.message}</p>
+        <div className="bg-slate-900 border border-red-500/40 rounded-lg overflow-hidden mb-8">
+          <div className="bg-red-950/50 px-6 py-4 border-b border-red-900/60 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-red-900/80 border border-red-700 flex items-center justify-center">
+                <span className="text-red-400 text-sm font-bold">!</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-red-200">Market Data Unavailable</h3>
+                <p className="text-xs text-red-400/80 font-mono mt-0.5">
+                  {error.error}
+                </p>
+              </div>
             </div>
           </div>
 
-          {error.fallback_available && (
-            <div className="mt-6 pt-6 border-t border-red-900/60 bg-gray-950 p-6 rounded border border-gray-800">
-              <h4 className="text-sm font-bold text-white mb-2">
-                Manual Spot Price Fallback Entry
-              </h4>
-              <p className="text-xs text-gray-400 mb-4">
-                Since live market data for symbol &apos;{error.field || tickerInput}&apos; could not be retrieved, enter manual parameters below to proceed directly to the Pricing Workspace:
-              </p>
+          <div className="px-6 py-5 space-y-4">
+            <p className="text-sm text-slate-300 leading-relaxed">{error.message}</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1 font-mono">Spot Price</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={manualSpot}
-                    onChange={(e) => setManualSpot(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
-                  />
+            {error.fallback_available && (
+              <div className="bg-slate-950 border border-slate-800 rounded-lg p-5 mt-4">
+                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  Manual Entry Available
+                </h4>
+                <p className="text-xs text-slate-500 mb-4">
+                  Enter parameters manually to proceed to the Pricing Workspace for <span className="text-slate-400 font-mono font-bold">{error.field || tickerInput}</span>.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Spot Price</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={manualSpot}
+                      onChange={(e) => setManualSpot(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Volatility</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={manualVol}
+                      onChange={(e) => setManualVol(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Dividend Yield</label>
+                    <input
+                      type="number"
+                      step="0.001"
+                      value={manualDiv}
+                      onChange={(e) => setManualDiv(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1 font-mono">Annualized Volatility (σ)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={manualVol}
-                    onChange={(e) => setManualVol(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1 font-mono">Dividend Yield (q)</label>
-                  <input
-                    type="number"
-                    step="0.001"
-                    value={manualDiv}
-                    onChange={(e) => setManualDiv(e.target.value)}
-                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
-                  />
-                </div>
+
+                <Link
+                  href={`/workspace?ticker=${encodeURIComponent(
+                    tickerInput
+                  )}&market=${marketInput}&spot_override=${manualSpot}&volatility=${manualVol}&dividend_yield=${manualDiv}`}
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                >
+                  <span>Proceed to Workspace</span>
+                  <span className="text-blue-300">&rarr;</span>
+                </Link>
               </div>
-
-              <Link
-                href={`/workspace?ticker=${encodeURIComponent(
-                  tickerInput
-                )}&market=${marketInput}&spot_override=${manualSpot}&volatility=${manualVol}&dividend_yield=${manualDiv}`}
-                className="inline-block bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm px-6 py-2.5 rounded transition-colors"
-              >
-                Proceed to Workspace with Manual Entry &rarr;
-              </Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 

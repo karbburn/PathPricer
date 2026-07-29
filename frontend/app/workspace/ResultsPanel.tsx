@@ -33,18 +33,38 @@ export function ResultsPanel({
 }: ResultsPanelProps) {
   // Error state — structured error display
   if (error) {
+    const isValidationError = error.error === "validation_error";
+    const isMarketError = error.error === "market_data_error" || error.error === "not_found";
     return (
-      <div className="bg-red-950/40 border border-red-800 rounded-lg p-6 text-red-200 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-red-300">Pricing Engine Error</h3>
+      <div className="bg-slate-900 border border-red-500/40 rounded-lg overflow-hidden">
+        <div className="bg-red-950/50 px-6 py-4 border-b border-red-900/60 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-red-900/80 border border-red-700 flex items-center justify-center">
+              <span className="text-red-400 text-sm font-bold">!</span>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-red-200">
+                {isValidationError ? "Input Validation Failed" : isMarketError ? "Market Data Error" : "Pricing Engine Error"}
+              </h3>
+              <p className="text-xs text-red-400/80 font-mono mt-0.5">{error.error}</p>
+            </div>
+          </div>
           <PreviewBadge tier="error" nSimulations={0} />
         </div>
-        <p className="text-sm font-mono">{error.message}</p>
-        {error.field && (
-          <p className="text-xs text-red-400 font-mono">
-            Invalid field: <span className="underline">{error.field}</span>
-          </p>
-        )}
+        <div className="px-6 py-5 space-y-3">
+          <p className="text-sm text-slate-300 leading-relaxed">{error.message}</p>
+          {error.field && (
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="text-slate-500">Field:</span>
+              <code className="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded font-mono text-red-300">{error.field}</code>
+            </div>
+          )}
+          {error.statusCode >= 500 && (
+            <p className="text-xs text-slate-500 mt-2">
+              If this persists, the backend pricing engine may be unreachable.
+            </p>
+          )}
+        </div>
       </div>
     );
   }

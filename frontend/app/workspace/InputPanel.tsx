@@ -712,6 +712,7 @@ export function InputPanel({
   const [fetchingMarket, setFetchingMarket] = useState<boolean>(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [tickerTouched, setTickerTouched] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Debounce preview-triggering inputs (~200ms)
@@ -740,12 +741,14 @@ export function InputPanel({
     [onInputsChange]
   );
 
-  // Filtered ticker suggestions for autocomplete
+  // Filtered ticker suggestions for autocomplete — matches ticker symbol OR company name
   const filteredTickers = useMemo(() => {
     const q = inputs.ticker.toUpperCase().trim();
     if (!q) return [];
     return TICKER_DATABASE.filter(
-      (t) => t.market === inputs.market && t.ticker.startsWith(q)
+      (t) =>
+        t.market === inputs.market &&
+        (t.ticker.startsWith(q) || t.name.toUpperCase().includes(q))
     ).slice(0, 10);
   }, [inputs.ticker, inputs.market]);
 
@@ -753,6 +756,7 @@ export function InputPanel({
     (ticker: string) => {
       updateField("ticker", ticker);
       setShowDropdown(false);
+      setTickerTouched(false);
       setActiveIndex(-1);
     },
     [updateField]
@@ -908,32 +912,47 @@ export function InputPanel({
                 onChange={(e) => {
                   updateField("ticker", e.target.value.toUpperCase());
                   setShowDropdown(true);
+                  setTickerTouched(true);
                   setActiveIndex(-1);
                 }}
                 onKeyDown={handleTickerKeyDown}
-                onFocus={() => setShowDropdown(true)}
+                onFocus={() => {
+                  setShowDropdown(true);
+                  setTickerTouched(true);
+                }}
                 placeholder="Ticker (e.g. AAPL)"
                 className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
               />
-              {showDropdown && filteredTickers.length > 0 && (
+              {showDropdown && tickerTouched && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
-                  {filteredTickers.map((entry, idx) => (
-                    <div
-                      key={entry.ticker}
-                      onMouseDown={() => selectTicker(entry.ticker)}
-                      className={`px-3 py-2 cursor-pointer flex items-center justify-between ${
-                        idx === activeIndex
-                          ? "bg-blue-900/60 text-white"
-                          : "text-gray-300 hover:bg-gray-800"
-                      }`}
-                    >
-                      <div>
-                        <span className="font-mono font-bold text-sm">{entry.ticker}</span>
-                        <span className="text-xs text-gray-500 ml-2">{entry.name}</span>
+                  {filteredTickers.length > 0 ? (
+                    filteredTickers.map((entry, idx) => (
+                      <div
+                        key={entry.ticker}
+                        onMouseDown={() => selectTicker(entry.ticker)}
+                        className={`px-3 py-2 cursor-pointer flex items-center justify-between ${
+                          idx === activeIndex
+                            ? "bg-blue-900/60 text-white"
+                            : "text-gray-300 hover:bg-gray-800"
+                        }`}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-mono font-bold text-sm">{entry.ticker}</span>
+                          <span className="text-[11px] text-gray-500">{entry.name}</span>
+                        </div>
+                        <span className="text-[10px] text-gray-500 font-mono bg-gray-800 px-1.5 py-0.5 rounded">{entry.market}</span>
                       </div>
-                      <span className="text-[10px] text-gray-500 font-mono">{entry.market}</span>
+                    ))
+                  ) : (
+                    <div className="px-3 py-3 text-center">
+                      <p className="text-xs text-gray-500">
+                        No tickers match &ldquo;{inputs.ticker}&rdquo; in {inputs.market} market
+                      </p>
+                      <p className="text-[10px] text-gray-600 mt-1">
+                        Try a different symbol or switch market
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
@@ -950,7 +969,11 @@ export function InputPanel({
           <div className="flex bg-gray-950 p-1 rounded border border-gray-700">
             <button
               type="button"
-              onClick={() => updateField("market", "US")}
+              onClick={() => {
+                updateField("market", "US");
+                setTickerTouched(false);
+                setShowDropdown(false);
+              }}
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "US"
                   ? "bg-blue-600 text-white"
@@ -961,7 +984,11 @@ export function InputPanel({
             </button>
             <button
               type="button"
-              onClick={() => updateField("market", "IN")}
+              onClick={() => {
+                updateField("market", "IN");
+                setTickerTouched(false);
+                setShowDropdown(false);
+              }}
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "IN"
                   ? "bg-blue-600 text-white"
