@@ -133,6 +133,7 @@ function WorkspaceContent() {
             fullResult={fullResult}
             error={error}
             activeTier={activeTier}
+            isFullSimulating={isFullSimulating}
           />
         </div>
       </div>

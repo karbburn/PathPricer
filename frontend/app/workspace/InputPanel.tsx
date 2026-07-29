@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { postPricePreview, getMarketQuote, ApiError } from "@/lib/api-client";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { serializeInputs } from "@/lib/url-state";
@@ -11,6 +11,117 @@ import {
   PricingRequest,
   VarianceReductionMethod,
 } from "@/lib/types";
+
+interface TickerEntry {
+  ticker: string;
+  name: string;
+  market: MarketRegion;
+}
+
+const TICKER_DATABASE: TickerEntry[] = [
+  // US Stocks
+  { ticker: "AAPL", name: "Apple Inc.", market: "US" },
+  { ticker: "MSFT", name: "Microsoft Corp.", market: "US" },
+  { ticker: "GOOGL", name: "Alphabet Inc.", market: "US" },
+  { ticker: "AMZN", name: "Amazon.com Inc.", market: "US" },
+  { ticker: "NVDA", name: "NVIDIA Corp.", market: "US" },
+  { ticker: "META", name: "Meta Platforms Inc.", market: "US" },
+  { ticker: "TSLA", name: "Tesla Inc.", market: "US" },
+  { ticker: "BRK.B", name: "Berkshire Hathaway", market: "US" },
+  { ticker: "JPM", name: "JPMorgan Chase & Co.", market: "US" },
+  { ticker: "V", name: "Visa Inc.", market: "US" },
+  { ticker: "JNJ", name: "Johnson & Johnson", market: "US" },
+  { ticker: "WMT", name: "Walmart Inc.", market: "US" },
+  { ticker: "MA", name: "Mastercard Inc.", market: "US" },
+  { ticker: "PG", name: "Procter & Gamble", market: "US" },
+  { ticker: "UNH", name: "UnitedHealth Group", market: "US" },
+  { ticker: "HD", name: "Home Depot Inc.", market: "US" },
+  { ticker: "DIS", name: "Walt Disney Co.", market: "US" },
+  { ticker: "PYPL", name: "PayPal Holdings", market: "US" },
+  { ticker: "NFLX", name: "Netflix Inc.", market: "US" },
+  { ticker: "ADBE", name: "Adobe Inc.", market: "US" },
+  { ticker: "CRM", name: "Salesforce Inc.", market: "US" },
+  { ticker: "INTC", name: "Intel Corp.", market: "US" },
+  { ticker: "AMD", name: "Advanced Micro Devices", market: "US" },
+  { ticker: "CSCO", name: "Cisco Systems", market: "US" },
+  { ticker: "QCOM", name: "Qualcomm Inc.", market: "US" },
+  { ticker: "ORCL", name: "Oracle Corp.", market: "US" },
+  { ticker: "IBM", name: "IBM Corp.", market: "US" },
+  { ticker: "KO", name: "Coca-Cola Co.", market: "US" },
+  { ticker: "PEP", name: "PepsiCo Inc.", market: "US" },
+  { ticker: "NKE", name: "Nike Inc.", market: "US" },
+  { ticker: "BA", name: "Boeing Co.", market: "US" },
+  { ticker: "MCD", name: "McDonald's Corp.", market: "US" },
+  { ticker: "SBUX", name: "Starbucks Corp.", market: "US" },
+  { ticker: "COST", name: "Costco Wholesale", market: "US" },
+  { ticker: "MRK", name: "Merck & Co.", market: "US" },
+  { ticker: "PFE", name: "Pfizer Inc.", market: "US" },
+  { ticker: "ABT", name: "Abbott Laboratories", market: "US" },
+  { ticker: "CVX", name: "Chevron Corp.", market: "US" },
+  { ticker: "XOM", name: "Exxon Mobil Corp.", market: "US" },
+  { ticker: "GE", name: "General Electric", market: "US" },
+  { ticker: "CAT", name: "Caterpillar Inc.", market: "US" },
+  { ticker: "AMGN", name: "Amgen Inc.", market: "US" },
+  { ticker: "GILD", name: "Gilead Sciences", market: "US" },
+  { ticker: "GM", name: "General Motors", market: "US" },
+  { ticker: "F", name: "Ford Motor Co.", market: "US" },
+  // US ETFs
+  { ticker: "SPY", name: "SPDR S&P 500 ETF", market: "US" },
+  { ticker: "QQQ", name: "Invesco QQQ Trust", market: "US" },
+  { ticker: "IWM", name: "iShares Russell 2000", market: "US" },
+  { ticker: "DIA", name: "SPDR Dow Jones ETF", market: "US" },
+  { ticker: "GLD", name: "SPDR Gold Shares", market: "US" },
+  { ticker: "SLV", name: "iShares Silver Trust", market: "US" },
+  { ticker: "TLT", name: "iShares 20+ Year Treasury", market: "US" },
+  { ticker: "VTI", name: "Vanguard Total Stock Market", market: "US" },
+  { ticker: "VOO", name: "Vanguard S&P 500 ETF", market: "US" },
+  // Indian Stocks
+  { ticker: "RELIANCE", name: "Reliance Industries", market: "IN" },
+  { ticker: "TCS", name: "Tata Consultancy Services", market: "IN" },
+  { ticker: "HDFCBANK", name: "HDFC Bank", market: "IN" },
+  { ticker: "INFY", name: "Infosys Ltd.", market: "IN" },
+  { ticker: "ICICIBANK", name: "ICICI Bank", market: "IN" },
+  { ticker: "HINDUNILVR", name: "Hindustan Unilever", market: "IN" },
+  { ticker: "ITC", name: "ITC Ltd.", market: "IN" },
+  { ticker: "SBIN", name: "State Bank of India", market: "IN" },
+  { ticker: "BHARTIARTL", name: "Bharti Airtel", market: "IN" },
+  { ticker: "KOTAKBANK", name: "Kotak Mahindra Bank", market: "IN" },
+  { ticker: "BAJFINANCE", name: "Bajaj Finance", market: "IN" },
+  { ticker: "LT", name: "Larsen & Toubro", market: "IN" },
+  { ticker: "WIPRO", name: "Wipro Ltd.", market: "IN" },
+  { ticker: "AXISBANK", name: "Axis Bank", market: "IN" },
+  { ticker: "MARUTI", name: "Maruti Suzuki", market: "IN" },
+  { ticker: "TITAN", name: "Titan Company", market: "IN" },
+  { ticker: "ASIANPAINT", name: "Asian Paints", market: "IN" },
+  { ticker: "NTPC", name: "NTPC Ltd.", market: "IN" },
+  { ticker: "ONGC", name: "Oil & Natural Gas Corp.", market: "IN" },
+  { ticker: "POWERGRID", name: "Power Grid Corp.", market: "IN" },
+  { ticker: "SUNPHARMA", name: "Sun Pharmaceutical", market: "IN" },
+  { ticker: "ULTRACEMCO", name: "UltraTech Cement", market: "IN" },
+  { ticker: "HCLTECH", name: "HCL Technologies", market: "IN" },
+  { ticker: "TATAMOTORS", name: "Tata Motors", market: "IN" },
+  { ticker: "NESTLEIND", name: "Nestlé India", market: "IN" },
+  { ticker: "M&M", name: "Mahindra & Mahindra", market: "IN" },
+  { ticker: "TATASTEEL", name: "Tata Steel", market: "IN" },
+  { ticker: "INDUSINDBK", name: "IndusInd Bank", market: "IN" },
+  { ticker: "BAJAJFINSV", name: "Bajaj Finserv", market: "IN" },
+  { ticker: "DRREDDY", name: "Dr. Reddy's Labs", market: "IN" },
+  { ticker: "CIPLA", name: "Cipla Ltd.", market: "IN" },
+  { ticker: "HEROMOTOCO", name: "Hero MotoCorp", market: "IN" },
+  { ticker: "EICHERMOT", name: "Eicher Motors", market: "IN" },
+  { ticker: "BRITANNIA", name: "Britannia Industries", market: "IN" },
+  { ticker: "HDFCLIFE", name: "HDFC Life Insurance", market: "IN" },
+  { ticker: "SBILIFE", name: "SBI Life Insurance", market: "IN" },
+  { ticker: "BPCL", name: "Bharat Petroleum", market: "IN" },
+  { ticker: "HINDALCO", name: "Hindalco Industries", market: "IN" },
+  { ticker: "DIVISLAB", name: "Divi's Laboratories", market: "IN" },
+  { ticker: "COALINDIA", name: "Coal India Ltd.", market: "IN" },
+  { ticker: "ADANIPORTS", name: "Adani Ports & SEZ", market: "IN" },
+  { ticker: "GRASIM", name: "Grasim Industries", market: "IN" },
+  { ticker: "JSWSTEEL", name: "JSW Steel", market: "IN" },
+  { ticker: "TATACONSUM", name: "Tata Consumer Products", market: "IN" },
+  { ticker: "HDFC", name: "Housing Development Finance", market: "IN" },
+];
 
 interface InputPanelProps {
   initialInputs: PricingRequest;
@@ -34,6 +145,9 @@ export function InputPanel({
   const [inputs, setInputs] = useState<PricingRequest>(initialInputs);
   const [seedLocked, setSeedLocked] = useState<boolean>(false);
   const [fetchingMarket, setFetchingMarket] = useState<boolean>(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Debounce preview-triggering inputs (~200ms)
   const debouncedInputs = useDebounce(inputs, 200);
@@ -60,6 +174,68 @@ export function InputPanel({
       return next;
     });
   };
+
+  // Filtered ticker suggestions for autocomplete
+  const filteredTickers = useMemo(() => {
+    const q = inputs.ticker.toUpperCase().trim();
+    if (!q) return [];
+    return TICKER_DATABASE.filter(
+      (t) => t.market === inputs.market && t.ticker.startsWith(q)
+    ).slice(0, 10);
+  }, [inputs.ticker, inputs.market]);
+
+  const selectTicker = useCallback(
+    (ticker: string) => {
+      updateField("ticker", ticker);
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    },
+    [updateField]
+  );
+
+  const handleTickerKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!showDropdown || filteredTickers.length === 0) return;
+
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setActiveIndex((prev) =>
+            prev < filteredTickers.length - 1 ? prev + 1 : 0
+          );
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setActiveIndex((prev) =>
+            prev > 0 ? prev - 1 : filteredTickers.length - 1
+          );
+          break;
+        case "Enter":
+          if (activeIndex >= 0 && activeIndex < filteredTickers.length) {
+            e.preventDefault();
+            selectTicker(filteredTickers[activeIndex].ticker);
+          }
+          break;
+        case "Escape":
+          setShowDropdown(false);
+          setActiveIndex(-1);
+          break;
+      }
+    },
+    [showDropdown, filteredTickers, activeIndex, selectTicker]
+  );
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+        setActiveIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Auto-fetch market quote when ticker or market changes
   const handleMarketFetch = async () => {
@@ -159,14 +335,43 @@ export function InputPanel({
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-2 flex gap-2">
-            <input
-              type="text"
-              value={inputs.ticker}
-              onChange={(e) => updateField("ticker", e.target.value.toUpperCase())}
-              placeholder="Ticker (e.g. AAPL)"
-              className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
-            />
+          <div ref={containerRef} className="sm:col-span-2 flex gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={inputs.ticker}
+                onChange={(e) => {
+                  updateField("ticker", e.target.value.toUpperCase());
+                  setShowDropdown(true);
+                  setActiveIndex(-1);
+                }}
+                onKeyDown={handleTickerKeyDown}
+                onFocus={() => setShowDropdown(true)}
+                placeholder="Ticker (e.g. AAPL)"
+                className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
+              />
+              {showDropdown && filteredTickers.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+                  {filteredTickers.map((entry, idx) => (
+                    <div
+                      key={entry.ticker}
+                      onMouseDown={() => selectTicker(entry.ticker)}
+                      className={`px-3 py-2 cursor-pointer flex items-center justify-between ${
+                        idx === activeIndex
+                          ? "bg-blue-900/60 text-white"
+                          : "text-gray-300 hover:bg-gray-800"
+                      }`}
+                    >
+                      <div>
+                        <span className="font-mono font-bold text-sm">{entry.ticker}</span>
+                        <span className="text-xs text-gray-500 ml-2">{entry.name}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-500 font-mono">{entry.market}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               type="button"
               onClick={handleMarketFetch}
