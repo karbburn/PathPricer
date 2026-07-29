@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { InputPanel } from "./InputPanel";
 import { ResultsPanel } from "./ResultsPanel";
+import { ExportControls } from "./ExportControls";
 import { ChartTabContainer } from "./charts/ChartTabContainer";
 import { postPriceFull, ApiError } from "@/lib/api-client";
 import { getEffectiveInputs, serializeInputs } from "@/lib/url-state";
@@ -16,12 +17,10 @@ import {
 function WorkspaceContent() {
   const searchParams = useSearchParams();
 
-  // Read URL search params directly on mount/update
-  const initialInputs = getEffectiveInputs(
+  const inputs = getEffectiveInputs(
     Object.fromEntries(searchParams.entries())
   );
 
-  const [inputs, setInputs] = useState<PricingRequest>(initialInputs);
   const [previewResult, setPreviewResult] =
     useState<PricingPreviewResponse | null>(null);
   const [fullResult, setFullResult] = useState<PricingFullResponse | null>(null);
@@ -32,21 +31,12 @@ function WorkspaceContent() {
   const [isFullSimulating, setIsFullSimulating] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
 
-  // Sync inputs state when URL search params change
-  useEffect(() => {
-    const updated = getEffectiveInputs(
-      Object.fromEntries(searchParams.entries())
-    );
-    setInputs(updated); // eslint-disable-line react-hooks/set-state-in-effect
-  }, [searchParams]);
-
-  // When inputs change, reset to preview tier unless full simulation is re-run
-  const handleInputsChange = useCallback((nextInputs: PricingRequest) => {
-    setInputs(nextInputs);
+  // Reset to preview tier when URL params change (unless full sim was just run)
+  const handleInputsChange = () => {
     if (activeTier === "full") {
       setActiveTier("preview");
     }
-  }, [activeTier]);
+  };
 
   const handlePreviewSuccess = useCallback(
     (result: PricingPreviewResponse) => {
@@ -66,7 +56,7 @@ function WorkspaceContent() {
     []
   );
 
-  // Full simulation trigger - manual only
+  // Full Simulation Trigger Handler (Doc 7 §6 — Never automatic)
   const handleRunFullSimulation = async (targetInputs: PricingRequest) => {
     setIsFullSimulating(true);
     setError(null);
@@ -126,7 +116,7 @@ function WorkspaceContent() {
           />
         </div>
 
-        {/* Right Column: Results & Analytics + Tabbed Charts */}
+        {/* Right Column: Results & Analytics + Export Suite + Tabbed Charts */}
         <div className="lg:col-span-7 space-y-6">
           <ResultsPanel
             microState={microState}
@@ -136,6 +126,8 @@ function WorkspaceContent() {
             activeTier={activeTier}
             isFullSimulating={isFullSimulating}
           />
+
+          <ExportControls fullResult={fullResult} request={inputs} />
 
           <ChartTabContainer request={inputs} fullResult={fullResult} />
         </div>
