@@ -43,7 +43,9 @@ export function downloadCsv(fullResult: PricingFullResponse) {
 
   fullResult.mc_results.forEach((mc) => {
     rows.push([
-      mc.method.replace("_", " ").toUpperCase(),
+      mc.method === "quasi_monte_carlo"
+        ? "RANDOMIZED QMC (SOBOL)"
+        : mc.method.replace(/_/g, " ").toUpperCase(),
       mc.price.toFixed(4),
       mc.standard_error.toFixed(4),
       mc.ci_lower.toFixed(2),

@@ -28,7 +28,10 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
       const errPlus = mc.ci_upper - mc.price;
 
       return {
-        name: mc.method.replace("_", " ").toUpperCase(),
+        name:
+          mc.method === "quasi_monte_carlo"
+            ? "RQMC (SOBOL)"
+            : mc.method.replace(/_/g, " ").toUpperCase(),
         price: Number(mc.price.toFixed(4)),
         ci_lower: Number(mc.ci_lower.toFixed(4)),
         ci_upper: Number(mc.ci_upper.toFixed(4)),

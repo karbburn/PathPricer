@@ -235,7 +235,9 @@ def generate_report(pricing_response: PricingFullResponse) -> bytes:
     mc_rows = [mc_header]
     for mc in resp.mc_results:
         mc_rows.append([
-            mc.method.replace("_", " ").title(),
+            "Randomized QMC (Sobol)"
+            if mc.method == "quasi_monte_carlo"
+            else mc.method.replace("_", " ").title(),
             format_price(mc.price, 4),
             format_price(mc.standard_error, 4),
             f"[{format_price(mc.ci_lower, 2)}, {format_price(mc.ci_upper, 2)}]",
