@@ -109,8 +109,8 @@ function WorkspaceContent() {
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
             Option Pricing Workspace
           </h1>
-          <p className="text-sm text-slate-400">
-            Interactive Monte Carlo simulation workspace &bull; URL search params drive all state
+          <p className="text-sm text-slate-300">
+            Interactive Monte Carlo simulation workspace
           </p>
         </div>
       </div>

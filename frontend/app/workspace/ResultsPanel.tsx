@@ -464,7 +464,7 @@ export function ResultsPanel({
             <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1">
               Black-Scholes (Indicative)
             </span>
-            <div className="text-3xl font-bold text-slate-300 font-mono">
+            <div className="text-4xl font-black text-slate-300 font-mono">
               {currencySymbol}{previewResult.black_scholes.price.toFixed(2)}
             </div>
             <div className="mt-3 flex gap-4 text-xs font-mono text-slate-400">
@@ -477,7 +477,7 @@ export function ResultsPanel({
             <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1">
               Standard MC (Indicative)
             </span>
-            <div className="text-3xl font-bold text-slate-300 font-mono">
+            <div className="text-4xl font-black text-slate-300 font-mono">
               {currencySymbol}{previewResult.monte_carlo_standard.price.toFixed(2)}
             </div>
             <div className="mt-3 flex gap-4 text-xs font-mono text-slate-400">
