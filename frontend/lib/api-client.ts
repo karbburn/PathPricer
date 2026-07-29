@@ -1,7 +1,7 @@
 /**
  * API Client module.
  *
- * Typed fetch wrappers matching backend FastAPI endpoints (Doc 6).
+ * Typed fetch wrappers for backend FastAPI endpoints.
  */
 
 import {

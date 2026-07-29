@@ -26,7 +26,7 @@ export default function MarketOverviewPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
 
-  // Manual fallback input state for 404 / resolution failures (PRD §5)
+  // Manual fallback input state for 404 / resolution failures
   const [manualSpot, setManualSpot] = useState<string>("100.00");
   const [manualVol, setManualVol] = useState<string>("0.25");
   const [manualDiv, setManualDiv] = useState<string>("0.00");
@@ -187,7 +187,7 @@ export default function MarketOverviewPage() {
         </div>
       )}
 
-      {/* 404 Error State & Manual Fallback Form (PRD §5) */}
+      {/* 404 Error State & Manual Fallback Form */}
       {!loading && error && (
         <div className="bg-red-950/40 border border-red-800 rounded-lg p-6 mb-8">
           <div className="flex items-start gap-3 mb-4">
@@ -203,7 +203,7 @@ export default function MarketOverviewPage() {
           {error.fallback_available && (
             <div className="mt-6 pt-6 border-t border-red-900/60 bg-gray-950 p-6 rounded border border-gray-800">
               <h4 className="text-sm font-bold text-white mb-2">
-                Manual Spot Price Fallback Entry (PRD §5)
+                Manual Spot Price Fallback Entry
               </h4>
               <p className="text-xs text-gray-400 mb-4">
                 Since live market data for symbol &apos;{error.field || tickerInput}&apos; could not be retrieved, enter manual parameters below to proceed directly to the Pricing Workspace:

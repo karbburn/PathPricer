@@ -722,23 +722,23 @@ export function InputPanel({
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Helper to update a field in state and notify parent / update URL
-  const updateField = <K extends keyof PricingRequest>(
-    field: K,
-    value: PricingRequest[K]
-  ) => {
-    setInputs((prev) => {
-      const next = { ...prev, [field]: value };
-      onInputsChange(next);
+  const updateField = useCallback(
+    <K extends keyof PricingRequest>(field: K, value: PricingRequest[K]) => {
+      setInputs((prev) => {
+        const next = { ...prev, [field]: value };
+        onInputsChange(next);
 
-      // Update URL search query string dynamically without full page reload
-      if (typeof window !== "undefined") {
-        const queryStr = serializeInputs(next);
-        const newUrl = `${window.location.pathname}?${queryStr}`;
-        window.history.replaceState(null, "", newUrl);
-      }
-      return next;
-    });
-  };
+        // Update URL search query string dynamically without full page reload
+        if (typeof window !== "undefined") {
+          const queryStr = serializeInputs(next);
+          const newUrl = `${window.location.pathname}?${queryStr}`;
+          window.history.replaceState(null, "", newUrl);
+        }
+        return next;
+      });
+    },
+    [onInputsChange]
+  );
 
   // Filtered ticker suggestions for autocomplete
   const filteredTickers = useMemo(() => {

@@ -41,12 +41,12 @@ function WorkspaceContent() {
   }, [searchParams]);
 
   // When inputs change, reset to preview tier unless full simulation is re-run
-  const handleInputsChange = (nextInputs: PricingRequest) => {
+  const handleInputsChange = useCallback((nextInputs: PricingRequest) => {
     setInputs(nextInputs);
     if (activeTier === "full") {
       setActiveTier("preview");
     }
-  };
+  }, [activeTier]);
 
   const handlePreviewSuccess = useCallback(
     (result: PricingPreviewResponse) => {
