@@ -63,7 +63,7 @@ export default function DocsPage() {
       <section className="bg-cyan-950/40 border-2 border-cyan-500/80 rounded-lg p-6 space-y-4 shadow-xl shadow-cyan-950/30">
         <div className="flex items-center justify-between border-b border-cyan-900/80 pb-3">
           <h2 className="text-xl font-extrabold text-cyan-300 tracking-tight flex items-center gap-2">
-            <span>💡 2. Why Monte Carlo for a Problem Black-Scholes Already Solves?</span>
+            <span>2. Why Monte Carlo for a Problem Black-Scholes Already Solves?</span>
           </h2>
           <span className="text-xs px-2.5 py-0.5 rounded bg-cyan-900 text-cyan-200 border border-cyan-700 font-mono font-bold">
             Core Intellectual Claim

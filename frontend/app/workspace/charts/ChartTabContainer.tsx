@@ -40,7 +40,8 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
                 : "text-slate-400 hover:text-white hover:bg-slate-900"
             }`}
           >
-            📈 Asset Paths
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Asset Paths
           </button>
 
           <button
@@ -52,7 +53,8 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
                 : "text-slate-400 hover:text-white hover:bg-slate-900"
             }`}
           >
-            📊 Terminal Distribution
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="12" width="3" height="9"/><rect x="14" y="7" width="3" height="14"/></svg>
+            Terminal Distribution
           </button>
 
           <button
@@ -64,7 +66,8 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
                 : "text-slate-400 hover:text-white hover:bg-slate-900"
             }`}
           >
-            🎯 Payoff Diagram
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            Payoff Diagram
           </button>
 
           <button
@@ -76,7 +79,8 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
                 : "text-slate-400 hover:text-white hover:bg-slate-900"
             }`}
           >
-            📉 Empirical Convergence
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Empirical Convergence
           </button>
 
           <button
@@ -88,7 +92,8 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
                 : "text-slate-400 hover:text-white hover:bg-slate-900"
             }`}
           >
-            ⚖️ MC vs BS Comparison
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8 7 4 3 0 7"/><polyline points="16 17 20 21 24 17"/><circle cx="4" cy="3" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+            MC vs BS
           </button>
         </div>
 
@@ -98,7 +103,8 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           onClick={handleExportPng}
           className="px-3 py-1.5 text-xs font-mono font-semibold rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-cyan-500 transition-colors flex items-center justify-center gap-1.5 self-end sm:self-auto"
         >
-          <span>🖼️ Export PNG</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Export PNG</span>
         </button>
       </div>
 

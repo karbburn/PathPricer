@@ -1252,7 +1252,7 @@ export function InputPanel({
               disabled={seedLocked}
               className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50"
             >
-              🎲 Randomize
+              Randomize
             </button>
             <button
               type="button"
@@ -1263,7 +1263,7 @@ export function InputPanel({
                   : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
               }`}
             >
-              {seedLocked ? "🔒 Locked" : "🔓 Unlocked"}
+              {seedLocked ? "Locked" : "Unlocked"}
             </button>
           </div>
         </div>
