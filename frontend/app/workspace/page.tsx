@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { InputPanel } from "./InputPanel";
 import { ResultsPanel } from "./ResultsPanel";
+import { ChartTabContainer } from "./charts/ChartTabContainer";
 import { postPriceFull, ApiError } from "@/lib/api-client";
 import { getEffectiveInputs, serializeInputs } from "@/lib/url-state";
 import {
@@ -65,7 +66,7 @@ function WorkspaceContent() {
     []
   );
 
-  // Full Simulation Trigger Handler
+  // Full simulation trigger - manual only
   const handleRunFullSimulation = async (targetInputs: PricingRequest) => {
     setIsFullSimulating(true);
     setError(null);
@@ -110,7 +111,7 @@ function WorkspaceContent() {
         </div>
       </div>
 
-      {/* Primary Workspace Grid: Input Panel (left) vs Results & Diagnostics (right) */}
+      {/* Primary Workspace Grid: Input Panel (left) vs Results & Analytics (right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Inputs Panel */}
         <div className="lg:col-span-5">
@@ -125,7 +126,7 @@ function WorkspaceContent() {
           />
         </div>
 
-        {/* Right Column: Results & Analytics */}
+        {/* Right Column: Results & Analytics + Tabbed Charts */}
         <div className="lg:col-span-7 space-y-6">
           <ResultsPanel
             microState={microState}
@@ -135,6 +136,8 @@ function WorkspaceContent() {
             activeTier={activeTier}
             isFullSimulating={isFullSimulating}
           />
+
+          <ChartTabContainer request={inputs} fullResult={fullResult} />
         </div>
       </div>
     </div>
