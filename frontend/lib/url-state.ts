@@ -8,7 +8,7 @@
 import { MarketRegion, OptionType, PricingRequest, VarianceReductionMethod } from "./types";
 
 export const DEFAULT_PRICING_REQUEST: PricingRequest = {
-  ticker: "AAPL",
+  ticker: "",
   market: "US",
   spot_override: null,
   strike: 350,

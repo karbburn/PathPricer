@@ -22,9 +22,6 @@ export default function RootLayout({
               <Link href="/" className="text-xl font-bold tracking-tight text-blue-400">
                 PathPricer
               </Link>
-              <span className="text-xs px-2 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-700">
-                v1.0
-              </span>
             </div>
             <nav className="flex items-center gap-6 text-sm font-medium">
               <Link href="/" className="hover:text-blue-400 transition-colors">

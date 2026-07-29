@@ -781,9 +781,11 @@ export function InputPanel({
           );
           break;
         case "Enter":
+          e.preventDefault();
           if (activeIndex >= 0 && activeIndex < filteredTickers.length) {
-            e.preventDefault();
             selectTicker(filteredTickers[activeIndex].ticker);
+          } else if (filteredTickers.length > 0) {
+            selectTicker(filteredTickers[0].ticker);
           }
           break;
         case "Escape":
@@ -937,17 +939,17 @@ export function InputPanel({
                   {filteredTickers.length > 0 ? (
                     <>
                       <div className="px-3 py-1.5 text-[10px] text-gray-500 font-mono border-b border-gray-800">
-                        {filteredTickers.length} match{filteredTickers.length !== 1 ? "es" : ""}
+                        {filteredTickers.length} MATCH{filteredTickers.length !== 1 ? "ES" : ""}
                       </div>
                       {filteredTickers.map((entry, idx) => (
                         <div
                           key={entry.ticker}
                           data-ticker-item
                           onMouseDown={() => selectTicker(entry.ticker)}
-                          className={`px-3 py-2 cursor-pointer flex items-center justify-between ${
+                          className={`px-3 py-2 cursor-pointer flex items-center justify-between border-l-2 ${
                             idx === activeIndex
-                              ? "bg-blue-900/60 text-white"
-                              : "text-gray-300 hover:bg-gray-800"
+                              ? "bg-amber-950/60 border-amber-500 text-white"
+                              : "text-gray-300 hover:bg-gray-800 border-transparent"
                           }`}
                         >
                           <div className="flex flex-col">
@@ -986,8 +988,13 @@ export function InputPanel({
               type="button"
               onClick={() => {
                 updateField("market", "US");
-                setTickerTouched(false);
-                setShowDropdown(false);
+                if (inputs.ticker.trim()) {
+                  setTickerTouched(true);
+                  setShowDropdown(true);
+                } else {
+                  setTickerTouched(false);
+                  setShowDropdown(false);
+                }
               }}
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "US"
@@ -1001,8 +1008,13 @@ export function InputPanel({
               type="button"
               onClick={() => {
                 updateField("market", "IN");
-                setTickerTouched(false);
-                setShowDropdown(false);
+                if (inputs.ticker.trim()) {
+                  setTickerTouched(true);
+                  setShowDropdown(true);
+                } else {
+                  setTickerTouched(false);
+                  setShowDropdown(false);
+                }
               }}
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "IN"
