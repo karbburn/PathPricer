@@ -98,7 +98,7 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4 overflow-hidden">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
             Simulated Asset Price Paths (Stepwise GBM)
           </h3>
           <p className="text-xs text-slate-300 font-mono mt-0.5">
@@ -130,9 +130,9 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
             <Tooltip content={<CustomTooltip currencySymbol={currencySymbol} />} />
             <ReferenceLine
               y={spotPrice}
-              stroke="#06b6d4"
+              stroke="#f59e0b"
               strokeDasharray="4 4"
-              label={{ value: `Spot ${currencySymbol}${spotPrice}`, fill: "#06b6d4", fontSize: 10, position: "left" }}
+              label={{ value: `Spot ${currencySymbol}${spotPrice}`, fill: "#f59e0b", fontSize: 10, position: "left" }}
             />
             <ReferenceLine
               y={strikePrice}

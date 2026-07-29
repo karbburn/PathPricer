@@ -91,7 +91,7 @@ export default function MarketOverviewPage() {
               onClick={() => setMarketInput("US")}
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
                 marketInput === "US"
-                  ? "bg-cyan-600 text-white"
+                  ? "bg-amber-600 text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -102,7 +102,7 @@ export default function MarketOverviewPage() {
               onClick={() => setMarketInput("IN")}
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
                 marketInput === "IN"
-                  ? "bg-cyan-600 text-white"
+                  ? "bg-amber-600 text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -117,7 +117,7 @@ export default function MarketOverviewPage() {
               value={tickerInput}
               onChange={(e) => setTickerInput(e.target.value.toUpperCase())}
               placeholder="Enter ticker (e.g. RELIANCE, AAPL, MSFT)"
-              className="w-full bg-slate-950 border border-slate-700 rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
+              className="w-full bg-slate-950 border border-slate-700 rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-amber-500 transition-colors"
             />
             {marketInput === "IN" && (
               <span className="absolute right-3 top-2.5 text-xs text-slate-300 font-mono">
@@ -130,7 +130,7 @@ export default function MarketOverviewPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50"
+            className="w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50"
           >
             {loading ? "Fetching..." : "Fetch Quote"}
           </button>
@@ -202,7 +202,7 @@ export default function MarketOverviewPage() {
                       step="0.01"
                       value={manualSpot}
                       onChange={(e) => setManualSpot(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-amber-500"
                     />
                   </div>
                   <div>
@@ -212,7 +212,7 @@ export default function MarketOverviewPage() {
                       step="0.01"
                       value={manualVol}
                       onChange={(e) => setManualVol(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-amber-500"
                     />
                   </div>
                   <div>
@@ -222,7 +222,7 @@ export default function MarketOverviewPage() {
                       step="0.001"
                       value={manualDiv}
                       onChange={(e) => setManualDiv(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export default function MarketOverviewPage() {
                   href={`/workspace?ticker=${encodeURIComponent(
                     tickerInput
                   )}&market=${marketInput}&spot_override=${manualSpot}&volatility=${manualVol}&dividend_yield=${manualDiv}`}
-                  className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
                 >
                   <span>Proceed to Workspace</span>
                   <span>&rarr;</span>
@@ -256,7 +256,7 @@ export default function MarketOverviewPage() {
                   {quote.market} &bull; {quote.resolved_symbol}
                 </span>
                 {quote.currency && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">
+                  <span className="text-xs px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-mono">
                     {quote.currency}
                   </span>
                 )}
@@ -290,7 +290,7 @@ export default function MarketOverviewPage() {
               )}&market=${quote.market}&spot_override=${quote.spot_price}&volatility=${
                 quote.historical_volatility["252d"] || 0.25
               }&dividend_yield=${quote.dividend_yield}`}
-              className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-cyan-950/40 flex items-center gap-2"
+              className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-amber-950/40 flex items-center gap-2"
             >
               <span>Open in Pricing Workspace</span>
               <span>&rarr;</span>
@@ -309,7 +309,7 @@ export default function MarketOverviewPage() {
 
           {/* Historical Volatility Grid */}
           <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-            <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-4">
+            <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4">
               Realized Historical Volatility (Close-to-Close Log Returns)
             </h3>
 
@@ -334,7 +334,7 @@ export default function MarketOverviewPage() {
               </div>
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
                 <span className="text-xs text-slate-300 font-mono block mb-1">252-Day Vol (1 Year)</span>
-                <span className="text-xl font-bold font-mono text-cyan-400">
+                <span className="text-xl font-bold font-mono text-amber-400">
                   {formatPercent(quote.historical_volatility["252d"] || 0)}
                 </span>
               </div>

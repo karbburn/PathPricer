@@ -48,14 +48,14 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
             MC Estimator Prices &amp; 95% Confidence Intervals vs BS Benchmark
           </h3>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
             Error bars reflect [&plusmn;1.96 SE] confidence width &bull; Reference line = BS analytical benchmark
           </p>
         </div>
-        <span className="text-xs font-mono font-bold text-cyan-300 bg-slate-950 px-2.5 py-1 rounded border border-slate-800">
+        <span className="text-xs font-mono font-bold text-amber-300 bg-slate-950 px-2.5 py-1 rounded border border-slate-800">
           BS: {currencySymbol}{bsPrice.toFixed(4)}
         </span>
       </div>
@@ -93,9 +93,9 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
             {/* Black-Scholes Benchmark Line */}
             <ReferenceLine
               y={bsPrice}
-              stroke="#06b6d4"
+              stroke="#f59e0b"
               strokeWidth={2}
-              label={{ value: `BS Benchmark ${currencySymbol}${bsPrice.toFixed(4)}`, fill: "#06b6d4", fontSize: 11, position: "top" }}
+              label={{ value: `BS Benchmark ${currencySymbol}${bsPrice.toFixed(4)}`, fill: "#f59e0b", fontSize: 11, position: "top" }}
             />
 
             {/* MC Estimator Price Bars with 95% CI Error Bars */}

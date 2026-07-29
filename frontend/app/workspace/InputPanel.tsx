@@ -912,7 +912,7 @@ export function InputPanel({
 
       {/* 1. Underlying Ticker & Market Selection */}
       <div className="space-y-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
           Underlying Asset
         </label>
 
@@ -1060,7 +1060,7 @@ export function InputPanel({
       {/* 2. Option Type & Strike Price */}
       <div className="space-y-3 pt-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-cyan-400">
+          <label className="text-xs font-bold uppercase tracking-wider text-amber-400">
             Contract Terms
           </label>
           <div className="flex bg-slate-950 p-1 rounded border border-slate-700">
@@ -1108,7 +1108,7 @@ export function InputPanel({
             step="1"
             value={inputs.strike}
             onChange={(e) => updateField("strike", Number(e.target.value))}
-            className="w-full accent-blue-500 cursor-pointer"
+            className="w-full accent-amber-500 cursor-pointer"
           />
         </div>
 
@@ -1126,7 +1126,7 @@ export function InputPanel({
 
       {/* 3. Market Risk Parameters (Vol & Rate) */}
       <div className="space-y-3 pt-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
           Risk &amp; Volatility Parameters
         </label>
 
@@ -1151,7 +1151,7 @@ export function InputPanel({
             step="0.01"
             value={inputs.volatility}
             onChange={(e) => updateField("volatility", Number(e.target.value))}
-            className="w-full accent-blue-500 cursor-pointer"
+            className="w-full accent-amber-500 cursor-pointer"
           />
         </div>
 
@@ -1176,14 +1176,14 @@ export function InputPanel({
             step="0.0025"
             value={inputs.risk_free_rate}
             onChange={(e) => updateField("risk_free_rate", Number(e.target.value))}
-            className="w-full accent-blue-500 cursor-pointer"
+            className="w-full accent-amber-500 cursor-pointer"
           />
         </div>
       </div>
 
       {/* 4. Simulation Engine Controls */}
       <div className="space-y-3 pt-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
           Simulation Controls
         </label>
 
@@ -1215,7 +1215,7 @@ export function InputPanel({
             step="5000"
             value={inputs.n_simulations}
             onChange={(e) => updateField("n_simulations", Number(e.target.value))}
-            className="w-full accent-blue-500 cursor-pointer"
+            className="w-full accent-amber-500 cursor-pointer"
           />
         </div>
 

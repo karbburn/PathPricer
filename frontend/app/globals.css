@@ -6,7 +6,7 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0e17;
+  background: #0c1018;
 }
 ::-webkit-scrollbar-thumb {
   background: #334155;
@@ -17,7 +17,7 @@
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0a0e17;
+  scrollbar-color: #334155 #0c1018;
 }
 
 /* ── Custom range slider ── */
@@ -36,26 +36,26 @@ input[type="range"]::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #06b6d4;
-  border: 2px solid #0a0e17;
-  box-shadow: 0 0 0 2px #06b6d433;
+  background: #f59e0b;
+  border: 2px solid #0c1018;
+  box-shadow: 0 0 0 2px #f59e0b33;
   cursor: grab;
   transition: box-shadow 0.15s ease-in-out;
 }
 input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 4px #06b6d433;
+  box-shadow: 0 0 0 4px #f59e0b33;
 }
 input[type="range"]::-webkit-slider-thumb:active {
   cursor: grabbing;
-  box-shadow: 0 0 0 6px #06b6d433;
+  box-shadow: 0 0 0 6px #f59e0b33;
 }
 input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #06b6d4;
-  border: 2px solid #0a0e17;
-  box-shadow: 0 0 0 2px #06b6d433;
+  background: #f59e0b;
+  border: 2px solid #0c1018;
+  box-shadow: 0 0 0 2px #f59e0b33;
   cursor: grab;
 }
 input[type="range"]::-moz-range-track {

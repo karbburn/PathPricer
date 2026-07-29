@@ -53,7 +53,7 @@ export default function ValidationPage() {
           </p>
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded text-xs font-mono text-cyan-300">
+        <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded text-xs font-mono text-amber-300">
           <span className="text-slate-300 block text-xs">VERIFICATION SOURCE:</span>
           Static CI Artifact (GET /validation/summary)
         </div>
@@ -133,12 +133,12 @@ export default function ValidationPage() {
                 <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                   Edge-Case Test Suite
                 </span>
-                <span className="text-xs bg-cyan-950 text-cyan-300 border border-cyan-800 px-2 py-0.5 rounded font-mono">
+                <span className="text-xs bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono">
                   ✓ 100% Passed
                 </span>
               </div>
 
-              <div className="text-4xl font-extrabold text-cyan-300 font-mono my-2">
+              <div className="text-4xl font-extrabold text-amber-300 font-mono my-2">
                 {summary.edge_cases.passed} / {summary.edge_cases.total}
               </div>
 
@@ -177,7 +177,7 @@ export default function ValidationPage() {
 
           {/* Greeks Validation Tolerances Table */}
           <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-            <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider mb-4">
               Greeks Finite-Difference Validation Tolerances
             </h3>
 
@@ -196,7 +196,7 @@ export default function ValidationPage() {
                   <tr>
                     <td className="p-3 font-bold text-white">Delta (&Delta;)</td>
                     <td className="p-3 text-slate-300">Spot Sensitivity (&partial;V / &partial;S)</td>
-                    <td className="p-3 text-right font-bold text-cyan-300">
+                    <td className="p-3 text-right font-bold text-amber-300">
                       &le; {((summary.greeks_validation.tolerances.delta ?? 0.02) * 100).toFixed(1)}%
                     </td>
                     <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
@@ -209,7 +209,7 @@ export default function ValidationPage() {
                   <tr>
                     <td className="p-3 font-bold text-white">Gamma (&Gamma;)</td>
                     <td className="p-3 text-slate-300">Convexity (&partial;&sup2;V / &partial;S&sup2;)</td>
-                    <td className="p-3 text-right font-bold text-cyan-300">
+                    <td className="p-3 text-right font-bold text-amber-300">
                       &le; {((summary.greeks_validation.tolerances.gamma ?? 0.05) * 100).toFixed(1)}%
                     </td>
                     <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
@@ -222,7 +222,7 @@ export default function ValidationPage() {
                   <tr>
                     <td className="p-3 font-bold text-white">Vega (&nu;)</td>
                     <td className="p-3 text-slate-300">Volatility Sensitivity (&partial;V / &partial;&sigma;)</td>
-                    <td className="p-3 text-right font-bold text-cyan-300">
+                    <td className="p-3 text-right font-bold text-amber-300">
                       &le; {((summary.greeks_validation.tolerances.vega ?? 0.03) * 100).toFixed(1)}%
                     </td>
                     <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
@@ -235,7 +235,7 @@ export default function ValidationPage() {
                   <tr>
                     <td className="p-3 font-bold text-white">Theta (&theta;)</td>
                     <td className="p-3 text-slate-300">Time Decay (&partial;V / &partial;t)</td>
-                    <td className="p-3 text-right font-bold text-cyan-300">
+                    <td className="p-3 text-right font-bold text-amber-300">
                       &le; {((summary.greeks_validation.tolerances.theta ?? 0.05) * 100).toFixed(1)}%
                     </td>
                     <td className="p-3 text-center text-slate-300">One-Sided Difference</td>
@@ -248,7 +248,7 @@ export default function ValidationPage() {
                   <tr>
                     <td className="p-3 font-bold text-white">Rho (&rho;)</td>
                     <td className="p-3 text-slate-300">Interest Rate Sensitivity (&partial;V / &partial;r)</td>
-                    <td className="p-3 text-right font-bold text-cyan-300">
+                    <td className="p-3 text-right font-bold text-amber-300">
                       &le; {((summary.greeks_validation.tolerances.rho ?? 0.03) * 100).toFixed(1)}%
                     </td>
                     <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
@@ -265,7 +265,7 @@ export default function ValidationPage() {
 
           {/* Empirical Convergence Proof Card */}
           <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-            <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider mb-2">
+            <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider mb-2">
               Empirical Monte Carlo Convergence Proof ($\mathcal{"{"}O{"}"}(N^{-1/2})$)
             </h3>
             <p className="text-xs text-slate-300 font-mono mb-4">
@@ -275,7 +275,7 @@ export default function ValidationPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
                 <span className="text-xs text-slate-300 block mb-1">Empirical Fitted Slope</span>
-                <div className="text-2xl font-extrabold text-cyan-300">-0.497</div>
+                <div className="text-2xl font-extrabold text-amber-300">-0.497</div>
                 <span className="text-xs text-slate-300 mt-1 block">Target: -0.500 (Central Limit Theorem)</span>
               </div>
 

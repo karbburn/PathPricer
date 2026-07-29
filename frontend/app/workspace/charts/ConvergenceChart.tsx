@@ -116,7 +116,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
             Monte Carlo Empirical Convergence Rate ($\log \widehat{"{"}SE{"}"}$ vs $\log N$)
           </h3>
           <p className="text-xs text-slate-300 font-mono mt-0.5">
@@ -124,7 +124,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
           </p>
         </div>
         <div className="text-right">
-          <span className="text-sm font-extrabold font-mono text-cyan-300 block">
+          <span className="text-sm font-extrabold font-mono text-amber-300 block">
             Slope = {fit.slope.toFixed(3)}
           </span>
           <span className="text-xs text-slate-300 font-mono">
@@ -137,7 +137,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         <button
           type="button"
           onClick={handleResetZoom}
-          className="text-xs font-mono text-cyan-400 hover:text-cyan-300 border border-cyan-800 rounded px-2 py-1 transition-colors"
+          className="text-xs font-mono text-amber-400 hover:text-amber-300 border border-amber-800 rounded px-2 py-1 transition-colors"
         >
           Reset zoom
         </button>
@@ -181,14 +181,14 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
                 fontFamily: "monospace",
                 color: "#e2e8f0",
               }}
-              cursor={{ stroke: "#06b6d4", strokeWidth: 1, strokeDasharray: "4 4" }}
+              cursor={{ stroke: "#f59e0b", strokeWidth: 1, strokeDasharray: "4 4" }}
               formatter={(val: unknown, name: unknown) => [
                 Number(val).toFixed(4),
                 name === "logSe" ? "Empirical log10(SE)" : "Fitted log10(SE)",
               ]}
             />
 
-            <Scatter name="logSe" dataKey="logSe" fill="#06b6d4" />
+            <Scatter name="logSe" dataKey="logSe" fill="#f59e0b" />
 
             <Line
               type="linear"
@@ -205,7 +205,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
                 x1={Number(refAreaLeft)}
                 x2={Number(refAreaRight)}
                 strokeOpacity={0.3}
-                fill="#06b6d4"
+                fill="#f59e0b"
                 fillOpacity={0.1}
               />
             )}

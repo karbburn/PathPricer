@@ -54,7 +54,7 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
             Deterministic Option Payoff Diagram at Expiry
           </h3>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
@@ -100,9 +100,9 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
             />
             <ReferenceLine
               x={S0}
-              stroke="#06b6d4"
+              stroke="#f59e0b"
               strokeDasharray="4 4"
-              label={{ value: `Spot ${currencySymbol}${S0}`, fill: "#06b6d4", fontSize: 10, position: "left" }}
+              label={{ value: `Spot ${currencySymbol}${S0}`, fill: "#f59e0b", fontSize: 10, position: "left" }}
             />
             <ReferenceLine
               x={breakeven}

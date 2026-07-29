@@ -80,7 +80,7 @@ export function ResultsPanel({
   // Full Simulation Computing State (Elapsed Time Timer)
   if (isFullSimulating) {
     return (
-      <div className="bg-slate-900 border border-cyan-500/60 rounded-lg p-8 space-y-6">
+      <div className="bg-slate-900 border border-amber-500/60 rounded-lg p-8 space-y-6">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight">
@@ -95,9 +95,9 @@ export function ResultsPanel({
 
         <div className="py-12 text-center space-y-4">
           <div className="flex justify-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-            <div className="h-2 w-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-            <div className="h-2 w-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+            <div className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="h-2 w-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
           <div className="space-y-2">
             <div className="animate-shimmer h-4 w-48 mx-auto rounded" />
@@ -132,7 +132,7 @@ export function ResultsPanel({
     return (
       <div className="space-y-6">
         {/* Header Strip with Validated PreviewBadge */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900 border-2 border-cyan-500/80 rounded-lg p-4 gap-4 shadow-lg shadow-cyan-950/40">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900 border-2 border-amber-500/80 rounded-lg p-4 gap-4 shadow-lg shadow-amber-950/40">
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight">
               Validated Pricing Results
@@ -150,8 +150,8 @@ export function ResultsPanel({
 
         {/* 1. Headline Price Comparison Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-slate-900 border border-cyan-600/60 rounded-lg p-6 shadow-md">
-            <span className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider block mb-1">
+          <div className="bg-slate-900 border border-amber-600/60 rounded-lg p-6 shadow-md">
+            <span className="text-xs font-extrabold text-amber-400 uppercase tracking-wider block mb-1">
               Black-Scholes Benchmark
             </span>
             <div className="text-4xl font-black text-white font-mono tracking-tight">
@@ -177,7 +177,7 @@ export function ResultsPanel({
 
         {/* 2. Analytical Greeks Table (all 5 side-by-side) */}
         <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-          <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider mb-3">
+          <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider mb-3">
             Analytical Greeks (Black-Scholes Closed-Form)
           </h3>
           <div className="grid grid-cols-5 gap-2 text-center font-mono">
@@ -217,7 +217,7 @@ export function ResultsPanel({
         {/* 3. Monte Carlo Estimator Comparison — Variance Reduction & Relative Efficiency */}
         <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">
+            <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">
               Monte Carlo Estimator Comparison &amp; Variance Reduction
             </h3>
             <span className="text-xs text-slate-400 font-mono">
@@ -245,7 +245,7 @@ export function ResultsPanel({
 
                   return (
                     <tr key={mc.method} className="hover:bg-slate-800/40">
-                      <td className="p-2.5 font-bold capitalize text-cyan-300">
+                      <td className="p-2.5 font-bold capitalize text-amber-300">
                         {mc.method.replace("_", " ")}
                       </td>
                       <td className="p-2.5 text-right font-extrabold text-white">
@@ -270,7 +270,7 @@ export function ResultsPanel({
                           <div className="w-16 bg-slate-950 h-2 rounded overflow-hidden border border-slate-800">
                             <div
                               className={`h-full ${
-                                isFocalPoint ? "bg-cyan-400" : "bg-slate-600"
+                                isFocalPoint ? "bg-amber-400" : "bg-slate-600"
                               }`}
                               style={{ width: `${barPercent}%` }}
                             ></div>
@@ -278,7 +278,7 @@ export function ResultsPanel({
                           <span
                             className={`text-sm ${
                               isFocalPoint
-                                ? "text-cyan-300 font-extrabold text-base"
+                                ? "text-amber-300 font-extrabold text-base"
                                 : "text-slate-400"
                             }`}
                           >
@@ -297,7 +297,7 @@ export function ResultsPanel({
         {/* 4. Greeks Comparison — Analytical BS vs Finite-Difference MC */}
         <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">
+            <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">
               Greeks Comparison: Analytical BS vs Finite-Difference MC (CRN)
             </h3>
             <span className="text-xs text-slate-400 font-mono">
@@ -333,7 +333,7 @@ export function ResultsPanel({
                       <td className="p-2.5 text-right text-slate-300 font-bold">
                         {bsVal.toFixed(5)}
                       </td>
-                      <td className="p-2.5 text-right text-cyan-300 font-bold">
+                      <td className="p-2.5 text-right text-amber-300 font-bold">
                         {fdVal.toFixed(5)}
                       </td>
                       {/* Delta column — explicit difference display */}
@@ -369,7 +369,7 @@ export function ResultsPanel({
 
         {/* 5. Diagnostics Panel */}
         <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-          <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider mb-3">
+          <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider mb-3">
             Simulation Diagnostics Panel
           </h3>
 
@@ -418,7 +418,7 @@ export function ResultsPanel({
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
               <span className="text-xs text-slate-300 block mb-1">Paths / Second</span>
-              <span className="text-base font-bold text-cyan-300">
+              <span className="text-base font-bold text-amber-300">
                 {stdMc ? stdMc.paths_per_second.toLocaleString() : "0"}
               </span>
             </div>

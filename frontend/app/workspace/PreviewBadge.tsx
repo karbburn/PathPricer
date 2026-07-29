@@ -20,7 +20,7 @@ interface PreviewBadgeProps {
  * - Computing: live elapsed time (not indeterminate spinner)
  * - Error: warm red/crimson
  * - Preview: muted/desaturated slate
- * - Validated: full-strength electric cyan-teal
+ * - Validated: full-strength electric amber-gold
  */
 export function PreviewBadge({
   tier,
@@ -62,9 +62,9 @@ export function PreviewBadge({
   if (tier === "computing") {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/80 text-cyan-300 text-xs font-mono font-bold shadow-md shadow-cyan-950/50 ${className}`}
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/80 text-amber-300 text-xs font-mono font-bold shadow-md shadow-amber-950/50 ${className}`}
       >
-        <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+        <span className="w-2 h-2 rounded-full bg-amber-400"></span>
         <span className="tracking-wide">
           COMPUTING &bull; {elapsedMs}ms
         </span>
@@ -88,21 +88,21 @@ export function PreviewBadge({
   if (tier === "full") {
     return (
       <div
-        className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950 border-2 border-cyan-400 text-cyan-300 text-xs font-mono font-extrabold shadow-lg shadow-cyan-950/60 ${className}`}
+        className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-950 border-2 border-amber-400 text-amber-300 text-xs font-mono font-extrabold shadow-lg shadow-amber-950/60 ${className}`}
       >
-        <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-400 text-cyan-950 font-bold text-xs">
+        <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-400 text-amber-950 font-bold text-xs">
           ✓
         </span>
         <span className="tracking-wider uppercase">
           VALIDATED &bull; N={nSimulations.toLocaleString()}
         </span>
         {computeMs !== undefined && (
-          <span className="text-cyan-400/80 font-normal border-l border-cyan-800 pl-2">
+          <span className="text-amber-400/80 font-normal border-l border-amber-800 pl-2">
             {computeMs.toFixed(1)}ms
           </span>
         )}
         {timestamp && (
-          <span className="text-cyan-500/60 text-xs hidden sm:inline">
+          <span className="text-amber-500/60 text-xs hidden sm:inline">
             [{timestamp}]
           </span>
         )}

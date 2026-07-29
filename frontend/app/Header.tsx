@@ -9,7 +9,7 @@ export function Header() {
   const { density, toggle } = useDensity();
 
   return (
-    <header className="border-b border-slate-800 bg-[#0a0e17] text-white px-6 py-3.5 relative z-50">
+    <header className="border-b border-slate-800 bg-[#0c1018] text-white px-6 py-3.5 relative z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
@@ -21,7 +21,7 @@ export function Header() {
             className="group-hover:opacity-80 transition-opacity"
           />
           <span className="text-lg font-bold tracking-tight text-white">
-            Path<span className="text-cyan-400">Pricer</span>
+            Path<span className="text-amber-400">Pricer</span>
           </span>
         </Link>
 
