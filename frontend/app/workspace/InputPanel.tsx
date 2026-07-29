@@ -714,6 +714,7 @@ export function InputPanel({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [tickerTouched, setTickerTouched] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Debounce preview-triggering inputs (~200ms)
   const debouncedInputs = useDebounce(inputs, 200);
@@ -805,6 +806,14 @@ export function InputPanel({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Scroll focused dropdown item into view
+  useEffect(() => {
+    if (activeIndex >= 0 && dropdownRef.current) {
+      const items = dropdownRef.current.querySelectorAll("[data-ticker-item]");
+      items[activeIndex]?.scrollIntoView({ block: "nearest" });
+    }
+  }, [activeIndex]);
 
   // Auto-fetch market quote when ticker or market changes
   const handleMarketFetch = async () => {
@@ -924,25 +933,31 @@ export function InputPanel({
                 className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
               />
               {showDropdown && tickerTouched && inputs.ticker.trim() && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+                <div ref={dropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
                   {filteredTickers.length > 0 ? (
-                    filteredTickers.map((entry, idx) => (
-                      <div
-                        key={entry.ticker}
-                        onMouseDown={() => selectTicker(entry.ticker)}
-                        className={`px-3 py-2 cursor-pointer flex items-center justify-between ${
-                          idx === activeIndex
-                            ? "bg-blue-900/60 text-white"
-                            : "text-gray-300 hover:bg-gray-800"
-                        }`}
-                      >
-                        <div className="flex flex-col">
-                          <span className="font-mono font-bold text-sm">{entry.ticker}</span>
-                          <span className="text-[11px] text-gray-500">{entry.name}</span>
-                        </div>
-                        <span className="text-[10px] text-gray-500 font-mono bg-gray-800 px-1.5 py-0.5 rounded">{entry.market}</span>
+                    <>
+                      <div className="px-3 py-1.5 text-[10px] text-gray-500 font-mono border-b border-gray-800">
+                        {filteredTickers.length} match{filteredTickers.length !== 1 ? "es" : ""}
                       </div>
-                    ))
+                      {filteredTickers.map((entry, idx) => (
+                        <div
+                          key={entry.ticker}
+                          data-ticker-item
+                          onMouseDown={() => selectTicker(entry.ticker)}
+                          className={`px-3 py-2 cursor-pointer flex items-center justify-between ${
+                            idx === activeIndex
+                              ? "bg-blue-900/60 text-white"
+                              : "text-gray-300 hover:bg-gray-800"
+                          }`}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-mono font-bold text-sm">{entry.ticker}</span>
+                            <span className="text-[11px] text-gray-500">{entry.name}</span>
+                          </div>
+                          <span className="text-[10px] text-gray-500 font-mono bg-gray-800 px-1.5 py-0.5 rounded">{entry.market}</span>
+                        </div>
+                      ))}
+                    </>
                   ) : (
                     <div className="px-3 py-3 text-center">
                       <p className="text-xs text-gray-500">
