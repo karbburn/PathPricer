@@ -4,22 +4,18 @@ Registers API routers under /api/v1 prefix, configures CORS,
 and wires dependency injection.
 """
 
-import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api import market, pricing, report
+from .core.config import settings
 
 app = FastAPI(title="PathPricer API", version="0.1.0")
 
-# CORS — env-driven allowed origins, with localhost fallback for dev
-_cors_origins_raw = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000")
-_cors_origins = [origin.strip() for origin in _cors_origins_raw.split(",") if origin.strip()]
-
+# CORS — env-driven allowed origins from settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_cors_origins,
+    allow_origins=settings.cors_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
