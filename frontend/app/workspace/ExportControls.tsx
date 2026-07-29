@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { downloadCsv, downloadPdfReport } from "@/lib/export-helpers";
+import { showToast } from "@/lib/components/Toast";
 import { PricingFullResponse, PricingRequest } from "@/lib/types";
 
 interface ExportControlsProps {
@@ -17,7 +18,7 @@ export function ExportControls({ fullResult, request }: ExportControlsProps) {
     try {
       await downloadPdfReport(request);
     } catch {
-      alert("Failed to generate PDF report. Make sure backend service is running.");
+      showToast("error", "Failed to generate PDF report. Make sure backend service is running.");
     } finally {
       setDownloadingPdf(false);
     }
