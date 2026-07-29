@@ -24,7 +24,7 @@ from ..core.config import (
     PREVIEW_MAX_N,
 )
 from ..core.rng import make_rng
-from ..engine import black_scholes, monte_carlo
+from ..engine import black_scholes, implied_vol, monte_carlo, pnl_explain
 from ..engine.greeks import finite_difference_greeks
 from ..schemas.pricing import (
     BSFullResult,
@@ -35,8 +35,12 @@ from ..schemas.pricing import (
     DiagnosticsBlock,
     ErrorResponse,
     FDGreeksResult,
+    ImpliedVolRequest,
+    ImpliedVolResponse,
     MCPreviewResult,
     MCResultItem,
+    PnLExplainRequest,
+    PnLExplainResponse,
     PricingFullResponse,
     PricingPreviewResponse,
     PricingRequestSchema,
@@ -264,3 +268,148 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
     if validation_err is not None:
         return JSONResponse(status_code=400, content=validation_err.model_dump())
     return run_full_simulation(req)
+
+
+@router.post(
+    "/implied-vol",
+    response_model=ImpliedVolResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def price_implied_vol(req: ImpliedVolRequest) -> ImpliedVolResponse | JSONResponse:
+    """Solve for Black-Scholes implied volatility given market option price."""
+    today = date.today()
+    if req.expiry_date <= today:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_expiry",
+                message="Expiry date must be in the future.",
+                field="expiry_date",
+            ).model_dump(),
+        )
+
+    if req.market_price <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_market_price",
+                message="Market price must be positive.",
+                field="market_price",
+            ).model_dump(),
+        )
+
+    if req.strike <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_strike",
+                message="Strike price must be positive.",
+                field="strike",
+            ).model_dump(),
+        )
+
+    T = _compute_T(req.expiry_date)
+    S0 = req.spot_override if req.spot_override is not None else 100.0
+    r = req.risk_free_rate
+    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+
+    try:
+        res = implied_vol.solve_implied_volatility(
+            S0=S0,
+            K=req.strike,
+            T=T,
+            r=r,
+            q=q,
+            option_type=req.option_type,
+            market_price=req.market_price,
+        )
+        return ImpliedVolResponse(
+            implied_vol=res.implied_vol,
+            iterations_used=res.iterations_used,
+            method_used=res.method_used,
+            converged=res.converged,
+            final_residual=res.final_residual,
+            bs_price_at_solution=res.bs_price_at_solution,
+        )
+    except implied_vol.ImpliedVolError as exc:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="no_solution_exists",
+                message=str(exc),
+                field="market_price",
+            ).model_dump(),
+        )
+
+
+@router.post(
+    "/pnl-explain",
+    response_model=PnLExplainResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def price_pnl_explain(req: PnLExplainRequest) -> PnLExplainResponse | JSONResponse:
+    """Decompose actual option P&L into Greek-attributed components and unexplained residual."""
+    today = date.today()
+    if req.expiry_date <= today:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_expiry",
+                message="Expiry date must be in the future.",
+                field="expiry_date",
+            ).model_dump(),
+        )
+
+    if req.volatility <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_volatility",
+                message="Volatility must be positive.",
+                field="volatility",
+            ).model_dump(),
+        )
+
+    if req.strike <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_strike",
+                message="Strike price must be positive.",
+                field="strike",
+            ).model_dump(),
+        )
+
+    T = _compute_T(req.expiry_date)
+    S0 = req.spot_override if req.spot_override is not None else 100.0
+    r = req.risk_free_rate
+    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+
+    res = pnl_explain.explain_pnl(
+        S0=S0,
+        K=req.strike,
+        T=T,
+        r=r,
+        q=q,
+        sigma=req.volatility,
+        option_type=req.option_type,
+        d_spot=req.shift.d_spot,
+        d_vol=req.shift.d_vol,
+        d_days=req.shift.d_days,
+        d_rate=req.shift.d_rate,
+    )
+
+    return PnLExplainResponse(
+        base_price=res.base_price,
+        shifted_price=res.shifted_price,
+        actual_pnl=res.actual_pnl,
+        predicted_pnl_total=res.predicted_pnl_total,
+        delta_pnl=res.delta_pnl,
+        gamma_pnl=res.gamma_pnl,
+        vega_pnl=res.vega_pnl,
+        theta_pnl=res.theta_pnl,
+        rho_pnl=res.rho_pnl,
+        unexplained_pnl=res.unexplained_pnl,
+    )
+
+

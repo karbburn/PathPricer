@@ -3,8 +3,9 @@
 import React from "react";
 import { PreviewBadge, PrecisionTier } from "./PreviewBadge";
 import { ApiError } from "@/lib/api-client";
-import { PricingPreviewResponse, PricingFullResponse, BSGreeks, MarketRegion } from "@/lib/types";
+import { PricingPreviewResponse, PricingFullResponse, BSGreeks, MarketRegion, ImpliedVolResponse, PnLExplainResponse } from "@/lib/types";
 import { useDensity } from "@/lib/contexts/DensityContext";
+import { formatPercent, formatPrice } from "@/lib/formatters";
 
 interface ResultsPanelProps {
   microState: "pending" | "preview" | "error";
@@ -14,6 +15,11 @@ interface ResultsPanelProps {
   activeTier: "preview" | "full";
   isFullSimulating: boolean;
   market: MarketRegion;
+  workspaceMode?: "pricing" | "implied_vol" | "pnl_explain";
+  impliedVolResult?: ImpliedVolResponse | null;
+  isSolvingIv?: boolean;
+  pnlExplainResult?: PnLExplainResponse | null;
+  isCalculatingPnL?: boolean;
 }
 
 const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9" };
@@ -35,6 +41,11 @@ export function ResultsPanel({
   activeTier,
   isFullSimulating,
   market,
+  workspaceMode = "pricing",
+  impliedVolResult,
+  isSolvingIv = false,
+  pnlExplainResult,
+  isCalculatingPnL = false,
 }: ResultsPanelProps) {
   const { density } = useDensity();
   const compact = density === "compact";
@@ -76,6 +87,276 @@ export function ResultsPanel({
       </div>
     );
   }
+
+  // Implied Volatility Mode Results Render
+  if (workspaceMode === "implied_vol") {
+    if (isSolvingIv) {
+      return (
+        <div className="bg-slate-900 border border-purple-500/60 rounded-xl p-8 text-center space-y-4">
+          <div className="flex justify-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="h-3 w-3 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="h-3 w-3 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
+          <p className="text-sm text-purple-200 font-semibold">
+            Solving Implied Volatility via Black-Scholes inversion...
+          </p>
+        </div>
+      );
+    }
+
+    if (!impliedVolResult) {
+      return (
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-purple-950/60 border border-purple-800 text-purple-400 flex items-center justify-center mx-auto text-xl">
+            ⚡
+          </div>
+          <h3 className="text-lg font-bold text-white">Implied Volatility Solver</h3>
+          <p className="text-sm text-slate-400 max-w-md mx-auto">
+            Enter a target market option price and click &quot;Solve Implied Volatility&quot; to compute the implied volatility (&sigma;) that yields that price under Black-Scholes.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-slate-900 border border-purple-500/40 rounded-xl overflow-hidden shadow-xl space-y-6 p-6">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+              <span>Implied Volatility Solver Output</span>
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Closed-form BSM Newton-Raphson / Brent Fallback root finder
+            </p>
+          </div>
+          <span className="px-3 py-1 bg-purple-950 border border-purple-700 text-purple-300 text-xs font-mono font-bold rounded-full">
+            Discrete Solve
+          </span>
+        </div>
+
+        {/* Hero Display */}
+        <div className="bg-slate-950 border border-purple-900/50 rounded-xl p-6 text-center space-y-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
+            Solved Implied Volatility (&sigma;)
+          </span>
+          <div className="text-5xl font-extrabold text-purple-300 tracking-tight font-mono">
+            {formatPercent(impliedVolResult.implied_vol, 2)}
+          </div>
+          <p className="text-xs text-slate-400">
+            Annualized Volatility Parameter
+          </p>
+        </div>
+
+        {/* Solver Diagnostics Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              Solver Method
+            </span>
+            <span className={`inline-block px-2 py-0.5 text-xs font-mono font-bold rounded ${
+              impliedVolResult.method_used === "newton"
+                ? "bg-purple-950 text-purple-300 border border-purple-800"
+                : "bg-amber-950 text-amber-300 border border-amber-800"
+            }`}>
+              {impliedVolResult.method_used === "newton" ? "Newton-Raphson" : "Brent Fallback"}
+            </span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              Convergence
+            </span>
+            <span className={`inline-block px-2 py-0.5 text-xs font-mono font-bold rounded ${
+              impliedVolResult.converged
+                ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                : "bg-red-950 text-red-300 border border-red-800"
+            }`}>
+              {impliedVolResult.converged ? "Converged" : "Failed"}
+            </span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              Iterations Used
+            </span>
+            <span className="text-sm font-mono font-bold text-white">
+              {impliedVolResult.iterations_used}
+            </span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              BS Price at Soln
+            </span>
+            <span className="text-sm font-mono font-bold text-white">
+              {currencySymbol}{formatPrice(impliedVolResult.bs_price_at_solution, 4)}
+            </span>
+          </div>
+        </div>
+
+        {/* Residual diagnostic line */}
+        <div className="bg-slate-950/50 border border-slate-800 px-4 py-2.5 rounded-lg flex items-center justify-between text-xs font-mono text-slate-400">
+          <span>Final Price Residual:</span>
+          <span className="text-slate-200">
+            {impliedVolResult.final_residual >= 0 ? "+" : ""}
+            {impliedVolResult.final_residual.toExponential(3)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // P&L Explain Mode Results Render
+  if (workspaceMode === "pnl_explain") {
+    if (isCalculatingPnL) {
+      return (
+        <div className="bg-slate-900 border border-teal-500/60 rounded-xl p-8 text-center space-y-4">
+          <div className="flex justify-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="h-3 w-3 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="h-3 w-3 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
+          <p className="text-sm text-teal-200 font-semibold">
+            Recomputing Black-Scholes scenario P&amp;L &amp; Taylor series Greek attribution...
+          </p>
+        </div>
+      );
+    }
+
+    if (!pnlExplainResult) {
+      return (
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-teal-950/60 border border-teal-800 text-teal-400 flex items-center justify-center mx-auto text-xl">
+            📊
+          </div>
+          <h3 className="text-lg font-bold text-white">P&amp;L Explain &amp; Greek Attribution</h3>
+          <p className="text-sm text-slate-400 max-w-md mx-auto">
+            Adjust hypothetical scenario shift sliders (&Delta;S, &Delta;&sigma;, &Delta;t, &Delta;r) and click &quot;Explain P&amp;L Attribution&quot; to decompose actual option P&amp;L into Greek contributions and higher-order residual.
+          </p>
+        </div>
+      );
+    }
+
+    const {
+      base_price,
+      shifted_price,
+      actual_pnl,
+      predicted_pnl_total,
+      delta_pnl,
+      gamma_pnl,
+      vega_pnl,
+      theta_pnl,
+      rho_pnl,
+      unexplained_pnl,
+    } = pnlExplainResult;
+
+    const terms = [
+      { name: "Delta P&L (Δ · ΔS)", val: delta_pnl, color: "bg-blue-500", text: "text-blue-400", border: "border-blue-800/40" },
+      { name: "Gamma P&L (½Γ · ΔS²)", val: gamma_pnl, color: "bg-indigo-500", text: "text-indigo-400", border: "border-indigo-800/40" },
+      { name: "Vega P&L (ν · Δσ)", val: vega_pnl, color: "bg-purple-500", text: "text-purple-400", border: "border-purple-800/40" },
+      { name: "Theta P&L (θ · Δt)", val: theta_pnl, color: "bg-amber-500", text: "text-amber-400", border: "border-amber-800/40" },
+      { name: "Rho P&L (ρ · Δr)", val: rho_pnl, color: "bg-cyan-500", text: "text-cyan-400", border: "border-cyan-800/40" },
+      { name: "Higher-Order Residual", val: unexplained_pnl, color: "bg-rose-500", text: "text-rose-400", border: "border-rose-800/80 bg-rose-950/40" },
+    ];
+
+    return (
+      <div className="bg-slate-900 border border-teal-500/40 rounded-xl overflow-hidden shadow-xl space-y-6 p-6">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+              <span>P&amp;L Explain &amp; Greek Attribution Output</span>
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              1st &amp; 2nd order Taylor Series decomposition vs actual BSM repriced P&amp;L
+            </p>
+          </div>
+          <span className="px-3 py-1 bg-teal-950 border border-teal-700 text-teal-300 text-xs font-mono font-bold rounded-full">
+            Exact BSM
+          </span>
+        </div>
+
+        {/* Base vs Shifted Summary Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              Base Price (V₀)
+            </span>
+            <span className="text-sm font-mono font-bold text-white">
+              {currencySymbol}{formatPrice(base_price, 4)}
+            </span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              Shifted Price (V_shift)
+            </span>
+            <span className="text-sm font-mono font-bold text-white">
+              {currencySymbol}{formatPrice(shifted_price, 4)}
+            </span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              Actual Repriced P&amp;L
+            </span>
+            <span className={`text-sm font-mono font-bold ${actual_pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+              {actual_pnl >= 0 ? "+" : ""}{currencySymbol}{formatPrice(actual_pnl, 4)}
+            </span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-lg">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+              Predicted P&amp;L Total
+            </span>
+            <span className="text-sm font-mono font-bold text-teal-300">
+              {predicted_pnl_total >= 0 ? "+" : ""}{currencySymbol}{formatPrice(predicted_pnl_total, 4)}
+            </span>
+          </div>
+        </div>
+
+        {/* Per-Term Attribution Table */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-teal-400">
+            P&amp;L Term Breakdown &amp; Attribution
+          </h3>
+          <div className="divide-y divide-slate-800/60 border border-slate-800 rounded-lg overflow-hidden bg-slate-950/60">
+            {terms.map((t) => (
+              <div
+                key={t.name}
+                className={`flex items-center justify-between px-4 py-2.5 text-xs font-mono ${t.border}`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={`w-2.5 h-2.5 rounded-full ${t.color}`} />
+                  <span className="text-slate-300 font-medium">{t.name}</span>
+                </div>
+                <span className={`font-bold ${t.text}`}>
+                  {t.val >= 0 ? "+" : ""}{currencySymbol}{formatPrice(t.val, 4)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Unexplained Residual Explanation Banner */}
+        <div className="bg-rose-950/30 border border-rose-800/40 rounded-lg p-3.5 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+              <span>💡</span> Unexplained Higher-Order Residual:
+            </span>
+            <span className="text-xs font-mono font-bold text-rose-300">
+              {unexplained_pnl >= 0 ? "+" : ""}{currencySymbol}{formatPrice(unexplained_pnl, 4)}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            This residual captures higher-order and cross-Greek interactions (such as Vanna, Volga, and cross-gamma between spot and volatility) that first- and second-order single-variable Greeks do not account for.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+
 
   // Full Simulation Computing State (Elapsed Time Timer)
   if (isFullSimulating) {

@@ -230,3 +230,79 @@ class ErrorResponse(BaseModel):
     message: str
     field: str | None = None
     fallback_available: bool | None = None
+
+
+# ---------------------------------------------------------------------------
+# Implied Volatility schemas
+# ---------------------------------------------------------------------------
+
+
+class ImpliedVolRequest(BaseModel):
+    """Request schema for implied volatility solver endpoint."""
+
+    ticker: str
+    market: Literal["US", "IN"]
+    spot_override: float | None = None
+    strike: float = Field(..., gt=0)
+    expiry_date: date
+    option_type: Literal["call", "put"]
+    market_price: float = Field(..., gt=0)
+    risk_free_rate: float
+    dividend_yield: float | None = None
+
+
+class ImpliedVolResponse(BaseModel):
+    """Response schema for implied volatility solver endpoint."""
+
+    implied_vol: float
+    iterations_used: int
+    method_used: Literal["newton", "brent_fallback"]
+    converged: bool
+    final_residual: float
+    bs_price_at_solution: float
+
+
+# ---------------------------------------------------------------------------
+# P&L Explain schemas
+# ---------------------------------------------------------------------------
+
+
+class PnLShiftSchema(BaseModel):
+    """Scenario parameter shifts for P&L attribution."""
+
+    d_spot: float = 0.0
+    d_vol: float = 0.0
+    d_days: float = 0.0
+    d_rate: float = 0.0
+
+
+class PnLExplainRequest(BaseModel):
+    """Request schema for P&L explain endpoint."""
+
+    ticker: str
+    market: Literal["US", "IN"]
+    spot_override: float | None = None
+    strike: float = Field(..., gt=0)
+    expiry_date: date
+    option_type: Literal["call", "put"]
+    volatility: float = Field(..., gt=0)
+    risk_free_rate: float
+    dividend_yield: float | None = None
+    shift: PnLShiftSchema = Field(default_factory=PnLShiftSchema)
+
+
+class PnLExplainResponse(BaseModel):
+    """Response schema for P&L explain endpoint."""
+
+    base_price: float
+    shifted_price: float
+    actual_pnl: float
+    predicted_pnl_total: float
+    delta_pnl: float
+    gamma_pnl: float
+    vega_pnl: float
+    theta_pnl: float
+    rho_pnl: float
+    unexplained_pnl: float
+
+

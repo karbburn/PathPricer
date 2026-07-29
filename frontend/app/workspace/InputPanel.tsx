@@ -10,6 +10,7 @@ import {
   PricingPreviewResponse,
   PricingRequest,
   VarianceReductionMethod,
+  PnLShift,
 } from "@/lib/types";
 import { TickerInput } from "@/app/components/TickerInput";
 
@@ -23,6 +24,16 @@ interface InputPanelProps {
   onRunFullSimulation: (inputs: PricingRequest) => void;
   isFullSimulating: boolean;
   onMicroStateChange: (state: "pending" | "preview" | "error") => void;
+  workspaceMode?: "pricing" | "implied_vol" | "pnl_explain";
+  onWorkspaceModeChange?: (mode: "pricing" | "implied_vol" | "pnl_explain") => void;
+  marketPrice?: number;
+  onMarketPriceChange?: (price: number) => void;
+  onSolveImpliedVol?: () => void;
+  isSolvingIv?: boolean;
+  pnlShift?: PnLShift;
+  onPnLShiftChange?: (shift: PnLShift) => void;
+  onCalculatePnLExplain?: () => void;
+  isCalculatingPnL?: boolean;
 }
 
 export function InputPanel({
@@ -33,6 +44,16 @@ export function InputPanel({
   onRunFullSimulation,
   isFullSimulating,
   onMicroStateChange,
+  workspaceMode = "pricing",
+  onWorkspaceModeChange,
+  marketPrice = 5.0,
+  onMarketPriceChange,
+  onSolveImpliedVol,
+  isSolvingIv = false,
+  pnlShift = { d_spot: 0, d_vol: 0, d_days: 0, d_rate: 0 },
+  onPnLShiftChange,
+  onCalculatePnLExplain,
+  isCalculatingPnL = false,
 }: InputPanelProps) {
   const [inputs, setInputs] = useState<PricingRequest>(initialInputs);
   const [seedLocked, setSeedLocked] = useState<boolean>(false);
@@ -105,6 +126,8 @@ export function InputPanel({
 
   // Preview Tier Debounce & Abort Effect
   useEffect(() => {
+    if (workspaceMode !== "pricing") return;
+
     // Increment request ID counter for this update
     requestIdRef.current += 1;
     const currentReqId = requestIdRef.current;
@@ -146,7 +169,7 @@ export function InputPanel({
     return () => {
       controller.abort();
     };
-  }, [debouncedInputs, onPreviewSuccess, onPreviewError, onMicroStateChange]);
+  }, [debouncedInputs, onPreviewSuccess, onPreviewError, onMicroStateChange, workspaceMode]);
 
   const handleRandomizeSeed = () => {
     if (seedLocked) return;
@@ -160,14 +183,58 @@ export function InputPanel({
         density === "compact" ? "p-4" : "p-6"
       }`}
     >
+      {/* Mode Selector Tabs */}
+      {onWorkspaceModeChange && (
+        <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 gap-1 overflow-x-auto">
+          <button
+            type="button"
+            onClick={() => onWorkspaceModeChange("pricing")}
+            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
+              workspaceMode === "pricing"
+                ? "bg-amber-500 text-slate-950 shadow"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            Option Pricing
+          </button>
+          <button
+            type="button"
+            onClick={() => onWorkspaceModeChange("implied_vol")}
+            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
+              workspaceMode === "implied_vol"
+                ? "bg-purple-600 text-white shadow"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            Implied Volatility
+          </button>
+          <button
+            type="button"
+            onClick={() => onWorkspaceModeChange("pnl_explain")}
+            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
+              workspaceMode === "pnl_explain"
+                ? "bg-teal-600 text-white shadow"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            P&amp;L Explain
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <h2 className="text-lg font-bold text-white tracking-wide">
-          Pricing Inputs
+          {workspaceMode === "implied_vol"
+            ? "IV Solver Inputs"
+            : workspaceMode === "pnl_explain"
+            ? "P&L Explain Base & Shift"
+            : "Pricing Inputs"}
         </h2>
         <span className="text-xs text-slate-300 font-mono">
-          Preview Auto-Debounced (~200ms)
+          {workspaceMode === "pricing" ? "Preview Auto-Debounced (~200ms)" : "Scenario Simulation"}
         </span>
       </div>
+
 
       {/* 1. Underlying Ticker & Market Selection */}
       <div className="space-y-3">
@@ -320,36 +387,54 @@ export function InputPanel({
         </div>
       </div>
 
-      {/* 3. Market Risk Parameters (Vol & Rate) */}
+      {/* 3. Market Risk Parameters */}
       <div className="space-y-3 pt-3">
         <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
-          Risk &amp; Volatility Parameters
+          {workspaceMode === "implied_vol" ? "Target Market Price & Rates" : "Risk & Volatility Parameters"}
         </label>
 
-        {/* Volatility Dual Input */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <label className="text-xs text-slate-300">
-              Volatility (σ): {(inputs.volatility * 100).toFixed(1)}%
-            </label>
+        {workspaceMode === "implied_vol" ? (
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs font-bold text-purple-300">
+                Market Option Price (V_mkt)
+              </label>
+            </div>
             <input
               type="number"
+              step="0.05"
+              min="0.01"
+              value={marketPrice}
+              onChange={(e) => onMarketPriceChange && onMarketPriceChange(Number(e.target.value))}
+              className="w-full bg-slate-950 border border-purple-500/60 focus:border-purple-400 rounded px-3 py-2 text-sm font-mono text-white font-bold"
+              placeholder="e.g. 5.25"
+            />
+          </div>
+        ) : (
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs text-slate-300">
+                Volatility (σ): {(inputs.volatility * 100).toFixed(1)}%
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={inputs.volatility}
+                onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
+                className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              />
+            </div>
+            <input
+              type="range"
+              min="0.01"
+              max="2.00"
               step="0.01"
               value={inputs.volatility}
               onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
-              className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-full accent-amber-500 cursor-pointer"
             />
           </div>
-          <input
-            type="range"
-            min="0.01"
-            max="2.00"
-            step="0.01"
-            value={inputs.volatility}
-            onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
-            className="w-full accent-amber-500 cursor-pointer"
-          />
-        </div>
+        )}
 
         {/* Risk-Free Rate Dual Input */}
         <div>
@@ -377,113 +462,265 @@ export function InputPanel({
         </div>
       </div>
 
-      {/* 4. Simulation Engine Controls */}
-      <div className="space-y-3 pt-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
-          Simulation Controls
-        </label>
-
-        {/* N Simulations Presets */}
-        <div>
-          <label className="block text-xs text-slate-300 mb-1">
-            Simulations (N): {inputs.n_simulations.toLocaleString()}
+      {/* 4. Simulation Engine Controls (Pricing Mode Only) */}
+      {workspaceMode === "pricing" && (
+        <div className="space-y-3 pt-3">
+          <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
+            Simulation Controls
           </label>
-          <div className="grid grid-cols-5 gap-1 mb-2">
-            {[10000, 50000, 100000, 500000, 1000000].map((nVal) => (
+
+          {/* N Simulations Presets */}
+          <div>
+            <label className="block text-xs text-slate-300 mb-1">
+              Simulations (N): {inputs.n_simulations.toLocaleString()}
+            </label>
+            <div className="grid grid-cols-5 gap-1 mb-2">
+              {[10000, 50000, 100000, 500000, 1000000].map((nVal) => (
+                <button
+                  key={nVal}
+                  type="button"
+                  onClick={() => updateField("n_simulations", nVal)}
+                  className={`py-1 text-xs font-mono rounded transition-colors ${
+                    inputs.n_simulations === nVal
+                      ? "bg-blue-600 text-white font-bold"
+                      : "bg-slate-950 text-slate-400 hover:text-white border border-slate-800"
+                  }`}
+                >
+                  {nVal >= 1000000 ? `${nVal / 1000000}M` : `${nVal / 1000}k`}
+                </button>
+              ))}
+            </div>
+            <input
+              type="range"
+              min="1000"
+              max="2000000"
+              step="5000"
+              value={inputs.n_simulations}
+              onChange={(e) => updateField("n_simulations", Number(e.target.value))}
+              className="w-full accent-amber-500 cursor-pointer"
+            />
+          </div>
+
+          {/* Variance Reduction Selector */}
+          <div>
+            <label className="block text-xs text-slate-300 mb-1">Variance Reduction Method</label>
+            <select
+              value={inputs.variance_reduction}
+              onChange={(e) =>
+                updateField("variance_reduction", e.target.value as VarianceReductionMethod)
+              }
+              className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-xs font-mono text-white"
+            >
+              <option value="all">All 4 Estimators (Standard / Anti / CV / Combined)</option>
+              <option value="standard">Standard Monte Carlo</option>
+              <option value="antithetic">Antithetic Variates</option>
+              <option value="control_variate">Control Variates (S_T)</option>
+              <option value="antithetic_cv">Combined Antithetic + CV</option>
+            </select>
+          </div>
+
+          {/* Seed Control (Randomize + Lock Button) */}
+          <div>
+            <label className="block text-xs text-slate-300 mb-1">RNG Seed</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={inputs.seed}
+                disabled={seedLocked}
+                onChange={(e) => updateField("seed", Number(e.target.value))}
+                className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50"
+              />
               <button
-                key={nVal}
                 type="button"
-                onClick={() => updateField("n_simulations", nVal)}
-                className={`py-1 text-xs font-mono rounded transition-colors ${
-                  inputs.n_simulations === nVal
-                    ? "bg-blue-600 text-white font-bold"
-                    : "bg-slate-950 text-slate-400 hover:text-white border border-slate-800"
+                onClick={handleRandomizeSeed}
+                disabled={seedLocked}
+                className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50"
+              >
+                Randomize
+              </button>
+              <button
+                type="button"
+                onClick={() => setSeedLocked(!seedLocked)}
+                className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors ${
+                  seedLocked
+                    ? "bg-amber-950 border-amber-700 text-amber-300"
+                    : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
                 }`}
               >
-                {nVal >= 1000000 ? `${nVal / 1000000}M` : `${nVal / 1000}k`}
+                {seedLocked ? "Locked" : "Unlocked"}
               </button>
-            ))}
+            </div>
           </div>
-          <input
-            type="range"
-            min="1000"
-            max="2000000"
-            step="5000"
-            value={inputs.n_simulations}
-            onChange={(e) => updateField("n_simulations", Number(e.target.value))}
-            className="w-full accent-amber-500 cursor-pointer"
-          />
         </div>
+      )}
 
-        {/* Variance Reduction Selector */}
-        <div>
-          <label className="block text-xs text-slate-300 mb-1">Variance Reduction Method</label>
-          <select
-            value={inputs.variance_reduction}
-            onChange={(e) =>
-              updateField("variance_reduction", e.target.value as VarianceReductionMethod)
-            }
-            className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-xs font-mono text-white"
-          >
-            <option value="all">All 4 Estimators (Standard / Anti / CV / Combined)</option>
-            <option value="standard">Standard Monte Carlo</option>
-            <option value="antithetic">Antithetic Variates</option>
-            <option value="control_variate">Control Variates (S_T)</option>
-            <option value="antithetic_cv">Combined Antithetic + CV</option>
-          </select>
-        </div>
+      {/* 4. Scenario Shift Parameters (P&L Explain Mode Only) */}
+      {workspaceMode === "pnl_explain" && (
+        <div className="space-y-3 pt-3 border-t border-slate-800">
+          <label className="block text-xs font-bold uppercase tracking-wider text-teal-400">
+            Hypothetical Scenario Shifts
+          </label>
 
-        {/* Seed Control (Randomize + Lock Button) */}
-        <div>
-          <label className="block text-xs text-slate-300 mb-1">RNG Seed</label>
-          <div className="flex items-center gap-2">
+          {/* Spot Shift (dS) */}
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs text-slate-300">
+                Spot Shift (ΔS): {pnlShift.d_spot >= 0 ? `+${pnlShift.d_spot}` : pnlShift.d_spot}
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                value={pnlShift.d_spot}
+                onChange={(e) =>
+                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
+                }
+                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              />
+            </div>
             <input
-              type="number"
-              value={inputs.seed}
-              disabled={seedLocked}
-              onChange={(e) => updateField("seed", Number(e.target.value))}
-              className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50"
+              type="range"
+              min={-Math.round(currentSpot * 0.3)}
+              max={Math.round(currentSpot * 0.3)}
+              step="0.5"
+              value={pnlShift.d_spot}
+              onChange={(e) =>
+                onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
+              }
+              className="w-full accent-teal-500 cursor-pointer"
             />
-            <button
-              type="button"
-              onClick={handleRandomizeSeed}
-              disabled={seedLocked}
-              className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50"
-            >
-              Randomize
-            </button>
-            <button
-              type="button"
-              onClick={() => setSeedLocked(!seedLocked)}
-              className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors ${
-                seedLocked
-                  ? "bg-amber-950 border-amber-700 text-amber-300"
-                  : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
-              }`}
-            >
-              {seedLocked ? "Locked" : "Unlocked"}
-            </button>
+          </div>
+
+          {/* Volatility Shift (d_vol) */}
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs text-slate-300">
+                Volatility Shift (Δσ): {(pnlShift.d_vol * 100).toFixed(1)}%
+              </label>
+              <input
+                type="number"
+                step="0.005"
+                value={pnlShift.d_vol}
+                onChange={(e) =>
+                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
+                }
+                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              />
+            </div>
+            <input
+              type="range"
+              min="-0.20"
+              max="0.20"
+              step="0.005"
+              value={pnlShift.d_vol}
+              onChange={(e) =>
+                onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
+              }
+              className="w-full accent-teal-500 cursor-pointer"
+            />
+          </div>
+
+          {/* Elapsed Days (d_days) */}
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs text-slate-300">
+                Time Elapsed (Δt): {pnlShift.d_days} days
+              </label>
+              <input
+                type="number"
+                step="1"
+                min="0"
+                max="180"
+                value={pnlShift.d_days}
+                onChange={(e) =>
+                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.max(0, Number(e.target.value)) })
+                }
+                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              />
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="90"
+              step="1"
+              value={pnlShift.d_days}
+              onChange={(e) =>
+                onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Number(e.target.value) })
+              }
+              className="w-full accent-teal-500 cursor-pointer"
+            />
+          </div>
+
+          {/* Rate Shift (d_rate) */}
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs text-slate-300">
+                Rate Shift (Δr): {(pnlShift.d_rate * 10000).toFixed(0)} bps
+              </label>
+              <input
+                type="number"
+                step="0.001"
+                value={pnlShift.d_rate}
+                onChange={(e) =>
+                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
+                }
+                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              />
+            </div>
+            <input
+              type="range"
+              min="-0.05"
+              max="0.05"
+              step="0.001"
+              value={pnlShift.d_rate}
+              onChange={(e) =>
+                onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
+              }
+              className="w-full accent-teal-500 cursor-pointer"
+            />
           </div>
         </div>
-      </div>
+      )}
 
-      {/* 5. Primary CTA: Run Full Simulation Button */}
+      {/* 5. Primary CTA */}
       <div className="pt-4">
-        <button
-          type="button"
-          disabled={isFullSimulating}
-          onClick={() => onRunFullSimulation(inputs)}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-blue-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-        >
-          <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
-          <span className="text-xs font-mono text-blue-200">(N={inputs.n_simulations.toLocaleString()})</span>
-        </button>
-        <p className="text-[11px] text-slate-500 text-center mt-1.5 font-mono">
-          <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Ctrl</kbd>
-          {" + "}
-          <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Enter</kbd>
-        </p>
+        {workspaceMode === "implied_vol" ? (
+          <button
+            type="button"
+            disabled={isSolvingIv}
+            onClick={onSolveImpliedVol}
+            className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-purple-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+          >
+            <span>{isSolvingIv ? "Solving Volatility..." : "⚡ Solve Implied Volatility"}</span>
+          </button>
+        ) : workspaceMode === "pnl_explain" ? (
+          <button
+            type="button"
+            disabled={isCalculatingPnL}
+            onClick={onCalculatePnLExplain}
+            className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-teal-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+          >
+            <span>{isCalculatingPnL ? "Calculating P&L Attribution..." : "📊 Explain P&L Attribution"}</span>
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={isFullSimulating}
+              onClick={() => onRunFullSimulation(inputs)}
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-blue-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            >
+              <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
+              <span className="text-xs font-mono text-blue-200">(N={inputs.n_simulations.toLocaleString()})</span>
+            </button>
+            <p className="text-[11px] text-slate-500 text-center mt-1.5 font-mono">
+              <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Ctrl</kbd>
+              {" + "}
+              <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Enter</kbd>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
+
 }

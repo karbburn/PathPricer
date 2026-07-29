@@ -26,6 +26,13 @@ class Settings(BaseSettings):
     min_t: float = 1e-7
     min_sigma: float = 1e-7
     days_per_year: float = 365.0
+    iv_tolerance: float = 1e-6
+    iv_max_iterations: int = 100
+    iv_vega_floor: float = 1e-8
+    iv_sigma_min: float = 0.001
+    iv_sigma_max: float = 5.0
+    iv_initial_sigma_min: float = 0.01
+    iv_initial_sigma_max: float = 5.0
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -61,3 +68,11 @@ MAX_N_SIMULATIONS: int = settings.max_n_simulations
 MIN_N_SIMULATIONS: int = settings.min_n_simulations
 PREVIEW_MAX_N: int = settings.preview_max_n
 BUMP_FRACTION_DEFAULT: float = settings.bump_fraction_default
+IV_TOLERANCE: float = settings.iv_tolerance
+IV_MAX_ITERATIONS: int = settings.iv_max_iterations
+IV_VEGA_FLOOR: float = settings.iv_vega_floor
+IV_SIGMA_MIN: float = settings.iv_sigma_min
+IV_SIGMA_MAX: float = settings.iv_sigma_max
+IV_INITIAL_SIGMA_MIN: float = settings.iv_initial_sigma_min
+IV_INITIAL_SIGMA_MAX: float = settings.iv_initial_sigma_max
+

@@ -6,8 +6,12 @@
 
 import {
   ErrorResponse,
+  ImpliedVolRequest,
+  ImpliedVolResponse,
   MarketQuoteResponse,
   MarketRegion,
+  PnLExplainRequest,
+  PnLExplainResponse,
   PricingFullResponse,
   PricingPreviewResponse,
   PricingRequest,
@@ -124,3 +128,33 @@ export async function fetchReportPdf(
 
   return response.blob();
 }
+
+export async function postImpliedVol(
+  request: ImpliedVolRequest,
+  signal?: AbortSignal
+): Promise<ImpliedVolResponse> {
+  const url = `${BASE_URL}/price/implied-vol`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+    signal,
+  });
+  return handleResponse<ImpliedVolResponse>(response);
+}
+
+export async function postPnLExplain(
+  request: PnLExplainRequest,
+  signal?: AbortSignal
+): Promise<PnLExplainResponse> {
+  const url = `${BASE_URL}/price/pnl-explain`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+    signal,
+  });
+  return handleResponse<PnLExplainResponse>(response);
+}
+
+

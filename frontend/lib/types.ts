@@ -161,3 +161,59 @@ export interface ErrorResponse {
   field?: string | null;
   fallback_available?: boolean | null;
 }
+
+export interface ImpliedVolRequest {
+  ticker: string;
+  market: MarketRegion;
+  spot_override?: number | null;
+  strike: number;
+  expiry_date: string;
+  option_type: OptionType;
+  market_price: number;
+  risk_free_rate: number;
+  dividend_yield?: number | null;
+}
+
+export interface ImpliedVolResponse {
+  implied_vol: number;
+  iterations_used: number;
+  method_used: "newton" | "brent_fallback";
+  converged: boolean;
+  final_residual: number;
+  bs_price_at_solution: number;
+}
+
+export interface PnLShift {
+  d_spot: number;
+  d_vol: number;
+  d_days: number;
+  d_rate: number;
+}
+
+export interface PnLExplainRequest {
+  ticker: string;
+  market: MarketRegion;
+  spot_override?: number | null;
+  strike: number;
+  expiry_date: string;
+  option_type: OptionType;
+  volatility: number;
+  risk_free_rate: number;
+  dividend_yield?: number | null;
+  shift: PnLShift;
+}
+
+export interface PnLExplainResponse {
+  base_price: number;
+  shifted_price: number;
+  actual_pnl: number;
+  predicted_pnl_total: number;
+  delta_pnl: number;
+  gamma_pnl: number;
+  vega_pnl: number;
+  theta_pnl: number;
+  rho_pnl: number;
+  unexplained_pnl: number;
+}
+
+
