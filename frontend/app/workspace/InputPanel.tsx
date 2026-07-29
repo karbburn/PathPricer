@@ -1,0 +1,462 @@
+"use client";
+
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { postPricePreview, getMarketQuote, ApiError } from "@/lib/api-client";
+import { useDebounce } from "@/lib/hooks/useDebounce";
+import { serializeInputs } from "@/lib/url-state";
+import {
+  MarketRegion,
+  OptionType,
+  PricingPreviewResponse,
+  PricingRequest,
+  VarianceReductionMethod,
+} from "@/lib/types";
+
+interface InputPanelProps {
+  initialInputs: PricingRequest;
+  onInputsChange: (inputs: PricingRequest) => void;
+  onPreviewSuccess: (result: PricingPreviewResponse) => void;
+  onPreviewError: (error: ApiError | null) => void;
+  onRunFullSimulation: (inputs: PricingRequest) => void;
+  isFullSimulating: boolean;
+  onMicroStateChange: (state: "pending" | "preview" | "error") => void;
+}
+
+export function InputPanel({
+  initialInputs,
+  onInputsChange,
+  onPreviewSuccess,
+  onPreviewError,
+  onRunFullSimulation,
+  isFullSimulating,
+  onMicroStateChange,
+}: InputPanelProps) {
+  const [inputs, setInputs] = useState<PricingRequest>(initialInputs);
+  const [seedLocked, setSeedLocked] = useState<boolean>(false);
+  const [fetchingMarket, setFetchingMarket] = useState<boolean>(false);
+
+  // Debounce preview-triggering inputs (~200ms)
+  const debouncedInputs = useDebounce(inputs, 200);
+
+  // Request sequence ref & AbortController ref to prevent out-of-order race conditions
+  const requestIdRef = useRef<number>(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Helper to update a field in state and notify parent / update URL
+  const updateField = <K extends keyof PricingRequest>(
+    field: K,
+    value: PricingRequest[K]
+  ) => {
+    setInputs((prev) => {
+      const next = { ...prev, [field]: value };
+      onInputsChange(next);
+
+      // Update URL search query string dynamically without full page reload
+      if (typeof window !== "undefined") {
+        const queryStr = serializeInputs(next);
+        const newUrl = `${window.location.pathname}?${queryStr}`;
+        window.history.replaceState(null, "", newUrl);
+      }
+      return next;
+    });
+  };
+
+  // Auto-fetch market quote when ticker or market changes
+  const handleMarketFetch = async () => {
+    if (!inputs.ticker.trim()) return;
+    setFetchingMarket(true);
+    try {
+      const quote = await getMarketQuote(inputs.ticker, inputs.market);
+      setInputs((prev) => {
+        const next: PricingRequest = {
+          ...prev,
+          spot_override: quote.spot_price,
+          volatility: quote.historical_volatility["252d"] || prev.volatility,
+          dividend_yield: quote.dividend_yield,
+        };
+        onInputsChange(next);
+        if (typeof window !== "undefined") {
+          window.history.replaceState(null, "", `?${serializeInputs(next)}`);
+        }
+        return next;
+      });
+    } catch {
+      // Ignore market fetch failure — manual spot override remains
+    } finally {
+      setFetchingMarket(false);
+    }
+  };
+
+  // Preview Tier Debounce & Abort Effect
+  useEffect(() => {
+    // Increment request ID counter for this update
+    requestIdRef.current += 1;
+    const currentReqId = requestIdRef.current;
+
+    // Abort previous in-flight preview request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // Notify parent of pending micro-state
+    onMicroStateChange("pending");
+
+    // Preview request payload (capped N simulations for preview tier: max 20,000)
+    const previewPayload: PricingRequest = {
+      ...debouncedInputs,
+      n_simulations: Math.min(debouncedInputs.n_simulations, 10000),
+    };
+
+    postPricePreview(previewPayload, controller.signal)
+      .then((data) => {
+        // Race condition check: ignore if superseded or aborted
+        if (requestIdRef.current !== currentReqId || controller.signal.aborted) {
+          return;
+        }
+        onPreviewSuccess(data);
+        onPreviewError(null);
+        onMicroStateChange("preview");
+      })
+      .catch((err) => {
+        if (requestIdRef.current !== currentReqId || controller.signal.aborted) {
+          return;
+        }
+        if (err instanceof ApiError) {
+          onPreviewError(err);
+        }
+        onMicroStateChange("error");
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [debouncedInputs, onMicroStateChange, onPreviewError, onPreviewSuccess]);
+
+  const handleRandomizeSeed = () => {
+    if (seedLocked) return;
+    const newSeed = Math.floor(Math.random() * 1000000);
+    updateField("seed", newSeed);
+  };
+
+  return (
+    <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-gray-700 pb-3">
+        <h2 className="text-lg font-bold text-white tracking-tight">
+          Pricing Inputs
+        </h2>
+        <span className="text-xs text-gray-400 font-mono">
+          Preview Auto-Debounced (~200ms)
+        </span>
+      </div>
+
+      {/* 1. Underlying Ticker & Market Selection */}
+      <div className="space-y-3">
+        <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
+          Underlying Asset
+        </label>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="sm:col-span-2 flex gap-2">
+            <input
+              type="text"
+              value={inputs.ticker}
+              onChange={(e) => updateField("ticker", e.target.value.toUpperCase())}
+              placeholder="Ticker (e.g. AAPL)"
+              className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
+            />
+            <button
+              type="button"
+              onClick={handleMarketFetch}
+              disabled={fetchingMarket}
+              className="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {fetchingMarket ? "Syncing..." : "Sync Market"}
+            </button>
+          </div>
+
+          <div className="flex bg-gray-950 p-1 rounded border border-gray-700">
+            <button
+              type="button"
+              onClick={() => updateField("market", "US")}
+              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
+                inputs.market === "US"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              US
+            </button>
+            <button
+              type="button"
+              onClick={() => updateField("market", "IN")}
+              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
+                inputs.market === "IN"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              IN (.NS)
+            </button>
+          </div>
+        </div>
+
+        {/* Spot Price Override */}
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Spot Price ($S_0$)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={inputs.spot_override ?? ""}
+              onChange={(e) =>
+                updateField("spot_override", e.target.value ? Number(e.target.value) : null)
+              }
+              placeholder="Market default"
+              className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-sm text-white font-mono"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Dividend Yield ($q$)</label>
+            <input
+              type="number"
+              step="0.001"
+              value={inputs.dividend_yield ?? 0}
+              onChange={(e) => updateField("dividend_yield", Number(e.target.value))}
+              className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-sm text-white font-mono"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Option Type & Strike Price */}
+      <div className="space-y-3 pt-3 border-t border-gray-700/60">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold uppercase tracking-wider text-blue-400">
+            Contract Terms
+          </label>
+          <div className="flex bg-gray-950 p-1 rounded border border-gray-700">
+            <button
+              type="button"
+              onClick={() => updateField("option_type", "call")}
+              className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
+                inputs.option_type === "call"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              CALL
+            </button>
+            <button
+              type="button"
+              onClick={() => updateField("option_type", "put")}
+              className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
+                inputs.option_type === "put"
+                  ? "bg-red-600 text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              PUT
+            </button>
+          </div>
+        </div>
+
+        {/* Strike Price Dual Input (Slider + Box) */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-xs text-gray-300">Strike Price ($K$)</label>
+            <input
+              type="number"
+              step="0.5"
+              value={inputs.strike}
+              onChange={(e) => updateField("strike", Number(e.target.value))}
+              className="w-24 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+            />
+          </div>
+          <input
+            type="range"
+            min="10"
+            max="1000"
+            step="1"
+            value={inputs.strike}
+            onChange={(e) => updateField("strike", Number(e.target.value))}
+            className="w-full accent-blue-500 cursor-pointer"
+          />
+        </div>
+
+        {/* Expiry Date */}
+        <div>
+          <label className="block text-xs text-gray-300 mb-1">Expiration Date</label>
+          <input
+            type="date"
+            value={inputs.expiry_date}
+            onChange={(e) => updateField("expiry_date", e.target.value)}
+            className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
+          />
+        </div>
+      </div>
+
+      {/* 3. Market Risk Parameters (Vol & Rate) */}
+      <div className="space-y-3 pt-3 border-t border-gray-700/60">
+        <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
+          Risk &amp; Volatility Parameters
+        </label>
+
+        {/* Volatility Dual Input */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-xs text-gray-300">
+              Volatility ($\sigma$): {(inputs.volatility * 100).toFixed(1)}%
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              value={inputs.volatility}
+              onChange={(e) => updateField("volatility", Number(e.target.value))}
+              className="w-24 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+            />
+          </div>
+          <input
+            type="range"
+            min="0.01"
+            max="2.00"
+            step="0.01"
+            value={inputs.volatility}
+            onChange={(e) => updateField("volatility", Number(e.target.value))}
+            className="w-full accent-blue-500 cursor-pointer"
+          />
+        </div>
+
+        {/* Risk-Free Rate Dual Input */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-xs text-gray-300">
+              Risk-Free Rate ($r$): {(inputs.risk_free_rate * 100).toFixed(1)}%
+            </label>
+            <input
+              type="number"
+              step="0.005"
+              value={inputs.risk_free_rate}
+              onChange={(e) => updateField("risk_free_rate", Number(e.target.value))}
+              className="w-24 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+            />
+          </div>
+          <input
+            type="range"
+            min="-0.02"
+            max="0.20"
+            step="0.0025"
+            value={inputs.risk_free_rate}
+            onChange={(e) => updateField("risk_free_rate", Number(e.target.value))}
+            className="w-full accent-blue-500 cursor-pointer"
+          />
+        </div>
+      </div>
+
+      {/* 4. Simulation Engine Controls */}
+      <div className="space-y-3 pt-3 border-t border-gray-700/60">
+        <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
+          Simulation Controls
+        </label>
+
+        {/* N Simulations Presets */}
+        <div>
+          <label className="block text-xs text-gray-300 mb-1">
+            Simulations ($N$): {inputs.n_simulations.toLocaleString()}
+          </label>
+          <div className="grid grid-cols-5 gap-1 mb-2">
+            {[10000, 50000, 100000, 500000, 1000000].map((nVal) => (
+              <button
+                key={nVal}
+                type="button"
+                onClick={() => updateField("n_simulations", nVal)}
+                className={`py-1 text-[10px] font-mono rounded transition-colors ${
+                  inputs.n_simulations === nVal
+                    ? "bg-blue-600 text-white font-bold"
+                    : "bg-gray-950 text-gray-400 hover:text-white border border-gray-800"
+                }`}
+              >
+                {nVal >= 1000000 ? `${nVal / 1000000}M` : `${nVal / 1000}k`}
+              </button>
+            ))}
+          </div>
+          <input
+            type="range"
+            min="1000"
+            max="2000000"
+            step="5000"
+            value={inputs.n_simulations}
+            onChange={(e) => updateField("n_simulations", Number(e.target.value))}
+            className="w-full accent-blue-500 cursor-pointer"
+          />
+        </div>
+
+        {/* Variance Reduction Selector */}
+        <div>
+          <label className="block text-xs text-gray-300 mb-1">Variance Reduction Method</label>
+          <select
+            value={inputs.variance_reduction}
+            onChange={(e) =>
+              updateField("variance_reduction", e.target.value as VarianceReductionMethod)
+            }
+            className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-xs font-mono text-white"
+          >
+            <option value="all">All 4 Estimators (Standard / Anti / CV / Combined)</option>
+            <option value="standard">Standard Monte Carlo</option>
+            <option value="antithetic">Antithetic Variates</option>
+            <option value="control_variate">Control Variates (S_T)</option>
+            <option value="antithetic_cv">Combined Antithetic + CV</option>
+          </select>
+        </div>
+
+        {/* Seed Control (Randomize + Lock Button) */}
+        <div>
+          <label className="block text-xs text-gray-300 mb-1">RNG Seed</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={inputs.seed}
+              disabled={seedLocked}
+              onChange={(e) => updateField("seed", Number(e.target.value))}
+              className="flex-1 bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50"
+            />
+            <button
+              type="button"
+              onClick={handleRandomizeSeed}
+              disabled={seedLocked}
+              className="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50"
+            >
+              🎲 Randomize
+            </button>
+            <button
+              type="button"
+              onClick={() => setSeedLocked(!seedLocked)}
+              className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors ${
+                seedLocked
+                  ? "bg-amber-950 border-amber-700 text-amber-300"
+                  : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white"
+              }`}
+            >
+              {seedLocked ? "🔒 Locked" : "🔓 Unlocked"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Primary CTA: Run Full Simulation Button */}
+      <div className="pt-4">
+        <button
+          type="button"
+          disabled={isFullSimulating}
+          onClick={() => onRunFullSimulation(inputs)}
+          className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-blue-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+        >
+          <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
+          <span className="text-xs font-mono text-blue-200">(N={inputs.n_simulations.toLocaleString()})</span>
+        </button>
+      </div>
+    </div>
+  );
+}
