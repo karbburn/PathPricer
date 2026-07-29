@@ -48,7 +48,7 @@ router = APIRouter(prefix="/price", tags=["pricing"])
 _TERMINAL_SAMPLE_CAP = 5000
 
 
-def _validate_request(req: PricingRequestSchema, max_n: int) -> ErrorResponse | None:
+def validate_request(req: PricingRequestSchema, max_n: int) -> ErrorResponse | None:
     """Validate pricing request. Returns ErrorResponse or None."""
     today = date.today()
     if req.expiry_date <= today:
@@ -81,17 +81,8 @@ def _compute_T(expiry_date: date) -> float:
     return delta.days / 365.0
 
 
-@router.post(
-    "/preview",
-    response_model=PricingPreviewResponse,
-    responses={400: {"model": ErrorResponse}},
-)
-def price_preview(req: PricingRequestSchema) -> PricingPreviewResponse | JSONResponse:
-    """Preview-tier pricing: Standard MC + BS only, no SE/CI/diagnostics."""
-    validation_err = _validate_request(req, max_n=PREVIEW_MAX_N)
-    if validation_err is not None:
-        return JSONResponse(status_code=400, content=validation_err.model_dump())
-
+def run_full_simulation(req: PricingRequestSchema) -> PricingFullResponse:
+    """Run full simulation: all 4 MC estimators, FD Greeks, convergence, diagnostics."""
     t_start = time.perf_counter()
 
     T = _compute_T(req.expiry_date)
@@ -101,59 +92,17 @@ def price_preview(req: PricingRequestSchema) -> PricingPreviewResponse | JSONRes
     sigma = req.volatility
     opt = req.option_type
 
-    # Black-Scholes analytical
     bs = black_scholes.price_and_greeks(S0, req.strike, T, r, q, sigma, opt)
 
-    # Standard MC
-    rng = make_rng(req.seed)
-    mc = monte_carlo.estimate_standard(S0, req.strike, T, r, q, sigma, opt, req.n_simulations, rng)
-
-    compute_ms = (time.perf_counter() - t_start) * 1000.0
-
-    return PricingPreviewResponse(
-        black_scholes=BSPreviewResult(price=bs.price, delta=bs.delta, gamma=bs.gamma),
-        monte_carlo_standard=MCPreviewResult(price=mc.price, delta=bs.delta, gamma=bs.gamma),
-        n_simulations=req.n_simulations,
-        compute_ms=round(compute_ms, 1),
-    )
-
-
-@router.post(
-    "/full",
-    response_model=PricingFullResponse,
-    responses={400: {"model": ErrorResponse}},
-)
-def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
-    """Full-tier pricing: all 4 estimators, full diagnostics, convergence, FD Greeks."""
-    validation_err = _validate_request(req, max_n=MAX_N_SIMULATIONS)
-    if validation_err is not None:
-        return JSONResponse(status_code=400, content=validation_err.model_dump())
-
-    t_start = time.perf_counter()
-
-    T = _compute_T(req.expiry_date)
-    S0 = req.spot_override if req.spot_override is not None else 100.0
-    r = req.risk_free_rate
-    q = req.dividend_yield if req.dividend_yield is not None else 0.0
-    sigma = req.volatility
-    opt = req.option_type
-
-    # Black-Scholes analytical
-    bs = black_scholes.price_and_greeks(S0, req.strike, T, r, q, sigma, opt)
-
-    # Monte Carlo estimators
     rng = make_rng(req.seed)
     base_Z = rng.standard_normal(req.n_simulations)
 
     mc_results_raw = []
-
-    # Standard
     mc_std = monte_carlo.estimate_standard(
         S0, req.strike, T, r, q, sigma, opt, req.n_simulations, rng, base_Z=base_Z
     )
     mc_results_raw.append(mc_std)
 
-    # Determine which methods to run
     methods = (
         ["antithetic", "control_variate", "antithetic_cv"]
         if req.variance_reduction == "all"
@@ -181,22 +130,15 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
 
     mc_results = [
         MCResultItem(
-            method=r.method,
-            price=r.price,
-            standard_error=r.standard_error,
-            ci_lower=r.ci_lower,
-            ci_upper=r.ci_upper,
-            runtime_ms=r.runtime_ms,
-            n_effective=r.n_effective,
-            paths_per_second=r.paths_per_second,
+            method=r.method, price=r.price, standard_error=r.standard_error,
+            ci_lower=r.ci_lower, ci_upper=r.ci_upper, runtime_ms=r.runtime_ms,
+            n_effective=r.n_effective, paths_per_second=r.paths_per_second,
         )
         for r in mc_results_raw
     ]
 
-    # FD Greeks with CRN
     fd = finite_difference_greeks(S0, req.strike, T, r, q, sigma, opt, seed=req.seed, n=DEFAULT_GREEKS_N)
 
-    # Convergence sweep — independent draws at each grid point
     grid = req.convergence_grid or DEFAULT_CONVERGENCE_GRID
     convergence_data = []
     for i, n_grid in enumerate(grid):
@@ -206,14 +148,12 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
         )
         convergence_data.append(ConvergencePoint(n=n_grid, standard_error=grid_result.standard_error))
 
-    # Convergence fit: log-log regression of SE vs N → slope ≈ -0.5
     if len(convergence_data) >= 2:
         log_n = np.log([p.n for p in convergence_data])
         log_se = np.log([p.standard_error for p in convergence_data if p.standard_error > 0])
         if len(log_se) == len(log_n) and len(log_n) >= 2:
             coeffs = np.polyfit(log_n, log_se, 1)
             slope = float(coeffs[0])
-            # R-squared
             predicted = np.polyval(coeffs, log_n)
             ss_res = float(np.sum((log_se - predicted) ** 2))
             ss_tot = float(np.sum((log_se - np.mean(log_se)) ** 2))
@@ -225,9 +165,7 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
 
     conv_fit = ConvergenceFit(slope=round(slope, 3), r_squared=round(r_squared, 3))
 
-    # Diagnostics
     discount_factor = math.exp(-r * T)
-    # Recompute S_T from base_Z for diagnostics
     drift = (r - q - 0.5 * sigma**2) * T
     vol_sqrt_T = sigma * math.sqrt(T)
     S_T = S0 * np.exp(drift + vol_sqrt_T * base_Z)
@@ -250,7 +188,6 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
         relative_error_vs_bs=round(relative_error, 5),
     )
 
-    # Terminal distribution sample (capped at 5000 points)
     if len(S_T) > _TERMINAL_SAMPLE_CAP:
         sample_rng = make_rng(req.seed + 999)
         indices = sample_rng.choice(len(S_T), size=_TERMINAL_SAMPLE_CAP, replace=False)
@@ -270,11 +207,7 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
         ),
         mc_results=mc_results,
         greeks_fd=FDGreeksResult(
-            delta=fd.delta,
-            gamma=fd.gamma,
-            vega=fd.vega,
-            theta=fd.theta,
-            rho=fd.rho,
+            delta=fd.delta, gamma=fd.gamma, vega=fd.vega, theta=fd.theta, rho=fd.rho,
             bump_size_used=fd.bump_sizes_used,
         ),
         convergence_data=convergence_data,
@@ -283,3 +216,51 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
         terminal_distribution_sample=terminal_sample,
         compute_ms=round(compute_ms, 1),
     )
+
+
+@router.post(
+    "/preview",
+    response_model=PricingPreviewResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def price_preview(req: PricingRequestSchema) -> PricingPreviewResponse | JSONResponse:
+    """Preview-tier pricing: Standard MC + BS only, no SE/CI/diagnostics."""
+    validation_err = validate_request(req, max_n=PREVIEW_MAX_N)
+    if validation_err is not None:
+        return JSONResponse(status_code=400, content=validation_err.model_dump())
+
+    t_start = time.perf_counter()
+
+    T = _compute_T(req.expiry_date)
+    S0 = req.spot_override if req.spot_override is not None else 100.0
+    r = req.risk_free_rate
+    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+    sigma = req.volatility
+    opt = req.option_type
+
+    bs = black_scholes.price_and_greeks(S0, req.strike, T, r, q, sigma, opt)
+
+    rng = make_rng(req.seed)
+    mc = monte_carlo.estimate_standard(S0, req.strike, T, r, q, sigma, opt, req.n_simulations, rng)
+
+    compute_ms = (time.perf_counter() - t_start) * 1000.0
+
+    return PricingPreviewResponse(
+        black_scholes=BSPreviewResult(price=bs.price, delta=bs.delta, gamma=bs.gamma),
+        monte_carlo_standard=MCPreviewResult(price=mc.price, delta=bs.delta, gamma=bs.gamma),
+        n_simulations=req.n_simulations,
+        compute_ms=round(compute_ms, 1),
+    )
+
+
+@router.post(
+    "/full",
+    response_model=PricingFullResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
+    """Full-tier pricing: all 4 estimators, full diagnostics, convergence, FD Greeks."""
+    validation_err = validate_request(req, max_n=MAX_N_SIMULATIONS)
+    if validation_err is not None:
+        return JSONResponse(status_code=400, content=validation_err.model_dump())
+    return run_full_simulation(req)

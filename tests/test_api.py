@@ -158,11 +158,22 @@ def test_full_rejects_n_above_maximum():
 # ---------------------------------------------------------------------------
 
 
-def test_report_pdf_returns_501():
-    """POST /api/v1/report/pdf returns 501 Not Implemented."""
-    resp = client.post("/api/v1/report/pdf")
-    assert resp.status_code == 501
-    assert resp.json()["error"] == "not_implemented"
+def test_report_pdf_returns_pdf():
+    """POST /api/v1/report/pdf returns 200 with application/pdf content type."""
+    payload = _make_pricing_request(n_simulations=5000)
+    resp = client.post("/api/v1/report/pdf", json=payload)
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "application/pdf"
+    # PDF files start with %PDF magic bytes
+    assert resp.content[:5] == b"%PDF-"
+
+
+def test_report_pdf_rejects_past_expiry():
+    """POST /api/v1/report/pdf with past expiry returns 400."""
+    past = (date.today() - timedelta(days=1)).isoformat()
+    payload = _make_pricing_request(expiry_date=past)
+    resp = client.post("/api/v1/report/pdf", json=payload)
+    assert resp.status_code == 400
 
 
 # ---------------------------------------------------------------------------
