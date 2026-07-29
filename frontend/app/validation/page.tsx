@@ -48,13 +48,13 @@ export default function ValidationPage() {
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
             Validation &amp; CI Verification Suite
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-300 mt-1">
             Static CI-time empirical verification artifacts &bull; Serves pre-computed CI test results
           </p>
         </div>
 
         <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded text-xs font-mono text-cyan-300">
-          <span className="text-slate-400 block text-xs">VERIFICATION SOURCE:</span>
+          <span className="text-slate-300 block text-xs">VERIFICATION SOURCE:</span>
           Static CI Artifact (GET /validation/summary)
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function ValidationPage() {
           <h3 className="text-lg font-bold text-slate-300 font-mono">
             Validation Summary Generated on CI
           </h3>
-          <p className="text-sm text-slate-400 max-w-md mx-auto font-mono">
+          <p className="text-sm text-slate-300 max-w-md mx-auto font-mono">
             Validation summary generated on CI — will appear after first run.
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function ValidationPage() {
             {/* Card 1: 200-Trial Coverage Calibration */}
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                   200-Trial CI Coverage
                 </span>
                 <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono">
@@ -116,11 +116,11 @@ export default function ValidationPage() {
                   : "N/A"}
               </div>
 
-              <div className="text-xs font-mono text-slate-400 space-y-1">
+              <div className="text-xs font-mono text-slate-300 space-y-1">
                 <div>Nominal Target: {(summary.ci_coverage.nominal_confidence * 100).toFixed(1)}%</div>
                 <div>Total Trials: {summary.ci_coverage.trials}</div>
                 {summary.ci_coverage.last_run && (
-                  <div className="text-slate-400 text-xs pt-1 border-t border-slate-800 mt-2">
+                  <div className="text-slate-300 text-xs pt-1 border-t border-slate-800 mt-2">
                     Last Run: {formatDateTime(summary.ci_coverage.last_run)}
                   </div>
                 )}
@@ -130,7 +130,7 @@ export default function ValidationPage() {
             {/* Card 2: Edge-Cases Suite Badge */}
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                   Edge-Case Test Suite
                 </span>
                 <span className="text-xs bg-cyan-950 text-cyan-300 border border-cyan-800 px-2 py-0.5 rounded font-mono">
@@ -142,11 +142,11 @@ export default function ValidationPage() {
                 {summary.edge_cases.passed} / {summary.edge_cases.total}
               </div>
 
-              <div className="text-xs font-mono text-slate-400 space-y-1">
+              <div className="text-xs font-mono text-slate-300 space-y-1">
                 <div>Analytical boundary checks (T&rarr;0, &sigma;&rarr;0)</div>
                 <div>Put-Call Parity residuals &le; 1e-5</div>
                 {summary.edge_cases.last_run && (
-                  <div className="text-slate-400 text-xs pt-1 border-t border-slate-800 mt-2">
+                  <div className="text-slate-300 text-xs pt-1 border-t border-slate-800 mt-2">
                     Last Run: {formatDateTime(summary.edge_cases.last_run)}
                   </div>
                 )}
@@ -156,7 +156,7 @@ export default function ValidationPage() {
             {/* Card 3: Greeks Validation Badge */}
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                   Greeks Validation Suite
                 </span>
                 <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono">
@@ -168,7 +168,7 @@ export default function ValidationPage() {
                 {summary.greeks_validation.passed} / {summary.greeks_validation.total}
               </div>
 
-              <div className="text-xs font-mono text-slate-400 space-y-1">
+              <div className="text-xs font-mono text-slate-300 space-y-1">
                 <div>Finite-Difference vs Analytical BS</div>
                 <div>Common Random Numbers (CRN) verified</div>
               </div>
@@ -183,7 +183,7 @@ export default function ValidationPage() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs font-mono text-left">
-                <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                <thead className="bg-slate-950 text-slate-300 border-b border-slate-800">
                   <tr>
                     <th className="p-3">Greek Symbol</th>
                     <th className="p-3">Parameter Name</th>
@@ -195,11 +195,11 @@ export default function ValidationPage() {
                 <tbody className="divide-y divide-slate-800 text-slate-200">
                   <tr>
                     <td className="p-3 font-bold text-white">Delta (&Delta;)</td>
-                    <td className="p-3 text-slate-400">Spot Sensitivity (&partial;V / &partial;S)</td>
+                    <td className="p-3 text-slate-300">Spot Sensitivity (&partial;V / &partial;S)</td>
                     <td className="p-3 text-right font-bold text-cyan-300">
                       &le; {((summary.greeks_validation.tolerances.delta ?? 0.02) * 100).toFixed(1)}%
                     </td>
-                    <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
+                    <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
@@ -208,11 +208,11 @@ export default function ValidationPage() {
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-white">Gamma (&Gamma;)</td>
-                    <td className="p-3 text-slate-400">Convexity (&partial;&sup2;V / &partial;S&sup2;)</td>
+                    <td className="p-3 text-slate-300">Convexity (&partial;&sup2;V / &partial;S&sup2;)</td>
                     <td className="p-3 text-right font-bold text-cyan-300">
                       &le; {((summary.greeks_validation.tolerances.gamma ?? 0.05) * 100).toFixed(1)}%
                     </td>
-                    <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
+                    <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
@@ -221,11 +221,11 @@ export default function ValidationPage() {
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-white">Vega (&nu;)</td>
-                    <td className="p-3 text-slate-400">Volatility Sensitivity (&partial;V / &partial;&sigma;)</td>
+                    <td className="p-3 text-slate-300">Volatility Sensitivity (&partial;V / &partial;&sigma;)</td>
                     <td className="p-3 text-right font-bold text-cyan-300">
                       &le; {((summary.greeks_validation.tolerances.vega ?? 0.03) * 100).toFixed(1)}%
                     </td>
-                    <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
+                    <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
@@ -234,11 +234,11 @@ export default function ValidationPage() {
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-white">Theta (&theta;)</td>
-                    <td className="p-3 text-slate-400">Time Decay (&partial;V / &partial;t)</td>
+                    <td className="p-3 text-slate-300">Time Decay (&partial;V / &partial;t)</td>
                     <td className="p-3 text-right font-bold text-cyan-300">
                       &le; {((summary.greeks_validation.tolerances.theta ?? 0.05) * 100).toFixed(1)}%
                     </td>
-                    <td className="p-3 text-center text-slate-400">One-Sided Difference</td>
+                    <td className="p-3 text-center text-slate-300">One-Sided Difference</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
@@ -247,11 +247,11 @@ export default function ValidationPage() {
                   </tr>
                   <tr>
                     <td className="p-3 font-bold text-white">Rho (&rho;)</td>
-                    <td className="p-3 text-slate-400">Interest Rate Sensitivity (&partial;V / &partial;r)</td>
+                    <td className="p-3 text-slate-300">Interest Rate Sensitivity (&partial;V / &partial;r)</td>
                     <td className="p-3 text-right font-bold text-cyan-300">
                       &le; {((summary.greeks_validation.tolerances.rho ?? 0.03) * 100).toFixed(1)}%
                     </td>
-                    <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
+                    <td className="p-3 text-center text-slate-300">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
@@ -268,21 +268,21 @@ export default function ValidationPage() {
             <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider mb-2">
               Empirical Monte Carlo Convergence Proof ($\mathcal{"{"}O{"}"}(N^{-1/2})$)
             </h3>
-            <p className="text-xs text-slate-400 font-mono mb-4">
+            <p className="text-xs text-slate-300 font-mono mb-4">
               Theoretical regression proof fitted over grid $N \in [1k, 5k, 25k, 100k, 500k]$
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-400 block mb-1">Empirical Fitted Slope</span>
+                <span className="text-xs text-slate-300 block mb-1">Empirical Fitted Slope</span>
                 <div className="text-2xl font-extrabold text-cyan-300">-0.497</div>
-                <span className="text-xs text-slate-400 mt-1 block">Target: -0.500 (Central Limit Theorem)</span>
+                <span className="text-xs text-slate-300 mt-1 block">Target: -0.500 (Central Limit Theorem)</span>
               </div>
 
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-400 block mb-1">Goodness of Fit ($R^2$)</span>
+                <span className="text-xs text-slate-300 block mb-1">Goodness of Fit ($R^2$)</span>
                 <div className="text-2xl font-extrabold text-emerald-400">0.998</div>
-                <span className="text-xs text-slate-400 mt-1 block">Target: &gt; 0.990 (Strong Log-Log Linearity)</span>
+                <span className="text-xs text-slate-300 mt-1 block">Target: &gt; 0.990 (Strong Log-Log Linearity)</span>
               </div>
             </div>
           </div>

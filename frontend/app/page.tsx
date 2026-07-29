@@ -76,7 +76,7 @@ export default function MarketOverviewPage() {
         <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
           Market Overview
         </h1>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-300">
           Inspect underlying asset market data, historical volatility windows, and dividend yields before pricing options.
         </p>
       </div>
@@ -120,7 +120,7 @@ export default function MarketOverviewPage() {
               className="w-full bg-slate-950 border border-slate-700 rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
             />
             {marketInput === "IN" && (
-              <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-mono">
+              <span className="absolute right-3 top-2.5 text-xs text-slate-300 font-mono">
                 Auto-appends .NS
               </span>
             )}
@@ -138,7 +138,7 @@ export default function MarketOverviewPage() {
 
         {/* Preset Quick Tickers */}
         <div className="mt-4 pt-4 border-t border-slate-800/60 flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-slate-400 mr-2 font-medium">Quick Presets:</span>
+          <span className="text-xs text-slate-300 mr-2 font-medium">Quick Presets:</span>
           {PRESET_TICKERS.map((item) => (
             <button
               key={item.ticker}
@@ -190,13 +190,13 @@ export default function MarketOverviewPage() {
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
                   Manual Entry Available
                 </h4>
-                <p className="text-xs text-slate-400 mb-4">
+                <p className="text-xs text-slate-300 mb-4">
                   Enter parameters manually to proceed to the Pricing Workspace for <span className="text-slate-300 font-mono font-bold">{error.field || tickerInput}</span>.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Spot Price</label>
+                    <label className="block text-xs text-slate-300 mb-1">Spot Price</label>
                     <input
                       type="number"
                       step="0.01"
@@ -206,7 +206,7 @@ export default function MarketOverviewPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Volatility</label>
+                    <label className="block text-xs text-slate-300 mb-1">Volatility</label>
                     <input
                       type="number"
                       step="0.01"
@@ -216,7 +216,7 @@ export default function MarketOverviewPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Dividend Yield</label>
+                    <label className="block text-xs text-slate-300 mb-1">Dividend Yield</label>
                     <input
                       type="number"
                       step="0.001"
@@ -261,7 +261,7 @@ export default function MarketOverviewPage() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 font-mono">
+              <p className="text-xs text-slate-300 font-mono">
                 Delayed Data (yfinance) &bull; Last Updated: {formatDateTime(quote.last_updated)}
               </p>
             </div>
@@ -315,25 +315,25 @@ export default function MarketOverviewPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-400 font-mono block mb-1">20-Day Vol</span>
+                <span className="text-xs text-slate-300 font-mono block mb-1">20-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["20d"] || 0)}
                 </span>
               </div>
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-400 font-mono block mb-1">60-Day Vol</span>
+                <span className="text-xs text-slate-300 font-mono block mb-1">60-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["60d"] || 0)}
                 </span>
               </div>
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-400 font-mono block mb-1">126-Day Vol</span>
+                <span className="text-xs text-slate-300 font-mono block mb-1">126-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["126d"] || 0)}
                 </span>
               </div>
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-400 font-mono block mb-1">252-Day Vol (1 Year)</span>
+                <span className="text-xs text-slate-300 font-mono block mb-1">252-Day Vol (1 Year)</span>
                 <span className="text-xl font-bold font-mono text-cyan-400">
                   {formatPercent(quote.historical_volatility["252d"] || 0)}
                 </span>
@@ -344,7 +344,7 @@ export default function MarketOverviewPage() {
           {/* Secondary Financial Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
                 Dividend Yield (q)
               </span>
               <span className="text-2xl font-bold font-mono text-white">
@@ -353,7 +353,7 @@ export default function MarketOverviewPage() {
             </div>
 
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
                 Market Capitalization
               </span>
               <span className="text-2xl font-bold font-mono text-white">
@@ -362,7 +362,7 @@ export default function MarketOverviewPage() {
             </div>
 
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
                 Quote Currency
               </span>
               <span className="text-2xl font-bold font-mono text-white">

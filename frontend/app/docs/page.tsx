@@ -8,7 +8,7 @@ export default function DocsPage() {
         <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
           Quantitative Methodology &amp; Mathematical Specification
         </h1>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-300">
           Single source of truth for all mathematical models, Monte Carlo variance-reduction algorithms, Greeks derivations, and defensible architectural decisions.
         </p>
       </div>
@@ -29,16 +29,16 @@ export default function DocsPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono text-slate-300 py-2">
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-400 block">S_t</span> Stock price at time t
+            <span className="text-slate-300 block">S_t</span> Stock price at time t
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-400 block">r</span> Risk-free rate (annualized)
+            <span className="text-slate-300 block">r</span> Risk-free rate (annualized)
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-400 block">q</span> Continuous dividend yield
+            <span className="text-slate-300 block">q</span> Continuous dividend yield
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-400 block">σ</span> Volatility (annualized)
+            <span className="text-slate-300 block">σ</span> Volatility (annualized)
           </div>
         </div>
 
@@ -122,7 +122,7 @@ export default function DocsPage() {
         <h3 className="text-sm font-bold text-slate-200 pt-2">Analytical Greeks Table</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono text-left">
-            <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+            <thead className="bg-slate-950 text-slate-300 border-b border-slate-800">
               <tr>
                 <th className="p-2.5">Greek</th>
                 <th className="p-2.5">Call Formula</th>
@@ -135,31 +135,31 @@ export default function DocsPage() {
                 <td className="p-2.5 font-bold text-white">Delta (&Delta;)</td>
                 <td className="p-2.5 text-cyan-300">e^(-qT) N(d1)</td>
                 <td className="p-2.5 text-cyan-300">-e^(-qT) N(-d1)</td>
-                <td className="p-2.5 text-slate-400">Directional spot sensitivity</td>
+                <td className="p-2.5 text-slate-300">Directional spot sensitivity</td>
               </tr>
               <tr>
                 <td className="p-2.5 font-bold text-white">Gamma (&Gamma;)</td>
                 <td className="p-2.5 text-cyan-300">e^(-qT) &phi;(d1) / (S0 &sigma; &radic;T)</td>
                 <td className="p-2.5 text-cyan-300">Identical to Call</td>
-                <td className="p-2.5 text-slate-400">Convexity (curvature)</td>
+                <td className="p-2.5 text-slate-300">Convexity (curvature)</td>
               </tr>
               <tr>
                 <td className="p-2.5 font-bold text-white">Vega (&nu;)</td>
                 <td className="p-2.5 text-cyan-300">S0 e^(-qT) &phi;(d1) &radic;T</td>
                 <td className="p-2.5 text-cyan-300">Identical to Call</td>
-                <td className="p-2.5 text-slate-400">Volatility sensitivity</td>
+                <td className="p-2.5 text-slate-300">Volatility sensitivity</td>
               </tr>
               <tr>
                 <td className="p-2.5 font-bold text-white">Theta (&theta;)</td>
                 <td className="p-2.5 text-cyan-300">Annualized / 365</td>
                 <td className="p-2.5 text-cyan-300">Annualized / 365</td>
-                <td className="p-2.5 text-slate-400">Reported per calendar day</td>
+                <td className="p-2.5 text-slate-300">Reported per calendar day</td>
               </tr>
               <tr>
                 <td className="p-2.5 font-bold text-white">Rho (&rho;)</td>
                 <td className="p-2.5 text-cyan-300">K T e^(-rT) N(d2)</td>
                 <td className="p-2.5 text-cyan-300">-K T e^(-rT) N(-d2)</td>
-                <td className="p-2.5 text-slate-400">Interest rate sensitivity</td>
+                <td className="p-2.5 text-slate-300">Interest rate sensitivity</td>
               </tr>
             </tbody>
           </table>
@@ -178,17 +178,17 @@ export default function DocsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
           <div className="bg-slate-950 p-4 rounded border border-slate-800">
-            <span className="text-slate-400 font-bold block mb-1">Standard Error (SE):</span>
+            <span className="text-slate-300 font-bold block mb-1">Standard Error (SE):</span>
             <div className="text-cyan-300 text-sm">SE = s / &radic;N</div>
-            <p className="text-slate-400 text-xs mt-2">
+            <p className="text-slate-300 text-xs mt-2">
               Sample variance s&sup2; computed over i.i.d. discounted payoffs.
             </p>
           </div>
 
           <div className="bg-slate-950 p-4 rounded border border-slate-800">
-            <span className="text-slate-400 font-bold block mb-1">95% Confidence Interval:</span>
+            <span className="text-slate-300 font-bold block mb-1">95% Confidence Interval:</span>
             <div className="text-cyan-300 text-sm">95% CI = V̂ &plusmn; 1.96 &bull; SE</div>
-            <p className="text-slate-400 text-xs mt-2">
+            <p className="text-slate-300 text-xs mt-2">
               Normal-approximation CI justified by Central Limit Theorem (CLT).
             </p>
           </div>
@@ -211,27 +211,27 @@ export default function DocsPage() {
         <div className="space-y-4 text-sm text-slate-300">
           <div className="bg-slate-950 p-4 rounded border border-slate-800">
             <h3 className="font-bold text-white mb-1">5.1 Antithetic Variates</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               For each standard normal draw +Z_i, also evaluate payoff at -Z_i. Monotonic option payoffs guarantee negative correlation between paired paths, reducing variance of their average.
             </p>
           </div>
 
           <div className="bg-slate-950 p-4 rounded border border-slate-800">
             <h3 className="font-bold text-white mb-1">5.2 Control Variates (Terminal Asset Price S_T)</h3>
-            <p className="text-xs text-slate-400 leading-relaxed mb-2">
+            <p className="text-xs text-slate-300 leading-relaxed mb-2">
               Uses terminal asset price S_T as control variate with known expectation E^Q[S_T] = S0 e^((r-q)T) (Boyle 1977).
             </p>
             <div className="font-mono text-xs text-cyan-300 bg-slate-900 p-2 rounded">
               V̂_CV = e^(-rT) &bull; (1/N) &sum; [ h(S_T^(i)) - &beta;* (S_T^(i) - E[S_T]) ]
             </div>
-            <p className="text-xs text-slate-400 mt-2 font-mono">
+            <p className="text-xs text-slate-300 mt-2 font-mono">
               Why S_T and NOT BS price as control? BS price is the benchmark being validated, so using it as a control would be circular. S_T has a known expectation independent of the option price.
             </p>
           </div>
 
           <div className="bg-slate-950 p-4 rounded border border-slate-800">
             <h3 className="font-bold text-white mb-1">5.3 Combined Antithetic + Control Variates</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               Applies antithetic pairing first, then applies control variate correction to paired averages. Stacked techniques achieve maximal variance reduction without redundancy.
             </p>
           </div>
@@ -248,7 +248,7 @@ export default function DocsPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono text-left">
-            <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+            <thead className="bg-slate-950 text-slate-300 border-b border-slate-800">
               <tr>
                 <th className="p-3">Model Assumption</th>
                 <th className="p-3">Market Reality</th>
@@ -259,43 +259,43 @@ export default function DocsPage() {
             <tbody className="divide-y divide-slate-800 text-slate-200">
               <tr>
                 <td className="p-3 font-bold text-white">Constant Volatility</td>
-                <td className="p-3 text-slate-400">Implied vol varies by strike &amp; expiry (smile/skew)</td>
+                <td className="p-3 text-slate-300">Implied vol varies by strike &amp; expiry (smile/skew)</td>
                 <td className="p-3 text-cyan-300">Single &sigma; input (historical or manual)</td>
                 <td className="p-3 text-emerald-400">SABR / Local Volatility (Dupire)</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">GBM / Log-Normal Returns</td>
-                <td className="p-3 text-slate-400">Real returns exhibit fat tails &amp; negative skew</td>
+                <td className="p-3 text-slate-300">Real returns exhibit fat tails &amp; negative skew</td>
                 <td className="p-3 text-cyan-300">GBM log-normal exact sampling</td>
                 <td className="p-3 text-emerald-400">Merton Jump-Diffusion / Heston</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Constant Risk-Free Rate</td>
-                <td className="p-3 text-slate-400">Rates have term structure &amp; evolve stochastically</td>
+                <td className="p-3 text-slate-300">Rates have term structure &amp; evolve stochastically</td>
                 <td className="p-3 text-cyan-300">Flat r rate input</td>
                 <td className="p-3 text-emerald-400">BondFactor Yield Curve Provider Hook</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Continuous Dividend Yield</td>
-                <td className="p-3 text-slate-400">Real dividends are discrete cash payments</td>
+                <td className="p-3 text-slate-300">Real dividends are discrete cash payments</td>
                 <td className="p-3 text-cyan-300">Continuous q yield approximation</td>
                 <td className="p-3 text-emerald-400">Scheduled Ex-Dividend Escrow Modeling</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">European Exercise Only</td>
-                <td className="p-3 text-slate-400">Most US single-name equity options are American</td>
+                <td className="p-3 text-slate-300">Most US single-name equity options are American</td>
                 <td className="p-3 text-cyan-300">Explicit scope limitation</td>
                 <td className="p-3 text-emerald-400">Longstaff-Schwartz LSM Monte Carlo</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Frictionless Markets</td>
-                <td className="p-3 text-slate-400">Real trading has bid-ask spreads &amp; market impact</td>
+                <td className="p-3 text-slate-300">Real trading has bid-ask spreads &amp; market impact</td>
                 <td className="p-3 text-cyan-300">Not modeled in pricing engine</td>
                 <td className="p-3 text-emerald-400">Pricing Model vs Execution System distinction</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Risk-Neutral Measure Q</td>
-                <td className="p-3 text-slate-400">Physical measure drift &ne; risk-neutral drift</td>
+                <td className="p-3 text-slate-300">Physical measure drift &ne; risk-neutral drift</td>
                 <td className="p-3 text-cyan-300">Priced strictly under risk-neutral measure Q</td>
                 <td className="p-3 text-emerald-400">Appropriate for pricing/hedging, not forecasting</td>
               </tr>
@@ -312,7 +312,7 @@ export default function DocsPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono text-left">
-            <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+            <thead className="bg-slate-950 text-slate-300 border-b border-slate-800">
               <tr>
                 <th className="p-3">Interview Question</th>
                 <th className="p-3">One-Line Defensible Answer</th>
@@ -323,42 +323,42 @@ export default function DocsPage() {
               <tr>
                 <td className="p-3 font-bold text-white">Why MC for a problem BS solves?</td>
                 <td className="p-3 text-cyan-300">Validation infrastructure for machinery meant to generalize to unsolvable cases</td>
-                <td className="p-3 text-slate-400">Testing MC against BS on solvable case validates code before applying to path-dependent/American options</td>
+                <td className="p-3 text-slate-300">Testing MC against BS on solvable case validates code before applying to path-dependent/American options</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Why S_T and not BS price as control?</td>
                 <td className="p-3 text-cyan-300">BS price is the benchmark; using it as control would be circular</td>
-                <td className="p-3 text-slate-400">S_T has a known expectation E^Q[S_T] = S0 e^(r-q)T independent of option price</td>
+                <td className="p-3 text-slate-300">S_T has a known expectation E^Q[S_T] = S0 e^(r-q)T independent of option price</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Why exact GBM sampling, not Euler?</td>
                 <td className="p-3 text-cyan-300">No discretization error needed or wanted for European terminal payoffs</td>
-                <td className="p-3 text-slate-400">Log-normal transition density is known in closed form; Euler adds bias</td>
+                <td className="p-3 text-slate-300">Log-normal transition density is known in closed form; Euler adds bias</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Why normal CI, not Bootstrap?</td>
                 <td className="p-3 text-cyan-300">CLT applies cleanly to i.i.d. finite-variance draws; bootstrap adds cost with no benefit</td>
-                <td className="p-3 text-slate-400">Sample size N &ge; 10k guarantees sample mean is asymptotically normal</td>
+                <td className="p-3 text-slate-300">Sample size N &ge; 10k guarantees sample mean is asymptotically normal</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Why FD Greeks need CRN?</td>
                 <td className="p-3 text-cyan-300">Without CRN, finite-difference bumps are swamped by MC simulation noise</td>
-                <td className="p-3 text-slate-400">Reusing same random seed across bump pair cancels path noise</td>
+                <td className="p-3 text-slate-300">Reusing same random seed across bump pair cancels path noise</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Why continuous dividend yield?</td>
                 <td className="p-3 text-cyan-300">Free market data lacks reliable ex-dividend schedules; explicitly named gap</td>
-                <td className="p-3 text-slate-400">Merton continuous approximation is standard for equity index &amp; trailing yields</td>
+                <td className="p-3 text-slate-300">Merton continuous approximation is standard for equity index &amp; trailing yields</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Why close-to-close vol, not range?</td>
                 <td className="p-3 text-cyan-300">Data quality consistency across US/IN tickers matters more than marginal efficiency</td>
-                <td className="p-3 text-slate-400">Close price is guaranteed across all exchanges; intraday range data is noisy</td>
+                <td className="p-3 text-slate-300">Close price is guaranteed across all exchanges; intraday range data is noisy</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Why default_rng, not RandomState?</td>
                 <td className="p-3 text-cyan-300">PCG64 is statistically superior and avoids shared global state in backend</td>
-                <td className="p-3 text-slate-400">Request-scoped isolated generator prevents race conditions in API server</td>
+                <td className="p-3 text-slate-300">Request-scoped isolated generator prevents race conditions in API server</td>
               </tr>
             </tbody>
           </table>

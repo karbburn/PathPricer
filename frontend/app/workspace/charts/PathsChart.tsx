@@ -100,11 +100,11 @@ export function PathsChart({ request }: PathsChartProps) {
           <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
             Simulated Asset Price Paths (Stepwise GBM)
           </h3>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-slate-300 font-mono mt-0.5">
             Sample of {numPaths} log-normal paths &bull; Spot: ${spotPrice.toFixed(2)} &bull; Strike: ${strikePrice.toFixed(2)}
           </p>
         </div>
-        <span className="text-xs bg-slate-950 border border-slate-800 text-slate-400 px-2 py-1 rounded font-mono">
+        <span className="text-xs bg-slate-950 border border-slate-800 text-slate-300 px-2 py-1 rounded font-mono">
           Seed: {request.seed}
         </span>
       </div>

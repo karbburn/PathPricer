@@ -905,7 +905,7 @@ export function InputPanel({
         <h2 className="text-lg font-bold text-white tracking-tight">
           Pricing Inputs
         </h2>
-        <span className="text-xs text-slate-400 font-mono">
+        <span className="text-xs text-slate-300 font-mono">
           Preview Auto-Debounced (~200ms)
         </span>
       </div>
@@ -1032,7 +1032,7 @@ export function InputPanel({
         {/* Spot Price Override */}
         <div className="grid grid-cols-2 gap-3 pt-1">
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Spot Price ($S_0$)</label>
+            <label className="block text-xs text-slate-300 mb-1">Spot Price ($S_0$)</label>
             <input
               type="number"
               step="0.01"
@@ -1045,7 +1045,7 @@ export function InputPanel({
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Dividend Yield ($q$)</label>
+            <label className="block text-xs text-slate-300 mb-1">Dividend Yield ($q$)</label>
             <input
               type="number"
               step="0.001"

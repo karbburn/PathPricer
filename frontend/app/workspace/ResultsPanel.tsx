@@ -81,7 +81,7 @@ export function ResultsPanel({
             <h2 className="text-xl font-bold text-white tracking-tight">
               Executing Full Monte Carlo Simulation
             </h2>
-            <p className="text-xs text-slate-400 font-mono mt-1">
+            <p className="text-xs text-slate-300 font-mono mt-1">
               Evaluating 4 estimators &bull; Finite-difference Greeks (CRN) &bull; Convergence sweep
             </p>
           </div>
@@ -132,7 +132,7 @@ export function ResultsPanel({
             <h2 className="text-xl font-bold text-white tracking-tight">
               Validated Pricing Results
             </h2>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
+            <p className="text-xs text-slate-300 font-mono mt-0.5">
               Risk-neutral measure $\mathbb{"{"}Q{"}"}$ &bull; Seed: {fullResult.request_echo.seed}
             </p>
           </div>
@@ -152,7 +152,7 @@ export function ResultsPanel({
             <div className="text-4xl font-black text-white font-mono tracking-tight">
               ${bs.price.toFixed(4)}
             </div>
-            <p className="text-xs text-slate-400 mt-2 font-mono">
+            <p className="text-xs text-slate-300 mt-2 font-mono">
               Analytical closed-form price
             </p>
           </div>
@@ -164,7 +164,7 @@ export function ResultsPanel({
             <div className="text-4xl font-black text-emerald-300 font-mono tracking-tight">
               ${stdMc ? stdMc.price.toFixed(4) : "N/A"}
             </div>
-            <p className="text-xs text-slate-400 mt-2 font-mono">
+            <p className="text-xs text-slate-300 mt-2 font-mono">
               SE: &plusmn;${stdMc ? stdMc.standard_error.toFixed(4) : "0.0000"}
             </p>
           </div>
@@ -177,31 +177,31 @@ export function ResultsPanel({
           </h3>
           <div className="grid grid-cols-5 gap-2 text-center font-mono">
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block">Delta (&Delta;)</span>
+              <span className="text-xs text-slate-300 block">Delta (&Delta;)</span>
               <span className="text-base font-bold text-white">
                 {bs.greeks.delta.toFixed(4)}
               </span>
             </div>
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block">Gamma (&Gamma;)</span>
+              <span className="text-xs text-slate-300 block">Gamma (&Gamma;)</span>
               <span className="text-base font-bold text-white">
                 {bs.greeks.gamma.toFixed(5)}
               </span>
             </div>
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block">Vega (&nu;)</span>
+              <span className="text-xs text-slate-300 block">Vega (&nu;)</span>
               <span className="text-base font-bold text-white">
                 {bs.greeks.vega.toFixed(4)}
               </span>
             </div>
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block">Theta (&theta;/day)</span>
+              <span className="text-xs text-slate-300 block">Theta (&theta;/day)</span>
               <span className="text-base font-bold text-white">
                 {bs.greeks.theta.toFixed(4)}
               </span>
             </div>
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block">Rho (&rho;)</span>
+              <span className="text-xs text-slate-300 block">Rho (&rho;)</span>
               <span className="text-base font-bold text-white">
                 {bs.greeks.rho.toFixed(4)}
               </span>
@@ -370,56 +370,56 @@ export function ResultsPanel({
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">Expected Payoff</span>
+              <span className="text-xs text-slate-300 block mb-1">Expected Payoff</span>
               <span className="text-base font-bold text-white">
                 ${fullResult.diagnostics.expected_payoff.toFixed(2)}
               </span>
             </div>
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">Discount Factor</span>
+              <span className="text-xs text-slate-300 block mb-1">Discount Factor</span>
               <span className="text-base font-bold text-white">
                 {fullResult.diagnostics.discount_factor.toFixed(4)}
               </span>
             </div>
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">Terminal Mean (S_T)</span>
+              <span className="text-xs text-slate-300 block mb-1">Terminal Mean (S_T)</span>
               <span className="text-base font-bold text-white">
                 ${fullResult.diagnostics.terminal_mean.toFixed(2)}
               </span>
             </div>
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">Terminal Std (S_T)</span>
+              <span className="text-xs text-slate-300 block mb-1">Terminal Std (S_T)</span>
               <span className="text-base font-bold text-white">
                 ${fullResult.diagnostics.terminal_std.toFixed(2)}
               </span>
             </div>
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">Standard Error (SE)</span>
+              <span className="text-xs text-slate-300 block mb-1">Standard Error (SE)</span>
               <span className="text-base font-bold text-amber-400">
                 &plusmn;${(stdMc?.standard_error || 0).toFixed(4)}
               </span>
             </div>
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">95% CI Width</span>
+              <span className="text-xs text-slate-300 block mb-1">95% CI Width</span>
               <span className="text-base font-bold text-white">
                 ${stdMc ? (stdMc.ci_upper - stdMc.ci_lower).toFixed(4) : "0.0000"}
               </span>
             </div>
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">Paths / Second</span>
+              <span className="text-xs text-slate-300 block mb-1">Paths / Second</span>
               <span className="text-base font-bold text-cyan-300">
                 {stdMc ? stdMc.paths_per_second.toLocaleString() : "0"}
               </span>
             </div>
 
             <div className="bg-slate-950 p-3 rounded border border-slate-800">
-              <span className="text-xs text-slate-400 block mb-1">Relative Error vs BS</span>
+              <span className="text-xs text-slate-300 block mb-1">Relative Error vs BS</span>
               <span className="text-base font-bold text-emerald-400">
                 {(fullResult.diagnostics.relative_error_vs_bs * 100).toFixed(3)}%
               </span>
@@ -441,7 +441,7 @@ export function ResultsPanel({
           <h2 className="text-xl font-bold text-slate-300 tracking-tight">
             Indicative Preview
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-slate-300 font-mono mt-0.5">
             Fast debounced scenario estimate (&le; 10k simulations) &bull; Run full simulation for validated pricing
           </p>
         </div>
@@ -456,7 +456,7 @@ export function ResultsPanel({
         /* Muted / desaturated card styling for indicative tier */
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 opacity-90">
           <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-5">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+            <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1">
               Black-Scholes (Indicative)
             </span>
             <div className="text-3xl font-bold text-slate-300 font-mono">
@@ -469,7 +469,7 @@ export function ResultsPanel({
           </div>
 
           <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-5">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+            <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1">
               Standard MC (Indicative)
             </span>
             <div className="text-3xl font-bold text-slate-300 font-mono">

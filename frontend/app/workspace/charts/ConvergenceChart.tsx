@@ -119,7 +119,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
           <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
             Monte Carlo Empirical Convergence Rate ($\log \widehat{"{"}SE{"}"}$ vs $\log N$)
           </h3>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-slate-300 font-mono mt-0.5">
             Log-log regression fit verifying theoretical $\mathcal{"{"}O{"}"}(N^{-1/2})$ error reduction rate
           </p>
         </div>
@@ -127,7 +127,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
           <span className="text-sm font-extrabold font-mono text-cyan-300 block">
             Slope = {fit.slope.toFixed(3)}
           </span>
-          <span className="text-xs text-slate-400 font-mono">
+          <span className="text-xs text-slate-300 font-mono">
             R&sup2; = {fit.r_squared.toFixed(3)} &bull; Target: -0.500
           </span>
         </div>
