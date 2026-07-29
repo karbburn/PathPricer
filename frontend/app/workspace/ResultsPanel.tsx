@@ -33,8 +33,8 @@ export function ResultsPanel({
 }: ResultsPanelProps) {
   // Error state — structured error display
   if (error) {
+    const isMarketError = error.error === "ticker_not_found";
     const isValidationError = error.error === "validation_error";
-    const isMarketError = error.error === "market_data_error" || error.error === "not_found";
     return (
       <div className="bg-slate-900 border border-red-500/40 rounded-lg overflow-hidden">
         <div className="bg-red-950/50 px-6 py-4 border-b border-red-900/60 flex items-center justify-between">

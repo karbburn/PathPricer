@@ -923,7 +923,7 @@ export function InputPanel({
                 placeholder="Ticker (e.g. AAPL)"
                 className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
               />
-              {showDropdown && tickerTouched && (
+              {showDropdown && tickerTouched && inputs.ticker.trim() && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
                   {filteredTickers.length > 0 ? (
                     filteredTickers.map((entry, idx) => (
