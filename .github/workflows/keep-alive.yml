@@ -1,4 +1,8 @@
-name: Render Keep-Alive
+name: Render Keep-Alive Pinger
+
+# Prevents Render free-tier 15-minute idle spin-down.
+# Note: GitHub Actions cron schedule is best-effort and may slip under load.
+# This pings /health to keep the instance warm; it does not affect per-request simulation compute time.
 
 on:
   schedule:
@@ -6,9 +10,30 @@ on:
   workflow_dispatch:
 
 jobs:
-  keep-alive:
+  ping-health:
     runs-on: ubuntu-latest
     steps:
       - name: Ping backend health endpoint
         run: |
-          curl -s -f <PLACEHOLDER_URL>/health || echo "Keep-alive ping completed"
+          if [ -z "${{ vars.RENDER_URL }}" ]; then
+            echo "::warning ::RENDER_URL repository variable is not set in GitHub repository settings."
+            exit 0
+          fi
+
+          URL="${{ vars.RENDER_URL }}/health"
+          echo "Pinging backend health check at: ${URL}"
+
+          HTTP_STATUS=$(curl -s -o /tmp/health_response.json -w "%{http_code}" "${URL}")
+          echo "HTTP Status Code: ${HTTP_STATUS}"
+
+          if [ -f /tmp/health_response.json ]; then
+            echo "Response Payload:"
+            cat /tmp/health_response.json
+            echo ""
+          fi
+
+          if [ "${HTTP_STATUS}" -eq 200 ]; then
+            echo "Keep-alive ping successful."
+          else
+            echo "Keep-alive ping returned non-200 status code: ${HTTP_STATUS}"
+          fi
