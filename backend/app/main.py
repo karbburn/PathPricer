@@ -7,7 +7,7 @@ and wires dependency injection.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import market, pricing, report
+from .api import market, pricing, report, validation
 from .core.config import settings
 
 app = FastAPI(title="PathPricer API", version="0.1.0")
@@ -33,3 +33,4 @@ def health_check() -> dict[str, str]:
 app.include_router(market.router, prefix="/api/v1")
 app.include_router(pricing.router, prefix="/api/v1")
 app.include_router(report.router, prefix="/api/v1")
+app.include_router(validation.router, prefix="/api/v1")

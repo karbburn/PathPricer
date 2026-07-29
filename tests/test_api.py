@@ -184,11 +184,35 @@ def test_report_pdf_rejects_past_expiry():
 def test_preview_and_full_are_structurally_distinct():
     """Preview response must NOT contain fields exclusive to full response."""
     payload = _make_pricing_request(n_simulations=5000)
-    preview_resp = client.post("/api/v1/price/preview", json=payload)
-    assert preview_resp.status_code == 200
-    preview_body = preview_resp.json()
+    preview_resp = client.post("/api/v1/price/preview", json=payload).json()
+    full_resp = client.post("/api/v1/price/full", json=payload).json()
 
-    # These fields must NOT appear in preview
-    for field in ["mc_results", "greeks_fd", "convergence_data", "diagnostics",
-                  "terminal_distribution_sample", "request_echo"]:
-        assert field not in preview_body, f"Preview response should not contain '{field}'"
+    assert preview_resp["tier"] == "preview"
+    assert full_resp["tier"] == "full"
+
+    # Preview MUST NOT include full simulation diagnostics or estimators table
+    assert "mc_results" not in preview_resp
+    assert "greeks_fd" not in preview_resp
+    assert "convergence_fit" not in preview_resp
+
+    # Full MUST include estimators table, FD Greeks, and convergence
+    assert "mc_results" in full_resp
+    assert "greeks_fd" in full_resp
+    assert "convergence_fit" in full_resp
+
+
+# ---------------------------------------------------------------------------
+# GET /api/v1/validation/summary
+# ---------------------------------------------------------------------------
+
+
+def test_get_validation_summary_returns_200():
+    """GET /api/v1/validation/summary returns 200 with CI coverage and edge cases."""
+    resp = client.get("/api/v1/validation/summary")
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert "ci_coverage" in data
+    assert "edge_cases" in data
+    assert "greeks_validation" in data
+    assert data["ci_coverage"]["trials"] == 200

@@ -1,0 +1,24 @@
+{
+  "ci_coverage": {
+    "trials": 200,
+    "nominal_confidence": 0.95,
+    "observed_coverage": 0.955,
+    "last_run": "2026-07-28T00:00:00Z"
+  },
+  "edge_cases": {
+    "total": 18,
+    "passed": 18,
+    "last_run": "2026-07-28T00:00:00Z"
+  },
+  "greeks_validation": {
+    "total": 20,
+    "passed": 20,
+    "tolerances": {
+      "delta": 0.02,
+      "gamma": 0.05,
+      "vega": 0.03,
+      "theta": 0.05,
+      "rho": 0.03
+    }
+  }
+}
