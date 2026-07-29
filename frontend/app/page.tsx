@@ -10,6 +10,7 @@ import {
   formatMarketCap,
   formatDateTime,
 } from "@/lib/formatters";
+import { TickerInput } from "@/app/components/TickerInput";
 
 const PRESET_TICKERS: Array<{ ticker: string; market: MarketRegion; name: string }> = [
   { ticker: "AAPL", market: "US", name: "Apple Inc." },
@@ -110,21 +111,14 @@ export default function MarketOverviewPage() {
             </button>
           </div>
 
-          {/* Ticker Input */}
-          <div className="relative flex-1 w-full">
-            <input
-              type="text"
-              value={tickerInput}
-              onChange={(e) => setTickerInput(e.target.value.toUpperCase())}
-              placeholder="Enter ticker (e.g. RELIANCE, AAPL, MSFT)"
-              className="w-full bg-slate-950 border border-slate-700 rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-amber-500 transition-colors"
-            />
-            {marketInput === "IN" && (
-              <span className="absolute right-3 top-2.5 text-xs text-slate-300 font-mono">
-                Auto-appends .NS
-              </span>
-            )}
-          </div>
+          {/* Ticker Autocomplete Input */}
+          <TickerInput
+            value={tickerInput}
+            onChange={(val) => setTickerInput(val)}
+            market={marketInput}
+            onSelectTicker={(selectedTicker) => fetchQuote(selectedTicker, marketInput)}
+            accentColor="amber"
+          />
 
           {/* Fetch Button */}
           <button
