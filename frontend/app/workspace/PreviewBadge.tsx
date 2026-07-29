@@ -33,17 +33,17 @@ export function PreviewBadge({
 
   // Live elapsed time counter when in 'computing' state
   useEffect(() => {
-    if (tier !== "computing") {
-      setElapsedMs(0);
-      return;
-    }
+    if (tier !== "computing") return;
 
     const startTime = Date.now();
     const interval = setInterval(() => {
       setElapsedMs(Date.now() - startTime);
     }, 50);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      setElapsedMs(0);
+    };
   }, [tier]);
 
   // 1. Pending (Debounce micro-state)

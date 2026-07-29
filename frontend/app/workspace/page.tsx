@@ -37,7 +37,7 @@ function WorkspaceContent() {
     const updated = getEffectiveInputs(
       Object.fromEntries(searchParams.entries())
     );
-    setInputs(updated);
+    setInputs(updated); // eslint-disable-line react-hooks/set-state-in-effect
   }, [searchParams]);
 
   // When inputs change, reset to preview tier unless full simulation is re-run

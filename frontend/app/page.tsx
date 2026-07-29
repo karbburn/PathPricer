@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
-import useRouter from "next/navigation";
 import Link from "next/link";
 import { getMarketQuote, ApiError } from "@/lib/api-client";
 import { MarketQuoteResponse, MarketRegion } from "@/lib/types";
@@ -56,7 +55,28 @@ export default function MarketOverviewPage() {
   };
 
   useEffect(() => {
-    fetchQuote("AAPL", "US");
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getMarketQuote("AAPL", "US");
+        setQuote(data);
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setError(err);
+        } else {
+          setError(
+            new ApiError(500, {
+              error: "unknown_error",
+              message: "Failed to connect to backend market data service.",
+            })
+          );
+        }
+        setQuote(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const handleSearchSubmit = (e: FormEvent) => {

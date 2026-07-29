@@ -37,8 +37,6 @@ export function ComparisonChart({ fullResult }: ComparisonChartProps) {
     });
   }, [fullResult]);
 
-  // Compute tight Y-axis domain around BS price
-  const prices = chartData.map((d) => d.price);
   const minP = Math.min(bsPrice, ...chartData.map((d) => d.ci_lower));
   const maxP = Math.max(bsPrice, ...chartData.map((d) => d.ci_upper));
   const padding = (maxP - minP) * 0.2 || 1.0;
@@ -85,8 +83,8 @@ export function ComparisonChart({ fullResult }: ComparisonChartProps) {
                 fontFamily: "monospace",
                 color: "#e2e8f0",
               }}
-              formatter={(val: any, name: any, item: any) => [
-                `$${Number(val).toFixed(4)} (SE: ±$${item.payload.se.toFixed(4)})`,
+              formatter={(val: unknown, name: unknown, item: { payload?: Record<string, unknown> }) => [
+                `$${Number(val).toFixed(4)} (SE: ±$${Number(item.payload?.se).toFixed(4)})`,
                 "Estimator Price",
               ]}
             />

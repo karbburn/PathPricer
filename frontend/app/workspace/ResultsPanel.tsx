@@ -3,7 +3,7 @@
 import React from "react";
 import { PreviewBadge, PrecisionTier } from "./PreviewBadge";
 import { ApiError } from "@/lib/api-client";
-import { PricingPreviewResponse, PricingFullResponse } from "@/lib/types";
+import { PricingPreviewResponse, PricingFullResponse, BSGreeks } from "@/lib/types";
 
 interface ResultsPanelProps {
   microState: "pending" | "preview" | "error";
@@ -285,8 +285,8 @@ export function ResultsPanel({
               </thead>
               <tbody className="divide-y divide-slate-800 text-slate-200">
                 {Object.entries(GREEK_TOLERANCES).map(([key, meta]) => {
-                  const bsVal = (bs.greeks as any)[key] ?? 0;
-                  const fdVal = (fd as any)[key] ?? 0;
+                  const bsVal = bs.greeks[key as keyof BSGreeks] ?? 0;
+                  const fdVal = fd[key as keyof BSGreeks] ?? 0;
                   const diff = fdVal - bsVal;
                   const relErr = bsVal !== 0 ? Math.abs(diff / bsVal) : 0;
                   const isWithinTolerance = relErr <= meta.tolerance;

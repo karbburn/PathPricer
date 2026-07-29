@@ -6,7 +6,6 @@ import { useDebounce } from "@/lib/hooks/useDebounce";
 import { serializeInputs } from "@/lib/url-state";
 import {
   MarketRegion,
-  OptionType,
   PricingPreviewResponse,
   PricingRequest,
   VarianceReductionMethod,

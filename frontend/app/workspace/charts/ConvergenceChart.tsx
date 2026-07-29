@@ -106,7 +106,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
                 fontFamily: "monospace",
                 color: "#e2e8f0",
               }}
-              formatter={(val: any, name: any) => [
+              formatter={(val: unknown, name: unknown) => [
                 Number(val).toFixed(4),
                 name === "logSe" ? "Empirical log10(SE)" : "Fitted log10(SE)",
               ]}

@@ -127,7 +127,7 @@ export function TerminalDistributionChart({ fullResult }: TerminalDistributionCh
                 fontFamily: "monospace",
                 color: "#e2e8f0",
               }}
-              formatter={(val: any, name: any) => [
+              formatter={(val: unknown, name: unknown) => [
                 Number(val).toFixed(5),
                 name === "empiricalDensity"
                   ? "Empirical Density"
