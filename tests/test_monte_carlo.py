@@ -262,3 +262,54 @@ def test_variance_reduction_ordering():
 
     # Combined 95% CI contains Black-Scholes price
     assert acv_res.ci_lower <= bs_call <= acv_res.ci_upper
+
+
+def test_estimate_qmc_result_structure_and_benchmark_convergence():
+    """Verify estimate_qmc result structure and convergence to Black-Scholes benchmark."""
+    S0, K, T, r, q, sigma = 100.0, 100.0, 1.0, 0.05, 0.02, 0.2
+    bs_call = black_scholes.price(S0, K, T, r, q, sigma, "call")
+
+    res = monte_carlo.estimate_qmc(
+        S0=S0, K=K, T=T, r=r, q=q, sigma=sigma, option_type="call",
+        n_simulations=4096, seed=42, n_replications=20
+    )
+
+    assert isinstance(res, MCEstimatorResult)
+    assert res.method == "quasi_monte_carlo"
+    assert res.n_effective == 20 * 4096
+    assert res.standard_error > 0
+    assert pytest.approx(res.price, abs=0.01) == bs_call
+
+
+def test_qmc_reproducibility():
+    """Verify RQMC estimator produces byte-identical price and SE for identical seeds."""
+    S0, K, T, r, q, sigma = 100.0, 105.0, 0.5, 0.04, 0.01, 0.25
+    res1 = monte_carlo.estimate_qmc(S0, K, T, r, q, sigma, "put", 8192, seed=123, n_replications=15)
+    res2 = monte_carlo.estimate_qmc(S0, K, T, r, q, sigma, "put", 8192, seed=123, n_replications=15)
+
+    assert res1.price == res2.price
+    assert res1.standard_error == res2.standard_error
+    assert res1.n_effective == res2.n_effective
+
+
+def test_qmc_se_smaller_than_standard_mc_on_average():
+    """Verify RQMC standard error is consistently smaller than Standard MC SE at comparable n_effective."""
+    S0, K, T, r, q, sigma = 100.0, 100.0, 1.0, 0.05, 0.02, 0.2
+    # Match n_effective: N_std = 20 * 4096 = 81,920
+    M, N = 20, 4096
+    n_total = M * N
+
+    qmc_se_wins = 0
+    test_seeds = [101, 202, 303, 404, 505]
+
+    for seed in test_seeds:
+        rng_std = make_rng(seed)
+        std_res = monte_carlo.estimate_standard(S0, K, T, r, q, sigma, "call", n_total, rng_std)
+        qmc_res = monte_carlo.estimate_qmc(S0, K, T, r, q, sigma, "call", N, seed, n_replications=M)
+
+        if qmc_res.standard_error < std_res.standard_error:
+            qmc_se_wins += 1
+
+    # Assert RQMC has smaller SE on average across random seeds
+    assert qmc_se_wins >= 4
+

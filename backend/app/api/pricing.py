@@ -110,7 +110,7 @@ def run_full_simulation(req: PricingRequestSchema) -> PricingFullResponse:
     mc_results_raw.append(mc_std)
 
     methods = (
-        ["antithetic", "control_variate", "antithetic_cv"]
+        ["antithetic", "control_variate", "antithetic_cv", "quasi_monte_carlo"]
         if req.variance_reduction == "all"
         else [req.variance_reduction]
         if req.variance_reduction != "standard"
@@ -129,6 +129,10 @@ def run_full_simulation(req: PricingRequestSchema) -> PricingFullResponse:
         elif method == "antithetic_cv":
             result = monte_carlo.estimate_antithetic_cv(
                 S0, req.strike, T, r, q, sigma, opt, req.n_simulations, rng, base_Z=base_Z
+            )
+        elif method == "quasi_monte_carlo":
+            result = monte_carlo.estimate_qmc(
+                S0, req.strike, T, r, q, sigma, opt, req.n_simulations, seed=req.seed
             )
         else:
             continue

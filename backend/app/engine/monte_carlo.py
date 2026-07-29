@@ -8,6 +8,8 @@ import math
 import time
 from dataclasses import dataclass
 import numpy as np
+from scipy.stats import norm
+from scipy.stats.qmc import Sobol
 
 from ..core.config import MIN_SIGMA, MIN_T
 
@@ -473,3 +475,108 @@ def estimate_antithetic_cv(
         n_effective=n_effective,
         paths_per_second=paths_per_second,
     )
+
+
+def estimate_qmc(
+    S0: float,
+    K: float,
+    T: float,
+    r: float,
+    q: float,
+    sigma: float,
+    option_type: str,
+    n_simulations: int,
+    seed: int,
+    n_replications: int = 20,
+) -> MCEstimatorResult:
+    """Estimate European option price using Randomized Quasi-Monte Carlo (RQMC).
+
+    Uses Owen-scrambled 1D Sobol sequences across M independent replications.
+    Points N per replication are rounded up to the nearest power of 2 to preserve Sobol discrepancy properties.
+    Between-replication variance provides a statistically valid CLT-based standard error.
+
+    Args:
+        S0: Current spot price (> 0).
+        K: Strike price (> 0).
+        T: Time to expiration in years.
+        r: Risk-free rate (annualized).
+        q: Dividend yield (annualized).
+        sigma: Volatility (annualized).
+        option_type: 'call' or 'put' (case-insensitive).
+        n_simulations: Target number of paths per replication N (rounded up to power of 2).
+        seed: Base seed for deterministic Owen-scramble replication seeding.
+        n_replications: Number of independent Owen-scrambled replications M (default 20).
+
+    Returns:
+        MCEstimatorResult: RQMC result containing mean price, valid SE, 95% CI, and n_effective = M * N.
+
+    Raises:
+        ValueError: If option_type is invalid or n_simulations <= 0.
+    """
+    opt_type = option_type.lower()
+    if opt_type not in ("call", "put"):
+        raise ValueError(f"Invalid option_type: '{option_type}'. Must be 'call' or 'put'.")
+    if n_simulations <= 0:
+        raise ValueError(f"n_simulations must be positive, got {n_simulations}.")
+
+    t_start = time.perf_counter()
+
+    T_eff = max(T, MIN_T)
+    sigma_eff = max(sigma, MIN_SIGMA)
+
+    # Power of 2 enforcement for Sobol discrepancy
+    # Round up n_simulations to nearest power of 2
+    N = int(2 ** int(np.ceil(np.log2(max(2, n_simulations)))))
+    M = max(2, n_replications)
+
+    drift = (r - q - 0.5 * sigma_eff**2) * T_eff
+    vol_sqrt_T = sigma_eff * math.sqrt(T_eff)
+    discount_factor = math.exp(-r * T_eff)
+
+    rep_prices = np.zeros(M, dtype=np.float64)
+
+    for m in range(M):
+        rep_seed = seed + m
+        sobol = Sobol(d=1, scramble=True, seed=rep_seed)
+        u = sobol.random(N).flatten()
+        # Avoid exact 0.0 or 1.0 boundary for norm.ppf transform
+        u_clipped = np.clip(u, 1e-12, 1.0 - 1e-12)
+        Z = norm.ppf(u_clipped)
+
+        # Exact GBM terminal stock price for replication m
+        S_T = S0 * np.exp(drift + vol_sqrt_T * Z)
+
+        if opt_type == "call":
+            payoffs = np.maximum(S_T - K, 0.0)
+        else:
+            payoffs = np.maximum(K - S_T, 0.0)
+
+        rep_prices[m] = discount_factor * float(np.mean(payoffs))
+
+    # RQMC mean price across M independent replications
+    price_val = float(np.mean(rep_prices))
+
+    # Statistically valid CLT standard error from between-replication sample variance
+    sample_var = float(np.var(rep_prices, ddof=1))
+    se = math.sqrt(sample_var) / math.sqrt(M)
+
+    # 95% Confidence Interval
+    ci_lower = price_val - 1.96 * se
+    ci_upper = price_val + 1.96 * se
+
+    t_end = time.perf_counter()
+    runtime_ms = (t_end - t_start) * 1000.0
+    n_effective = M * N
+    paths_per_second = (n_effective / (runtime_ms / 1000.0)) if runtime_ms > 0 else 0.0
+
+    return MCEstimatorResult(
+        method="quasi_monte_carlo",
+        price=price_val,
+        standard_error=se,
+        ci_lower=ci_lower,
+        ci_upper=ci_upper,
+        runtime_ms=runtime_ms,
+        n_effective=n_effective,
+        paths_per_second=paths_per_second,
+    )
+

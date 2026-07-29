@@ -511,11 +511,12 @@ export function InputPanel({
               }
               className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-xs font-mono text-white"
             >
-              <option value="all">All 4 Estimators (Standard / Anti / CV / Combined)</option>
+              <option value="all">All 5 Estimators (Standard / Anti / CV / Combined / RQMC)</option>
               <option value="standard">Standard Monte Carlo</option>
               <option value="antithetic">Antithetic Variates</option>
               <option value="control_variate">Control Variates (S_T)</option>
               <option value="antithetic_cv">Combined Antithetic + CV</option>
+              <option value="quasi_monte_carlo">Randomized QMC (Sobol)</option>
             </select>
           </div>
 

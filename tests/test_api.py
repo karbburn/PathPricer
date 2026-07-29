@@ -124,9 +124,9 @@ def test_full_returns_200_with_correct_shape():
     assert "diagnostics" in body
     assert "terminal_distribution_sample" in body
 
-    # Verify MC results contain all 4 methods when variance_reduction=all
+    # Verify MC results contain all 5 methods when variance_reduction=all
     methods = {r["method"] for r in body["mc_results"]}
-    assert methods == {"standard", "antithetic", "control_variate", "antithetic_cv"}
+    assert methods == {"standard", "antithetic", "control_variate", "antithetic_cv", "quasi_monte_carlo"}
 
 
 def test_full_rejects_past_expiry():

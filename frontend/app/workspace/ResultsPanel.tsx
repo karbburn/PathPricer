@@ -526,8 +526,14 @@ export function ResultsPanel({
 
                   return (
                     <tr key={mc.method} className="hover:bg-slate-800/40">
-                      <td className="p-2.5 font-bold capitalize text-amber-300">
-                        {mc.method.replace("_", " ")}
+                      <td className="p-2.5 font-bold text-amber-300">
+                        {mc.method === "quasi_monte_carlo"
+                          ? "Randomized QMC (Sobol)"
+                          : mc.method === "antithetic_cv"
+                          ? "Combined Antithetic + CV"
+                          : mc.method === "control_variate"
+                          ? "Control Variates (S_T)"
+                          : mc.method.replace(/_/g, " ")}
                       </td>
                       <td className="p-2.5 text-right font-extrabold text-white">
                         {currencySymbol}{mc.price.toFixed(4)}

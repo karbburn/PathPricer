@@ -9,6 +9,7 @@ export type VarianceReductionMethod =
   | "antithetic"
   | "control_variate"
   | "antithetic_cv"
+  | "quasi_monte_carlo"
   | "all";
 
 export interface PricingRequest {

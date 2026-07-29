@@ -33,7 +33,7 @@ class PricingRequestSchema(BaseModel):
     n_simulations: int = Field(..., ge=1)
     seed: int = 42
     variance_reduction: Literal[
-        "standard", "antithetic", "control_variate", "antithetic_cv", "all"
+        "standard", "antithetic", "control_variate", "antithetic_cv", "quasi_monte_carlo", "all"
     ] = "all"
     convergence_grid: list[int] | None = None
 
