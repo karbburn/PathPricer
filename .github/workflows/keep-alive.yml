@@ -1,0 +1,14 @@
+name: Render Keep-Alive
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend health endpoint
+        run: |
+          curl -s -f <PLACEHOLDER_URL>/health || echo "Keep-alive ping completed"
