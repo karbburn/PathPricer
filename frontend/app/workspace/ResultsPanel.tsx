@@ -4,6 +4,7 @@ import React from "react";
 import { PreviewBadge, PrecisionTier } from "./PreviewBadge";
 import { ApiError } from "@/lib/api-client";
 import { PricingPreviewResponse, PricingFullResponse, BSGreeks } from "@/lib/types";
+import { useDensity } from "@/lib/contexts/DensityContext";
 
 interface ResultsPanelProps {
   microState: "pending" | "preview" | "error";
@@ -31,6 +32,8 @@ export function ResultsPanel({
   activeTier,
   isFullSimulating,
 }: ResultsPanelProps) {
+  const { density } = useDensity();
+  const compact = density === "compact";
   // Error state — structured error display
   if (error) {
     const isMarketError = error.error === "ticker_not_found";

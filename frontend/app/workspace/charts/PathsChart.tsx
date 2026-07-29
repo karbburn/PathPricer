@@ -16,7 +16,6 @@ interface PathsChartProps {
   request: PricingRequest;
 }
 
-// Pseudo-random normal generator using Box-Muller transform seeded deterministically
 function makeSeededRng(seed: number) {
   let s = seed % 2147483647;
   if (s <= 0) s += 2147483646;
@@ -27,15 +26,34 @@ function makeSeededRng(seed: number) {
 }
 
 function randNormal(rng: () => number) {
-  let u = 0,
-    v = 0;
+  let u = 0, v = 0;
   while (u === 0) u = rng();
   while (v === 0) v = rng();
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ dataKey: string; value: number; color: string }>; label?: number }) {
+  if (!active || !payload || payload.length === 0) return null;
+  const shown = payload.slice(0, 5);
+  const remaining = payload.length - shown.length;
+  return (
+    <div className="bg-[#090d16] border border-slate-700 rounded px-3 py-2 font-mono text-xs max-w-[200px]">
+      <div className="text-slate-400 mb-1">t = {label}y</div>
+      {shown.map((p) => (
+        <div key={p.dataKey} className="flex justify-between gap-3">
+          <span className="text-slate-500">{p.dataKey}</span>
+          <span className="text-slate-200">${p.value.toFixed(2)}</span>
+        </div>
+      ))}
+      {remaining > 0 && (
+        <div className="text-slate-500 mt-1">+{remaining} more paths</div>
+      )}
+    </div>
+  );
+}
+
 export function PathsChart({ request }: PathsChartProps) {
-  const numPaths = 100;
+  const numPaths = 30;
   const steps = 50;
   const T = 0.5;
 
@@ -49,7 +67,6 @@ export function PathsChart({ request }: PathsChartProps) {
     const dt = T / steps;
     const drift = (r - q - 0.5 * sigma * sigma) * dt;
     const volSqrtDt = sigma * Math.sqrt(dt);
-
     const rng = makeSeededRng(request.seed);
 
     const pathsData: number[][] = Array.from({ length: numPaths }, () => {
@@ -77,14 +94,14 @@ export function PathsChart({ request }: PathsChartProps) {
   }, [request]);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
+    <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4 overflow-hidden">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
             Simulated Asset Price Paths (Stepwise GBM)
           </h3>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
-            Sample of 30 exact log-normal paths &bull; Spot: ${spotPrice.toFixed(2)} &bull; Strike: ${strikePrice.toFixed(2)}
+            Sample of {numPaths} log-normal paths &bull; Spot: ${spotPrice.toFixed(2)} &bull; Strike: ${strikePrice.toFixed(2)}
           </p>
         </div>
         <span className="text-xs bg-slate-950 border border-slate-800 text-slate-400 px-2 py-1 rounded font-mono">
@@ -92,9 +109,9 @@ export function PathsChart({ request }: PathsChartProps) {
         </span>
       </div>
 
-      <div className="h-[320px] w-full">
+      <div className="h-[320px] w-full overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+          <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
             <XAxis
               dataKey="time"
               stroke="#64748b"
@@ -109,16 +126,7 @@ export function PathsChart({ request }: PathsChartProps) {
               domain={["auto", "auto"]}
               tickFormatter={(v) => `$${v}`}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#090d16",
-                borderColor: "#1e293b",
-                fontSize: "12px",
-                fontFamily: "monospace",
-                color: "#e2e8f0",
-              }}
-            />
-            {/* Spot Price Reference Line */}
+            <Tooltip content={<CustomTooltip />} />
             <ReferenceLine
               y={spotPrice}
               stroke="#06b6d4"
@@ -137,8 +145,6 @@ export function PathsChart({ request }: PathsChartProps) {
               strokeDasharray="2 2"
               label={{ value: `Expiry (${T}y)`, fill: "#f59e0b", fontSize: 10, position: "top" }}
             />
-
-            {/* Path Lines */}
             {Array.from({ length: numPaths }).map((_, i) => (
               <Line
                 key={i}

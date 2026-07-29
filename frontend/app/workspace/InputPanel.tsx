@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { postPricePreview, getMarketQuote, ApiError } from "@/lib/api-client";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { serializeInputs } from "@/lib/url-state";
+import { useDensity } from "@/lib/contexts/DensityContext";
 import {
   MarketRegion,
   PricingPreviewResponse,
@@ -715,6 +716,7 @@ export function InputPanel({
   const [tickerTouched, setTickerTouched] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { density } = useDensity();
 
   // Debounce preview-triggering inputs (~200ms)
   const debouncedInputs = useDebounce(inputs, 200);
@@ -898,7 +900,7 @@ export function InputPanel({
   };
 
   return (
-    <div className="bg-slate-800/80 border border-slate-700 rounded-lg p-6 space-y-6">
+    <div className={`bg-slate-800/80 border border-slate-700 rounded-lg ${density === "compact" ? "p-4 space-y-4" : "p-6 space-y-6"}`}>
       <div className="flex items-center justify-between border-b border-slate-700 pb-3">
         <h2 className="text-lg font-bold text-white tracking-tight">
           Pricing Inputs
@@ -910,7 +912,7 @@ export function InputPanel({
 
       {/* 1. Underlying Ticker & Market Selection */}
       <div className="space-y-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
           Underlying Asset
         </label>
 
@@ -932,7 +934,7 @@ export function InputPanel({
                   setTickerTouched(true);
                 }}
                 placeholder="Ticker (e.g. AAPL)"
-                className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono"
+                className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-sm text-white font-mono"
               />
               {showDropdown && tickerTouched && inputs.ticker.trim() && (
                 <div ref={dropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
@@ -1039,7 +1041,7 @@ export function InputPanel({
                 updateField("spot_override", e.target.value ? Number(e.target.value) : null)
               }
               placeholder="Market default"
-              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-sm text-white font-mono"
+              className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-1.5 text-sm text-white font-mono"
             />
           </div>
           <div>
@@ -1049,16 +1051,16 @@ export function InputPanel({
               step="0.001"
               value={inputs.dividend_yield ?? 0}
               onChange={(e) => updateField("dividend_yield", Number(e.target.value))}
-              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-sm text-white font-mono"
+              className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-1.5 text-sm text-white font-mono"
             />
           </div>
         </div>
       </div>
 
       {/* 2. Option Type & Strike Price */}
-      <div className="space-y-3 pt-3 border-t border-slate-700/60">
+      <div className="space-y-3 pt-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-blue-400">
+          <label className="text-xs font-bold uppercase tracking-wider text-cyan-400">
             Contract Terms
           </label>
           <div className="flex bg-slate-950 p-1 rounded border border-slate-700">
@@ -1096,7 +1098,7 @@ export function InputPanel({
               step="0.5"
               value={inputs.strike}
               onChange={(e) => updateField("strike", Number(e.target.value))}
-              className="w-24 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
           <input
@@ -1117,14 +1119,14 @@ export function InputPanel({
             type="date"
             value={inputs.expiry_date}
             onChange={(e) => updateField("expiry_date", e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono"
+            className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-sm text-white font-mono"
           />
         </div>
       </div>
 
       {/* 3. Market Risk Parameters (Vol & Rate) */}
-      <div className="space-y-3 pt-3 border-t border-slate-700/60">
-        <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
+      <div className="space-y-3 pt-3">
+        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
           Risk &amp; Volatility Parameters
         </label>
 
@@ -1139,7 +1141,7 @@ export function InputPanel({
               step="0.01"
               value={inputs.volatility}
               onChange={(e) => updateField("volatility", Number(e.target.value))}
-              className="w-24 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
           <input
@@ -1164,7 +1166,7 @@ export function InputPanel({
               step="0.005"
               value={inputs.risk_free_rate}
               onChange={(e) => updateField("risk_free_rate", Number(e.target.value))}
-              className="w-24 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
           <input
@@ -1180,8 +1182,8 @@ export function InputPanel({
       </div>
 
       {/* 4. Simulation Engine Controls */}
-      <div className="space-y-3 pt-3 border-t border-slate-700/60">
-        <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
+      <div className="space-y-3 pt-3">
+        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
           Simulation Controls
         </label>
 
@@ -1225,7 +1227,7 @@ export function InputPanel({
             onChange={(e) =>
               updateField("variance_reduction", e.target.value as VarianceReductionMethod)
             }
-            className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white"
+            className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-xs font-mono text-white"
           >
             <option value="all">All 4 Estimators (Standard / Anti / CV / Combined)</option>
             <option value="standard">Standard Monte Carlo</option>
