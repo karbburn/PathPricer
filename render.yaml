@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: pathpricer-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: CORS_ALLOWED_ORIGINS
+        value: http://localhost:3000,https://pathpricer.vercel.app
