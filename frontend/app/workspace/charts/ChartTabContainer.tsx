@@ -7,7 +7,7 @@ import { PayoffDiagram } from "./PayoffDiagram";
 import { ConvergenceChart } from "./ConvergenceChart";
 import { ComparisonChart } from "./ComparisonChart";
 import { exportChartSvgToPng } from "@/lib/export-helpers";
-import { PricingFullResponse, PricingRequest } from "@/lib/types";
+import { PricingFullResponse, PricingRequest, MarketRegion } from "@/lib/types";
 
 interface ChartTabContainerProps {
   request: PricingRequest;
@@ -16,9 +16,12 @@ interface ChartTabContainerProps {
 
 type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison";
 
+const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9" };
+
 export function ChartTabContainer({ request, fullResult }: ChartTabContainerProps) {
   const [activeTab, setActiveTab] = useState<ChartTab>("paths");
   const chartRef = useRef<HTMLDivElement | null>(null);
+  const currencySymbol = CURRENCY_SYMBOL[request.market];
 
   const bsPrice = fullResult ? fullResult.black_scholes.price : 10.0;
 
@@ -110,11 +113,11 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
 
       {/* Tab Panels */}
       <div ref={chartRef}>
-        {activeTab === "paths" && <PathsChart request={request} />}
+        {activeTab === "paths" && <PathsChart request={request} currencySymbol={currencySymbol} />}
 
         {activeTab === "distribution" && (
           fullResult ? (
-            <TerminalDistributionChart fullResult={fullResult} />
+            <TerminalDistributionChart fullResult={fullResult} currencySymbol={currencySymbol} />
           ) : (
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-400 font-mono text-sm">
               Run full simulation to view downsampled terminal distribution histogram &amp; BS theoretical density overlay.
@@ -122,7 +125,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           )
         )}
 
-        {activeTab === "payoff" && <PayoffDiagram request={request} optionPrice={bsPrice} />}
+        {activeTab === "payoff" && <PayoffDiagram request={request} optionPrice={bsPrice} currencySymbol={currencySymbol} />}
 
         {activeTab === "convergence" && (
           fullResult ? (
@@ -136,7 +139,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
 
         {activeTab === "comparison" && (
           fullResult ? (
-            <ComparisonChart fullResult={fullResult} />
+            <ComparisonChart fullResult={fullResult} currencySymbol={currencySymbol} />
           ) : (
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-400 font-mono text-sm">
               Run full simulation to view MC estimator prices with 95% CI error bars.

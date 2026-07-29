@@ -15,9 +15,10 @@ import { PricingFullResponse } from "@/lib/types";
 
 interface ComparisonChartProps {
   fullResult: PricingFullResponse;
+  currencySymbol: string;
 }
 
-export function ComparisonChart({ fullResult }: ComparisonChartProps) {
+export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartProps) {
   const bsPrice = fullResult.black_scholes.price;
 
   const chartData = useMemo(() => {
@@ -55,7 +56,7 @@ export function ComparisonChart({ fullResult }: ComparisonChartProps) {
           </p>
         </div>
         <span className="text-xs font-mono font-bold text-cyan-300 bg-slate-950 px-2.5 py-1 rounded border border-slate-800">
-          BS: ${bsPrice.toFixed(4)}
+          BS: {currencySymbol}{bsPrice.toFixed(4)}
         </span>
       </div>
 
@@ -73,7 +74,7 @@ export function ComparisonChart({ fullResult }: ComparisonChartProps) {
               fontSize={11}
               fontFamily="monospace"
               domain={[yMin, yMax]}
-              tickFormatter={(v) => `$${v.toFixed(2)}`}
+              tickFormatter={(v) => `${currencySymbol}${v.toFixed(2)}`}
             />
             <Tooltip
               contentStyle={{
@@ -84,7 +85,7 @@ export function ComparisonChart({ fullResult }: ComparisonChartProps) {
                 color: "#e2e8f0",
               }}
               formatter={(val: unknown, name: unknown, item: { payload?: Record<string, unknown> }) => [
-                `$${Number(val).toFixed(4)} (SE: ±$${Number(item.payload?.se).toFixed(4)})`,
+                `${currencySymbol}${Number(val).toFixed(4)} (SE: \u00B1${currencySymbol}${Number(item.payload?.se).toFixed(4)})`,
                 "Estimator Price",
               ]}
             />
@@ -94,7 +95,7 @@ export function ComparisonChart({ fullResult }: ComparisonChartProps) {
               y={bsPrice}
               stroke="#06b6d4"
               strokeWidth={2}
-              label={{ value: `BS Benchmark $${bsPrice.toFixed(4)}`, fill: "#06b6d4", fontSize: 11, position: "top" }}
+              label={{ value: `BS Benchmark ${currencySymbol}${bsPrice.toFixed(4)}`, fill: "#06b6d4", fontSize: 11, position: "top" }}
             />
 
             {/* MC Estimator Price Bars with 95% CI Error Bars */}

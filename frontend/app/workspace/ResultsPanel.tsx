@@ -3,7 +3,7 @@
 import React from "react";
 import { PreviewBadge, PrecisionTier } from "./PreviewBadge";
 import { ApiError } from "@/lib/api-client";
-import { PricingPreviewResponse, PricingFullResponse, BSGreeks } from "@/lib/types";
+import { PricingPreviewResponse, PricingFullResponse, BSGreeks, MarketRegion } from "@/lib/types";
 import { useDensity } from "@/lib/contexts/DensityContext";
 
 interface ResultsPanelProps {
@@ -13,7 +13,10 @@ interface ResultsPanelProps {
   error: ApiError | null;
   activeTier: "preview" | "full";
   isFullSimulating: boolean;
+  market: MarketRegion;
 }
+
+const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9" };
 
 // Validation tolerances for FD Greeks comparison
 const GREEK_TOLERANCES: Record<string, { name: string; symbol: string; tolerance: number }> = {
@@ -31,9 +34,11 @@ export function ResultsPanel({
   error,
   activeTier,
   isFullSimulating,
+  market,
 }: ResultsPanelProps) {
   const { density } = useDensity();
   const compact = density === "compact";
+  const currencySymbol = CURRENCY_SYMBOL[market];
   // Error state — structured error display
   if (error) {
     const isMarketError = error.error === "ticker_not_found";
@@ -150,7 +155,7 @@ export function ResultsPanel({
               Black-Scholes Benchmark
             </span>
             <div className="text-4xl font-black text-white font-mono tracking-tight">
-              ${bs.price.toFixed(4)}
+              {currencySymbol}{bs.price.toFixed(4)}
             </div>
             <p className="text-xs text-slate-300 mt-2 font-mono">
               Analytical closed-form price
@@ -162,7 +167,7 @@ export function ResultsPanel({
               Monte Carlo (Standard)
             </span>
             <div className="text-4xl font-black text-emerald-300 font-mono tracking-tight">
-              ${stdMc ? stdMc.price.toFixed(4) : "N/A"}
+              {currencySymbol}{stdMc ? stdMc.price.toFixed(4) : "N/A"}
             </div>
             <p className="text-xs text-slate-300 mt-2 font-mono">
               SE: &plusmn;${stdMc ? stdMc.standard_error.toFixed(4) : "0.0000"}
@@ -244,7 +249,7 @@ export function ResultsPanel({
                         {mc.method.replace("_", " ")}
                       </td>
                       <td className="p-2.5 text-right font-extrabold text-white">
-                        ${mc.price.toFixed(4)}
+                        {currencySymbol}{mc.price.toFixed(4)}
                       </td>
                       <td className="p-2.5 text-right text-amber-400 font-bold">
                         &plusmn;${mc.standard_error.toFixed(4)}
@@ -460,7 +465,7 @@ export function ResultsPanel({
               Black-Scholes (Indicative)
             </span>
             <div className="text-3xl font-bold text-slate-300 font-mono">
-              ${previewResult.black_scholes.price.toFixed(2)}
+              {currencySymbol}{previewResult.black_scholes.price.toFixed(2)}
             </div>
             <div className="mt-3 flex gap-4 text-xs font-mono text-slate-400">
               <span>&Delta;: {previewResult.black_scholes.delta.toFixed(4)}</span>
@@ -473,7 +478,7 @@ export function ResultsPanel({
               Standard MC (Indicative)
             </span>
             <div className="text-3xl font-bold text-slate-300 font-mono">
-              ${previewResult.monte_carlo_standard.price.toFixed(2)}
+              {currencySymbol}{previewResult.monte_carlo_standard.price.toFixed(2)}
             </div>
             <div className="mt-3 flex gap-4 text-xs font-mono text-slate-400">
               <span>&Delta;: {previewResult.monte_carlo_standard.delta.toFixed(4)}</span>

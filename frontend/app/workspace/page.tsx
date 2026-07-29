@@ -139,6 +139,7 @@ function WorkspaceContent() {
             error={error}
             activeTier={activeTier}
             isFullSimulating={isFullSimulating}
+            market={inputs.market}
           />
 
           <ExportControls fullResult={fullResult} request={inputs} />

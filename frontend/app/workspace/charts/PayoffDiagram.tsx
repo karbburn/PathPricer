@@ -15,10 +15,11 @@ import { PricingRequest } from "@/lib/types";
 
 interface PayoffDiagramProps {
   request: PricingRequest;
-  optionPrice: number; // BS option price for breakeven calculation
+  optionPrice: number;
+  currencySymbol: string;
 }
 
-export function PayoffDiagram({ request, optionPrice }: PayoffDiagramProps) {
+export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDiagramProps) {
   const S0 = request.spot_override ?? 100.0;
   const K = request.strike;
   const opt = request.option_type;
@@ -57,7 +58,7 @@ export function PayoffDiagram({ request, optionPrice }: PayoffDiagramProps) {
             Deterministic Option Payoff Diagram at Expiry
           </h3>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
-            Hockey-stick payoff &bull; Strike: ${K.toFixed(2)} &bull; Spot: ${S0.toFixed(2)} &bull; Breakeven: ${breakeven.toFixed(2)}
+            Hockey-stick payoff &bull; Strike: {currencySymbol}{K.toFixed(2)} &bull; Spot: {currencySymbol}{S0.toFixed(2)} &bull; Breakeven: {currencySymbol}{breakeven.toFixed(2)}
           </p>
         </div>
         <span className="text-xs bg-slate-950 border border-slate-800 text-emerald-400 px-2 py-1 rounded font-mono font-bold uppercase">
@@ -73,13 +74,13 @@ export function PayoffDiagram({ request, optionPrice }: PayoffDiagramProps) {
               stroke="#64748b"
               fontSize={11}
               fontFamily="monospace"
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <YAxis
               stroke="#64748b"
               fontSize={11}
               fontFamily="monospace"
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <Tooltip
               contentStyle={{
@@ -95,19 +96,19 @@ export function PayoffDiagram({ request, optionPrice }: PayoffDiagramProps) {
               x={K}
               stroke="#e11d48"
               strokeDasharray="4 4"
-              label={{ value: `Strike $${K}`, fill: "#e11d48", fontSize: 10, position: "top" }}
+              label={{ value: `Strike ${currencySymbol}${K}`, fill: "#e11d48", fontSize: 10, position: "top" }}
             />
             <ReferenceLine
               x={S0}
               stroke="#06b6d4"
               strokeDasharray="4 4"
-              label={{ value: `Spot $${S0}`, fill: "#06b6d4", fontSize: 10, position: "left" }}
+              label={{ value: `Spot ${currencySymbol}${S0}`, fill: "#06b6d4", fontSize: 10, position: "left" }}
             />
             <ReferenceLine
               x={breakeven}
               stroke="#10b981"
               strokeDasharray="4 4"
-              label={{ value: `Breakeven $${breakeven}`, fill: "#10b981", fontSize: 10, position: "top" }}
+              label={{ value: `Breakeven ${currencySymbol}${breakeven}`, fill: "#10b981", fontSize: 10, position: "top" }}
             />
 
             {/* Shaded Gross Payoff Area */}

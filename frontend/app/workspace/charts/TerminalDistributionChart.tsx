@@ -15,9 +15,10 @@ import { PricingFullResponse } from "@/lib/types";
 
 interface TerminalDistributionChartProps {
   fullResult: PricingFullResponse;
+  currencySymbol: string;
 }
 
-export function TerminalDistributionChart({ fullResult }: TerminalDistributionChartProps) {
+export function TerminalDistributionChart({ fullResult, currencySymbol }: TerminalDistributionChartProps) {
   const sample = fullResult.terminal_distribution_sample;
   const req = fullResult.request_echo;
 
@@ -111,7 +112,7 @@ export function TerminalDistributionChart({ fullResult }: TerminalDistributionCh
               stroke="#64748b"
               fontSize={11}
               fontFamily="monospace"
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <YAxis
               stroke="#64748b"
@@ -138,7 +139,7 @@ export function TerminalDistributionChart({ fullResult }: TerminalDistributionCh
               x={req.strike}
               stroke="#e11d48"
               strokeDasharray="4 4"
-              label={{ value: `Strike $${req.strike}`, fill: "#e11d48", fontSize: 10, position: "top" }}
+              label={{ value: `Strike ${currencySymbol}${req.strike}`, fill: "#e11d48", fontSize: 10, position: "top" }}
             />
             {/* Histogram Bars */}
             <Bar dataKey="empiricalDensity" fill="#1e293b" stroke="#334155" radius={[2, 2, 0, 0]} />

@@ -14,6 +14,7 @@ import { PricingRequest } from "@/lib/types";
 
 interface PathsChartProps {
   request: PricingRequest;
+  currencySymbol: string;
 }
 
 function makeSeededRng(seed: number) {
@@ -32,7 +33,7 @@ function randNormal(rng: () => number) {
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ dataKey: string; value: number; color: string }>; label?: number }) {
+function CustomTooltip({ active, payload, label, currencySymbol }: { active?: boolean; payload?: Array<{ dataKey: string; value: number; color: string }>; label?: number; currencySymbol: string }) {
   if (!active || !payload || payload.length === 0) return null;
   const shown = payload.slice(0, 5);
   const remaining = payload.length - shown.length;
@@ -42,7 +43,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
       {shown.map((p) => (
         <div key={p.dataKey} className="flex justify-between gap-3">
           <span className="text-slate-500">{p.dataKey}</span>
-          <span className="text-slate-200">${p.value.toFixed(2)}</span>
+          <span className="text-slate-200">{currencySymbol}{p.value.toFixed(2)}</span>
         </div>
       ))}
       {remaining > 0 && (
@@ -52,7 +53,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   );
 }
 
-export function PathsChart({ request }: PathsChartProps) {
+export function PathsChart({ request, currencySymbol }: PathsChartProps) {
   const numPaths = 30;
   const steps = 50;
   const T = 0.5;
@@ -101,7 +102,7 @@ export function PathsChart({ request }: PathsChartProps) {
             Simulated Asset Price Paths (Stepwise GBM)
           </h3>
           <p className="text-xs text-slate-300 font-mono mt-0.5">
-            Sample of {numPaths} log-normal paths &bull; Spot: ${spotPrice.toFixed(2)} &bull; Strike: ${strikePrice.toFixed(2)}
+            Sample of {numPaths} log-normal paths &bull; Spot: {currencySymbol}{spotPrice.toFixed(2)} &bull; Strike: {currencySymbol}{strikePrice.toFixed(2)}
           </p>
         </div>
         <span className="text-xs bg-slate-950 border border-slate-800 text-slate-300 px-2 py-1 rounded font-mono">
@@ -124,20 +125,20 @@ export function PathsChart({ request }: PathsChartProps) {
               fontSize={11}
               fontFamily="monospace"
               domain={["auto", "auto"]}
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `${currencySymbol}${v}`}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip currencySymbol={currencySymbol} />} />
             <ReferenceLine
               y={spotPrice}
               stroke="#06b6d4"
               strokeDasharray="4 4"
-              label={{ value: `Spot $${spotPrice}`, fill: "#06b6d4", fontSize: 10, position: "left" }}
+              label={{ value: `Spot ${currencySymbol}${spotPrice}`, fill: "#06b6d4", fontSize: 10, position: "left" }}
             />
             <ReferenceLine
               y={strikePrice}
               stroke="#e11d48"
               strokeDasharray="4 4"
-              label={{ value: `Strike $${strikePrice}`, fill: "#e11d48", fontSize: 10, position: "right" }}
+              label={{ value: `Strike ${currencySymbol}${strikePrice}`, fill: "#e11d48", fontSize: 10, position: "right" }}
             />
             <ReferenceLine
               x={T}
