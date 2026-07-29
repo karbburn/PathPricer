@@ -16,7 +16,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Centralized application settings loaded from environment or .env file."""
 
-    cors_allowed_origins: list[str] | str = ["http://localhost:3000", "https://pathpricer.vercel.app"]
+    cors_allowed_origins: list[str] | str = ["http://localhost:3000", "https://pathpricer.vercel.app", "https://pathpricer-backend.onrender.com"]
     default_convergence_grid: list[int] = [1000, 5000, 25000, 100000, 500000]
     default_greeks_n: int = 50000
     max_n_simulations: int = 2_000_000
