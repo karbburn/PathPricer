@@ -95,15 +95,37 @@ class MarketDataService:
         symbol = self.resolve_symbol(ticker, market)
         data_warnings: list[str] = []
 
+        ticker_obj = yf.Ticker(symbol)
+        hist = None
+
+        # Attempt 1: Ticker.history(period="1y")
         try:
-            ticker_obj = yf.Ticker(symbol)
             hist = ticker_obj.history(period="1y")
-        except Exception as err:
-            raise MarketDataError(
-                message=f"Failed to fetch market data for symbol '{symbol}': {err}",
-                ticker=symbol,
-                fallback_available=True,
-            ) from err
+        except Exception:
+            hist = None
+
+        # Attempt 2: Fallback to yf.download if history() returned empty or failed
+        if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
+            try:
+                hist_dl = yf.download(symbol, period="1y", progress=False)
+                if hist_dl is not None and not hist_dl.empty:
+                    # Handle MultiIndex columns from yf.download
+                    if hasattr(hist_dl.columns, "levels") and len(hist_dl.columns.levels) > 1:
+                        if symbol in hist_dl.columns.levels[1]:
+                            hist = hist_dl.xs(symbol, level=1, axis=1)
+                        else:
+                            hist = hist_dl.droplevel(1, axis=1)
+                    else:
+                        hist = hist_dl
+            except Exception:
+                pass
+
+        # Attempt 3: Fallback to period="6m" if 1y returned empty
+        if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
+            try:
+                hist = ticker_obj.history(period="6m")
+            except Exception:
+                pass
 
         if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
             raise MarketDataError(
