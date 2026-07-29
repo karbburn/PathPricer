@@ -13,6 +13,8 @@ import {
 } from "@/lib/types";
 import { TickerInput } from "@/app/components/TickerInput";
 
+import { computeAtmStrike, roundClean } from "@/lib/formatters";
+
 interface InputPanelProps {
   initialInputs: PricingRequest;
   onInputsChange: (inputs: PricingRequest) => void;
@@ -36,6 +38,12 @@ export function InputPanel({
   const [seedLocked, setSeedLocked] = useState<boolean>(false);
   const [fetchingMarket, setFetchingMarket] = useState<boolean>(false);
   const { density } = useDensity();
+
+  // Dynamic strike bounds scaled to spot price level
+  const currentSpot = inputs.spot_override ?? 100;
+  const minStrike = Math.max(1, Math.floor(currentSpot * 0.25));
+  const maxStrike = Math.ceil(currentSpot * 1.75);
+  const strikeStep = currentSpot >= 1000 ? 5 : currentSpot >= 100 ? 1 : 0.5;
 
   // Debounce preview-triggering inputs (~200ms)
   const debouncedInputs = useDebounce(inputs, 200);
@@ -70,11 +78,17 @@ export function InputPanel({
     try {
       const quote = await getMarketQuote(inputs.ticker, inputs.market);
       setInputs((prev) => {
+        const cleanSpot = roundClean(quote.spot_price, 2);
+        const cleanVol = roundClean(quote.historical_volatility["252d"] || prev.volatility, 4);
+        const cleanDiv = roundClean(quote.dividend_yield, 4);
+        const atmStrike = computeAtmStrike(cleanSpot);
+
         const next: PricingRequest = {
           ...prev,
-          spot_override: quote.spot_price,
-          volatility: quote.historical_volatility["252d"] || prev.volatility,
-          dividend_yield: quote.dividend_yield,
+          spot_override: cleanSpot,
+          volatility: cleanVol,
+          dividend_yield: cleanDiv,
+          strike: atmStrike,
         };
         onInputsChange(next);
         if (typeof window !== "undefined") {
@@ -122,20 +136,17 @@ export function InputPanel({
         onPreviewError(null);
         onMicroStateChange("preview");
       })
-      .catch((err) => {
-        if (requestIdRef.current !== currentReqId || controller.signal.aborted) {
-          return;
-        }
-        if (err instanceof ApiError) {
-          onPreviewError(err);
-        }
+      .catch((err: Error) => {
+        if (err.name === "AbortError") return;
+        if (requestIdRef.current !== currentReqId) return;
+        onPreviewError(err as ApiError);
         onMicroStateChange("error");
       });
 
     return () => {
       controller.abort();
     };
-  }, [debouncedInputs, onMicroStateChange, onPreviewError, onPreviewSuccess]);
+  }, [debouncedInputs, onPreviewSuccess, onPreviewError, onMicroStateChange]);
 
   const handleRandomizeSeed = () => {
     if (seedLocked) return;
@@ -144,9 +155,13 @@ export function InputPanel({
   };
 
   return (
-    <div className={`bg-slate-800/80 border border-slate-700 rounded-lg ${density === "compact" ? "p-4 space-y-4" : "p-6 space-y-6"}`}>
-      <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-        <h2 className="text-lg font-bold text-white tracking-tight">
+    <div
+      className={`bg-slate-900 border border-slate-800 rounded-xl shadow-xl space-y-6 ${
+        density === "compact" ? "p-4" : "p-6"
+      }`}
+    >
+      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h2 className="text-lg font-bold text-white tracking-wide">
           Pricing Inputs
         </h2>
         <span className="text-xs text-slate-300 font-mono">
@@ -208,27 +223,32 @@ export function InputPanel({
         {/* Spot Price Override */}
         <div className="grid grid-cols-2 gap-3 pt-1">
           <div>
-            <label className="block text-xs text-slate-300 mb-1">Spot Price ($S_0$)</label>
+            <label className="block text-xs text-slate-300 mb-1">Spot Price (S₀)</label>
             <input
               type="number"
               step="0.01"
               value={inputs.spot_override ?? ""}
               onChange={(e) =>
-                updateField("spot_override", e.target.value ? Number(e.target.value) : null)
+                updateField("spot_override", e.target.value ? roundClean(Number(e.target.value), 2) : null)
               }
               placeholder="Market default"
               className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-1.5 text-sm text-white font-mono"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-300 mb-1">Dividend Yield ($q$)</label>
+            <label className="block text-xs text-slate-300 mb-1">Dividend Yield (q)</label>
             <input
               type="number"
               step="0.001"
               value={inputs.dividend_yield ?? 0}
-              onChange={(e) => updateField("dividend_yield", Number(e.target.value))}
+              onChange={(e) => updateField("dividend_yield", roundClean(Number(e.target.value), 4))}
               className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-1.5 text-sm text-white font-mono"
             />
+            {(!inputs.dividend_yield || inputs.dividend_yield === 0) && (
+              <p className="text-[10px] text-amber-400/90 mt-1 font-mono flex items-center gap-1">
+                <span>⚠️</span> Dividend yield 0.0% (defaulted/no payout)
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -268,10 +288,10 @@ export function InputPanel({
         {/* Strike Price Dual Input (Slider + Box) */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-xs text-slate-300">Strike Price ($K$)</label>
+            <label className="text-xs text-slate-300">Strike Price (K)</label>
             <input
               type="number"
-              step="0.5"
+              step={strikeStep}
               value={inputs.strike}
               onChange={(e) => updateField("strike", Number(e.target.value))}
               className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
@@ -279,9 +299,9 @@ export function InputPanel({
           </div>
           <input
             type="range"
-            min="10"
-            max="1000"
-            step="1"
+            min={minStrike}
+            max={maxStrike}
+            step={strikeStep}
             value={inputs.strike}
             onChange={(e) => updateField("strike", Number(e.target.value))}
             className="w-full accent-amber-500 cursor-pointer"
@@ -310,13 +330,13 @@ export function InputPanel({
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="text-xs text-slate-300">
-              Volatility ($\sigma$): {(inputs.volatility * 100).toFixed(1)}%
+              Volatility (σ): {(inputs.volatility * 100).toFixed(1)}%
             </label>
             <input
               type="number"
               step="0.01"
               value={inputs.volatility}
-              onChange={(e) => updateField("volatility", Number(e.target.value))}
+              onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
               className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
@@ -326,7 +346,7 @@ export function InputPanel({
             max="2.00"
             step="0.01"
             value={inputs.volatility}
-            onChange={(e) => updateField("volatility", Number(e.target.value))}
+            onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
             className="w-full accent-amber-500 cursor-pointer"
           />
         </div>
@@ -335,13 +355,13 @@ export function InputPanel({
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="text-xs text-slate-300">
-              Risk-Free Rate ($r$): {(inputs.risk_free_rate * 100).toFixed(1)}%
+              Risk-Free Rate (r): {(inputs.risk_free_rate * 100).toFixed(1)}%
             </label>
             <input
               type="number"
               step="0.005"
               value={inputs.risk_free_rate}
-              onChange={(e) => updateField("risk_free_rate", Number(e.target.value))}
+              onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
               className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
@@ -351,7 +371,7 @@ export function InputPanel({
             max="0.20"
             step="0.0025"
             value={inputs.risk_free_rate}
-            onChange={(e) => updateField("risk_free_rate", Number(e.target.value))}
+            onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
             className="w-full accent-amber-500 cursor-pointer"
           />
         </div>
@@ -366,7 +386,7 @@ export function InputPanel({
         {/* N Simulations Presets */}
         <div>
           <label className="block text-xs text-slate-300 mb-1">
-            Simulations ($N$): {inputs.n_simulations.toLocaleString()}
+            Simulations (N): {inputs.n_simulations.toLocaleString()}
           </label>
           <div className="grid grid-cols-5 gap-1 mb-2">
             {[10000, 50000, 100000, 500000, 1000000].map((nVal) => (
