@@ -1282,7 +1282,11 @@ export function InputPanel({
           <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
           <span className="text-xs font-mono text-blue-200">(N={inputs.n_simulations.toLocaleString()})</span>
         </button>
-        <p className="text-[10px] text-slate-500 text-center mt-1.5 font-mono">Ctrl+Enter</p>
+        <p className="text-[11px] text-slate-500 text-center mt-1.5 font-mono">
+          <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Ctrl</kbd>
+          {" + "}
+          <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Enter</kbd>
+        </p>
       </div>
     </div>
   );

@@ -155,8 +155,13 @@ export default function WorkspacePage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-7xl mx-auto px-6 py-12 text-center text-slate-400 font-mono">
-          Loading pricing workspace...
+        <div className="max-w-7xl mx-auto px-6 py-12 space-y-4">
+          <div className="animate-shimmer h-8 w-64 rounded" />
+          <div className="animate-shimmer h-4 w-96 rounded" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-5 animate-shimmer h-[400px] rounded-lg" />
+            <div className="lg:col-span-7 animate-shimmer h-[400px] rounded-lg" />
+          </div>
         </div>
       }
     >
