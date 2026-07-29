@@ -61,8 +61,17 @@ export default function ValidationPage() {
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-12 text-center text-slate-400 font-mono animate-pulse">
-          Loading static CI validation artifacts...
+        <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 space-y-4">
+          <div className="animate-shimmer h-5 w-56 rounded" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-slate-950/40 border border-slate-800 rounded-lg p-6 space-y-2">
+                <div className="animate-shimmer h-3 w-20 rounded" />
+                <div className="animate-shimmer h-8 w-16 rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="animate-shimmer h-40 w-full rounded" />
         </div>
       )}
 
@@ -76,7 +85,6 @@ export default function ValidationPage() {
       {/* Empty State before first CI run */}
       {!loading && !error && isEmptyState && (
         <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-12 text-center space-y-3">
-          <div className="text-2xl">⏳</div>
           <h3 className="text-lg font-bold text-slate-300 font-mono">
             Validation Summary Generated on CI
           </h3>

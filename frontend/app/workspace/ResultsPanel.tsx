@@ -86,8 +86,14 @@ export function ResultsPanel({
         </div>
 
         <div className="py-12 text-center space-y-4">
-          <div className="text-sm font-mono text-cyan-300">
-            4 estimators &bull; Finite-difference Greeks &bull; Convergence sweep
+          <div className="flex justify-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="h-2 w-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="h-2 w-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
+          <div className="space-y-2">
+            <div className="animate-shimmer h-4 w-48 mx-auto rounded" />
+            <div className="animate-shimmer h-3 w-32 mx-auto rounded" />
           </div>
         </div>
       </div>
@@ -473,8 +479,13 @@ export function ResultsPanel({
           </div>
         </div>
       ) : (
-        <div className="bg-slate-950/40 border border-slate-800 rounded-lg p-8 text-center text-slate-400 font-mono text-sm">
-          Loading preview pricing estimate...
+        <div className="bg-slate-950/40 border border-slate-800 rounded-lg p-8 space-y-3">
+          <div className="animate-shimmer h-4 w-40 rounded" />
+          <div className="animate-shimmer h-8 w-28 rounded" />
+          <div className="flex gap-4">
+            <div className="animate-shimmer h-3 w-20 rounded" />
+            <div className="animate-shimmer h-3 w-20 rounded" />
+          </div>
         </div>
       )}
     </div>
