@@ -609,8 +609,12 @@ export function ResultsPanel({
                   const bsVal = bs.greeks[key as keyof BSGreeks] ?? 0;
                   const fdVal = fd[key as keyof BSGreeks] ?? 0;
                   const diff = fdVal - bsVal;
-                  const relErr = bsVal !== 0 ? Math.abs(diff / bsVal) : 0;
-                  const isWithinTolerance = relErr <= meta.tolerance;
+                  const absBs = Math.abs(bsVal);
+                  const isNearZero = absBs < 1e-4;
+                  const relErr = !isNearZero ? Math.abs(diff / bsVal) : 0;
+                  const isWithinTolerance = isNearZero
+                    ? Math.abs(diff) <= 0.01
+                    : relErr <= meta.tolerance;
 
                   return (
                     <tr key={key} className="hover:bg-slate-800/40">
@@ -633,12 +637,12 @@ export function ResultsPanel({
                         {diff.toFixed(5)}
                       </td>
                       <td className="p-2.5 text-right text-slate-400">
-                        {(relErr * 100).toFixed(2)}%
+                        {isNearZero ? "N/A (near 0)" : `${(relErr * 100).toFixed(2)}%`}
                       </td>
                       <td className="p-2.5 text-center">
                         {isWithinTolerance ? (
                           <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
-                            ✓ Pass (&le; {(meta.tolerance * 100).toFixed(0)}%)
+                            ✓ Pass ({isNearZero ? "< 0.01" : `&le; ${(meta.tolerance * 100).toFixed(0)}%`})
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 text-xs">

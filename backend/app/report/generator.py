@@ -206,7 +206,7 @@ def generate_report(pricing_response: PricingFullResponse) -> bytes:
         ["Seed", str(req.seed)],
         ["Variance Reduction", req.variance_reduction],
     ]
-    elements.append(_make_table(input_data, colWidths=[140, 280]))
+    elements.append(_make_table(input_data, colWidths=[140, 340]))
     elements.append(Spacer(1, 10))
 
     # -----------------------------------------------------------------------
@@ -223,7 +223,7 @@ def generate_report(pricing_response: PricingFullResponse) -> bytes:
         ["Theta (per day)", format_greek(bs.greeks.theta)],
         ["Rho", format_greek(bs.greeks.rho)],
     ]
-    elements.append(_make_table(bs_data, colWidths=[140, 280]))
+    elements.append(_make_table(bs_data, colWidths=[140, 340]))
     elements.append(Spacer(1, 10))
 
     # -----------------------------------------------------------------------
@@ -246,7 +246,7 @@ def generate_report(pricing_response: PricingFullResponse) -> bytes:
             f"{mc.paths_per_second:,.0f}",
         ])
 
-    elements.append(_make_table(mc_rows, colWidths=[90, 60, 55, 100, 55, 60, 70], font_size=8, padding=4, align_right=True))
+    elements.append(_make_table(mc_rows, colWidths=[105, 55, 50, 95, 55, 55, 65], font_size=7.5, padding=3, align_right=True))
     elements.append(Spacer(1, 10))
 
     # -----------------------------------------------------------------------
@@ -267,7 +267,7 @@ def generate_report(pricing_response: PricingFullResponse) -> bytes:
         ["Rho", format_greek(fd.rho), format_greek(bs.greeks.rho),
          format_greek(fd.rho - bs.greeks.rho)],
     ]
-    elements.append(_make_table(fd_data, colWidths=[70, 110, 110, 110], align_right=True))
+    elements.append(_make_table(fd_data, colWidths=[90, 130, 130, 130], align_right=True))
     elements.append(Spacer(1, 10))
 
     # -----------------------------------------------------------------------
@@ -303,7 +303,7 @@ def generate_report(pricing_response: PricingFullResponse) -> bytes:
         ["Relative Error vs BS", format_percentage(diag.relative_error_vs_bs, 4)],
         ["Total Compute Time", f"{resp.compute_ms:.1f} ms"],
     ]
-    elements.append(_make_table(diag_data, colWidths=[140, 280]))
+    elements.append(_make_table(diag_data, colWidths=[140, 340]))
     elements.append(Spacer(1, 10))
 
     # -----------------------------------------------------------------------
@@ -313,7 +313,7 @@ def generate_report(pricing_response: PricingFullResponse) -> bytes:
 
     assumptions_header = ["Assumption", "Reality", "v1 Treatment"]
     assumptions_rows = [assumptions_header] + [list(row) for row in _ASSUMPTIONS]
-    elements.append(_make_table(assumptions_rows, colWidths=[120, 140, 160], font_size=7.5, padding=4, valign="TOP"))
+    elements.append(_make_table(assumptions_rows, colWidths=[130, 160, 190], font_size=7.5, padding=4, valign="TOP"))
     elements.append(Spacer(1, 14))
 
     # -----------------------------------------------------------------------
