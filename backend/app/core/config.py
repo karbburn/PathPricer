@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     iv_sigma_max: float = 5.0
     iv_initial_sigma_min: float = 0.01
     iv_initial_sigma_max: float = 5.0
+    default_risk_grid_points: int = 25
+    max_risk_grid_points: int = 100
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -75,4 +77,7 @@ IV_SIGMA_MIN: float = settings.iv_sigma_min
 IV_SIGMA_MAX: float = settings.iv_sigma_max
 IV_INITIAL_SIGMA_MIN: float = settings.iv_initial_sigma_min
 IV_INITIAL_SIGMA_MAX: float = settings.iv_initial_sigma_max
+DEFAULT_RISK_GRID_POINTS: int = settings.default_risk_grid_points
+MAX_RISK_GRID_POINTS: int = settings.max_risk_grid_points
+
 

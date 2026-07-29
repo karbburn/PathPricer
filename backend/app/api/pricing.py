@@ -24,7 +24,7 @@ from ..core.config import (
     PREVIEW_MAX_N,
 )
 from ..core.rng import make_rng
-from ..engine import black_scholes, implied_vol, monte_carlo, pnl_explain
+from ..engine import black_scholes, implied_vol, monte_carlo, pnl_explain, risk_grid
 from ..engine.greeks import finite_difference_greeks
 from ..schemas.pricing import (
     BSFullResult,
@@ -44,6 +44,8 @@ from ..schemas.pricing import (
     PricingFullResponse,
     PricingPreviewResponse,
     PricingRequestSchema,
+    RiskGridRequest,
+    RiskGridResponse,
 )
 
 router = APIRouter(prefix="/price", tags=["pricing"])
@@ -411,5 +413,87 @@ def price_pnl_explain(req: PnLExplainRequest) -> PnLExplainResponse | JSONRespon
         rho_pnl=res.rho_pnl,
         unexplained_pnl=res.unexplained_pnl,
     )
+
+
+@router.post(
+    "/risk-grid",
+    response_model=RiskGridResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def compute_risk_grid_endpoint(req: RiskGridRequest) -> RiskGridResponse | JSONResponse:
+    """Compute 2D option price or Greek risk grid across specified parameter ranges."""
+    T = _compute_T(req.expiry_date)
+    if T <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_expiry_date",
+                message="Expiry date must be strictly in the future.",
+                field="expiry_date",
+            ).model_dump(),
+        )
+
+    if req.volatility <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_volatility",
+                message="Volatility must be positive.",
+                field="volatility",
+            ).model_dump(),
+        )
+
+    if req.strike <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_strike",
+                message="Strike price must be positive.",
+                field="strike",
+            ).model_dump(),
+        )
+
+    S0 = req.spot_override if req.spot_override is not None else 100.0
+    r = req.risk_free_rate
+    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+
+    try:
+        res = risk_grid.compute_risk_grid(
+            S0=S0,
+            K=req.strike,
+            T=T,
+            r=r,
+            q=q,
+            sigma=req.volatility,
+            option_type=req.option_type,
+            axis_x=req.axis_x,
+            axis_y=req.axis_y,
+            x_min=req.x_range.min,
+            x_max=req.x_range.max,
+            num_x=req.x_range.num_points,
+            y_min=req.y_range.min,
+            y_max=req.y_range.max,
+            num_y=req.y_range.num_points,
+            metric=req.metric,
+        )
+    except risk_grid.RiskGridError as e:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_grid_range",
+                message=str(e),
+                field="x_range/y_range",
+            ).model_dump(),
+        )
+
+    return RiskGridResponse(
+        x_values=res.x_values,
+        y_values=res.y_values,
+        grid=res.grid,
+        metric=res.metric,
+        axis_x=res.axis_x,
+        axis_y=res.axis_y,
+    )
+
 
 

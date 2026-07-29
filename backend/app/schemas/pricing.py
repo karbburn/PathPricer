@@ -306,3 +306,47 @@ class PnLExplainResponse(BaseModel):
     unexplained_pnl: float
 
 
+# ---------------------------------------------------------------------------
+# Risk Grid schemas
+# ---------------------------------------------------------------------------
+
+
+class GridRangeSchema(BaseModel):
+    """Range configuration for a risk grid parameter axis."""
+
+    min: float
+    max: float
+    num_points: int = Field(default=25, ge=2, le=100)
+
+
+class RiskGridRequest(BaseModel):
+    """Request schema for 2D risk grid surface calculation endpoint."""
+
+    ticker: str
+    market: Literal["US", "IN"]
+    spot_override: float | None = None
+    strike: float = Field(..., gt=0)
+    expiry_date: date
+    option_type: Literal["call", "put"]
+    volatility: float = Field(..., gt=0)
+    risk_free_rate: float
+    dividend_yield: float | None = None
+    axis_x: Literal["spot", "strike", "volatility", "time_to_expiry", "rate"]
+    axis_y: Literal["spot", "strike", "volatility", "time_to_expiry", "rate"]
+    x_range: GridRangeSchema
+    y_range: GridRangeSchema
+    metric: Literal["price", "delta", "gamma", "vega", "theta", "rho"] = "price"
+
+
+class RiskGridResponse(BaseModel):
+    """Response schema for 2D risk grid surface calculation endpoint."""
+
+    x_values: list[float]
+    y_values: list[float]
+    grid: list[list[float]]
+    metric: str
+    axis_x: str
+    axis_y: str
+
+
+

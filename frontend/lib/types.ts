@@ -216,4 +216,40 @@ export interface PnLExplainResponse {
   unexplained_pnl: number;
 }
 
+export type RiskGridMetric = "price" | "delta" | "gamma" | "vega" | "theta" | "rho";
+export type RiskGridAxis = "spot" | "strike" | "volatility" | "time_to_expiry" | "rate";
+
+export interface GridRange {
+  min: number;
+  max: number;
+  num_points: number;
+}
+
+export interface RiskGridRequest {
+  ticker: string;
+  market: MarketRegion;
+  spot_override?: number | null;
+  strike: number;
+  expiry_date: string;
+  option_type: OptionType;
+  volatility: number;
+  risk_free_rate: number;
+  dividend_yield?: number | null;
+  axis_x: RiskGridAxis;
+  axis_y: RiskGridAxis;
+  x_range: GridRange;
+  y_range: GridRange;
+  metric: RiskGridMetric;
+}
+
+export interface RiskGridResponse {
+  x_values: number[];
+  y_values: number[];
+  grid: number[][];
+  metric: RiskGridMetric;
+  axis_x: RiskGridAxis;
+  axis_y: RiskGridAxis;
+}
+
+
 

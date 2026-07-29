@@ -5,17 +5,19 @@
  */
 
 import {
-  ErrorResponse,
+  PricingRequest,
+  PricingPreviewResponse,
+  PricingFullResponse,
+  ValidationSummaryResponse,
   ImpliedVolRequest,
   ImpliedVolResponse,
-  MarketQuoteResponse,
-  MarketRegion,
   PnLExplainRequest,
   PnLExplainResponse,
-  PricingFullResponse,
-  PricingPreviewResponse,
-  PricingRequest,
-  ValidationSummaryResponse,
+  RiskGridRequest,
+  RiskGridResponse,
+  ErrorResponse,
+  MarketQuoteResponse,
+  MarketRegion,
 } from "./types";
 
 const BASE_URL =
@@ -156,5 +158,20 @@ export async function postPnLExplain(
   });
   return handleResponse<PnLExplainResponse>(response);
 }
+
+export async function postRiskGrid(
+  request: RiskGridRequest,
+  signal?: AbortSignal
+): Promise<RiskGridResponse> {
+  const url = `${BASE_URL}/price/risk-grid`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+    signal,
+  });
+  return handleResponse<RiskGridResponse>(response);
+}
+
 
 

@@ -6,6 +6,7 @@ import { TerminalDistributionChart } from "./TerminalDistributionChart";
 import { PayoffDiagram } from "./PayoffDiagram";
 import { ConvergenceChart } from "./ConvergenceChart";
 import { ComparisonChart } from "./ComparisonChart";
+import { RiskGridHeatmap } from "./RiskGridHeatmap";
 import { exportChartSvgToPng } from "@/lib/export-helpers";
 import { PricingFullResponse, PricingRequest, MarketRegion } from "@/lib/types";
 
@@ -14,7 +15,7 @@ interface ChartTabContainerProps {
   fullResult: PricingFullResponse | null;
 }
 
-type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison";
+type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid";
 
 const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9" };
 
@@ -45,6 +46,19 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             Asset Paths
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("risk_grid")}
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap ${
+              activeTab === "risk_grid"
+                ? "bg-teal-600 text-white shadow"
+                : "text-slate-400 hover:text-white hover:bg-slate-900"
+            }`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Risk Grid Heatmap
           </button>
 
           <button
@@ -114,6 +128,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
       {/* Tab Panels */}
       <div ref={chartRef}>
         {activeTab === "paths" && <PathsChart request={request} currencySymbol={currencySymbol} />}
+        {activeTab === "risk_grid" && <RiskGridHeatmap request={request} />}
 
         {activeTab === "distribution" && (
           fullResult ? (
