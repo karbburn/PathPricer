@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PathPricer — Frontend Client
+
+The frontend web application for **PathPricer**, built with Next.js 14 (App Router), TypeScript, Tailwind CSS, Recharts, and KaTeX.
+
+It renders an interactive pricing workspace with real-time quantitative controls, 2D risk grid heatmaps, empirical convergence analysis, terminal distribution histograms, P&L attribution, implied volatility solving, and PDF report downloads.
+
+---
+
+## Architectural Highlights
+
+- **App Router Architecture**: Next.js 14 client component workspace (`app/workspace/`).
+- **Real-Time Interactive Workspace**:
+  - `InputPanel.tsx`: Market quote header, parameter sliders, RNG seed locks, estimator dropdown (5 estimators including Randomized QMC), implied volatility solver, and P&L explain inputs.
+  - `ResultsPanel.tsx`: Executive price summary, analytical vs. finite-difference Greeks, 5-estimator comparison table, P&L attribution term breakdown, and PDF/CSV download triggers.
+  - `charts/`: Specialized visualization components:
+    - `RiskGridHeatmap.tsx`: 2D SVG surface heatmap with hover diagnostics bar.
+    - `ConvergenceChart.tsx`: Empirical log-log error decay plot ($O(N^{-1/2})$ fit).
+    - `DistributionChart.tsx`: Terminal asset price $S_T$ histogram with strike marker.
+    - `ComparisonChart.tsx`: Bar chart comparing 5 MC estimators against BS benchmark with 95% confidence intervals.
+- **Client-Side Export**: High-resolution SVG/PNG chart rendering and client-side CSV generator (`lib/export-helpers.ts`).
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18.x or higher
+- `npm` (or `yarn` / `pnpm`)
+
+### Development Server
 
 ```bash
+# Install dependencies
+npm install
+
+# Start Next.js development server on http://localhost:3000
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ensure the FastAPI backend server is running on `http://localhost:8000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Typechecking & Production Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Run TypeScript compilation check
+npx tsc --noEmit
 
-## Learn More
+# Build production bundle
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
