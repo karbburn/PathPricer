@@ -81,6 +81,14 @@ input[type="date"] {
   filter: invert(0.7);
 }
 
+/* ── Touch targets (44px minimum for mobile) ── */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* ── Page transitions ── */
 @view-transition {
   navigation: auto;

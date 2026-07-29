@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, Suspense } from "react";
+import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { InputPanel } from "./InputPanel";
 import { ResultsPanel } from "./ResultsPanel";
@@ -55,6 +55,20 @@ function WorkspaceContent() {
     },
     []
   );
+
+  // Keyboard shortcut: Ctrl+Enter triggers full simulation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (!isFullSimulating) {
+          handleRunFullSimulation(inputs);
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [inputs, isFullSimulating]);
 
   // Full Simulation Trigger Handler (Doc 7 §6 — Never automatic)
   const handleRunFullSimulation = async (targetInputs: PricingRequest) => {
