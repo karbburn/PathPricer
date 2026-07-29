@@ -29,16 +29,16 @@ export default function DocsPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono text-slate-300 py-2">
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-500 block">S_t</span> Stock price at time t
+            <span className="text-slate-400 block">S_t</span> Stock price at time t
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-500 block">r</span> Risk-free rate (annualized)
+            <span className="text-slate-400 block">r</span> Risk-free rate (annualized)
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-500 block">q</span> Continuous dividend yield
+            <span className="text-slate-400 block">q</span> Continuous dividend yield
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800">
-            <span className="text-slate-500 block">σ</span> Volatility (annualized)
+            <span className="text-slate-400 block">σ</span> Volatility (annualized)
           </div>
         </div>
 
@@ -180,7 +180,7 @@ export default function DocsPage() {
           <div className="bg-slate-950 p-4 rounded border border-slate-800">
             <span className="text-slate-400 font-bold block mb-1">Standard Error (SE):</span>
             <div className="text-cyan-300 text-sm">SE = s / &radic;N</div>
-            <p className="text-slate-500 text-[11px] mt-2">
+            <p className="text-slate-400 text-xs mt-2">
               Sample variance s&sup2; computed over i.i.d. discounted payoffs.
             </p>
           </div>
@@ -188,7 +188,7 @@ export default function DocsPage() {
           <div className="bg-slate-950 p-4 rounded border border-slate-800">
             <span className="text-slate-400 font-bold block mb-1">95% Confidence Interval:</span>
             <div className="text-cyan-300 text-sm">95% CI = V̂ &plusmn; 1.96 &bull; SE</div>
-            <p className="text-slate-500 text-[11px] mt-2">
+            <p className="text-slate-400 text-xs mt-2">
               Normal-approximation CI justified by Central Limit Theorem (CLT).
             </p>
           </div>
@@ -224,7 +224,7 @@ export default function DocsPage() {
             <div className="font-mono text-xs text-cyan-300 bg-slate-900 p-2 rounded">
               V̂_CV = e^(-rT) &bull; (1/N) &sum; [ h(S_T^(i)) - &beta;* (S_T^(i) - E[S_T]) ]
             </div>
-            <p className="text-[11px] text-slate-500 mt-2 font-mono">
+            <p className="text-xs text-slate-400 mt-2 font-mono">
               Why S_T and NOT BS price as control? BS price is the benchmark being validated, so using it as a control would be circular. S_T has a known expectation independent of the option price.
             </p>
           </div>

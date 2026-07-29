@@ -90,12 +90,12 @@ function WorkspaceContent() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Workspace Header */}
-      <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-800">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
             Option Pricing Workspace
           </h1>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-slate-400">
             Interactive Monte Carlo simulation workspace &bull; URL search params drive all state
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function WorkspacePage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-7xl mx-auto px-6 py-12 text-center text-gray-400 font-mono">
+        <div className="max-w-7xl mx-auto px-6 py-12 text-center text-slate-400 font-mono">
           Loading pricing workspace...
         </div>
       }

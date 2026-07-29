@@ -90,7 +90,7 @@ export function PreviewBadge({
       <div
         className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950 border-2 border-cyan-400 text-cyan-300 text-xs font-mono font-extrabold shadow-lg shadow-cyan-950/60 ${className}`}
       >
-        <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-400 text-cyan-950 font-bold text-[10px]">
+        <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-400 text-cyan-950 font-bold text-xs">
           ✓
         </span>
         <span className="tracking-wider uppercase">
@@ -102,7 +102,7 @@ export function PreviewBadge({
           </span>
         )}
         {timestamp && (
-          <span className="text-cyan-500/60 text-[10px] hidden sm:inline">
+          <span className="text-cyan-500/60 text-xs hidden sm:inline">
             [{timestamp}]
           </span>
         )}
@@ -120,7 +120,7 @@ export function PreviewBadge({
         PREVIEW &bull; ~N={nSimulations.toLocaleString()}
       </span>
       {computeMs !== undefined && (
-        <span className="text-slate-500 text-[11px]">
+        <span className="text-slate-400 text-xs">
           ({computeMs.toFixed(1)}ms)
         </span>
       )}

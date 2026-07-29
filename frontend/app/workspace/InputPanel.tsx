@@ -898,12 +898,12 @@ export function InputPanel({
   };
 
   return (
-    <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6 space-y-6">
-      <div className="flex items-center justify-between border-b border-gray-700 pb-3">
+    <div className="bg-slate-800/80 border border-slate-700 rounded-lg p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-slate-700 pb-3">
         <h2 className="text-lg font-bold text-white tracking-tight">
           Pricing Inputs
         </h2>
-        <span className="text-xs text-gray-400 font-mono">
+        <span className="text-xs text-slate-400 font-mono">
           Preview Auto-Debounced (~200ms)
         </span>
       </div>
@@ -932,13 +932,13 @@ export function InputPanel({
                   setTickerTouched(true);
                 }}
                 placeholder="Ticker (e.g. AAPL)"
-                className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
+                className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono"
               />
               {showDropdown && tickerTouched && inputs.ticker.trim() && (
-                <div ref={dropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+                <div ref={dropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-slate-950 border border-slate-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
                   {filteredTickers.length > 0 ? (
                     <>
-                      <div className="px-3 py-1.5 text-[10px] text-gray-500 font-mono border-b border-gray-800">
+                      <div className="px-3 py-1.5 text-xs text-slate-400 font-mono border-b border-slate-800">
                         {filteredTickers.length} MATCH{filteredTickers.length !== 1 ? "ES" : ""}
                       </div>
                       {filteredTickers.map((entry, idx) => (
@@ -949,23 +949,23 @@ export function InputPanel({
                           className={`px-3 py-2 cursor-pointer flex items-center justify-between border-l-2 ${
                             idx === activeIndex
                               ? "bg-amber-950/60 border-amber-500 text-white"
-                              : "text-gray-300 hover:bg-gray-800 border-transparent"
+                              : "text-slate-300 hover:bg-slate-800 border-transparent"
                           }`}
                         >
                           <div className="flex flex-col">
                             <span className="font-mono font-bold text-sm">{entry.ticker}</span>
-                            <span className="text-[11px] text-gray-500">{entry.name}</span>
+                            <span className="text-xs text-slate-400">{entry.name}</span>
                           </div>
-                          <span className="text-[10px] text-gray-500 font-mono bg-gray-800 px-1.5 py-0.5 rounded">{entry.market}</span>
+                          <span className="text-xs text-slate-400 font-mono bg-slate-800 px-1.5 py-0.5 rounded">{entry.market}</span>
                         </div>
                       ))}
                     </>
                   ) : (
                     <div className="px-3 py-3 text-center">
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-400">
                         No tickers match &ldquo;{inputs.ticker}&rdquo; in {inputs.market} market
                       </p>
-                      <p className="text-[10px] text-gray-600 mt-1">
+                      <p className="text-xs text-slate-600 mt-1">
                         Try a different symbol or switch market
                       </p>
                     </div>
@@ -977,13 +977,13 @@ export function InputPanel({
               type="button"
               onClick={handleMarketFetch}
               disabled={fetchingMarket}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+              className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
             >
               {fetchingMarket ? "Syncing..." : "Sync Market"}
             </button>
           </div>
 
-          <div className="flex bg-gray-950 p-1 rounded border border-gray-700">
+          <div className="flex bg-slate-950 p-1 rounded border border-slate-700">
             <button
               type="button"
               onClick={() => {
@@ -999,7 +999,7 @@ export function InputPanel({
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "US"
                   ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               US
@@ -1019,7 +1019,7 @@ export function InputPanel({
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "IN"
                   ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               IN (.NS)
@@ -1030,7 +1030,7 @@ export function InputPanel({
         {/* Spot Price Override */}
         <div className="grid grid-cols-2 gap-3 pt-1">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Spot Price ($S_0$)</label>
+            <label className="block text-xs text-slate-400 mb-1">Spot Price ($S_0$)</label>
             <input
               type="number"
               step="0.01"
@@ -1039,36 +1039,36 @@ export function InputPanel({
                 updateField("spot_override", e.target.value ? Number(e.target.value) : null)
               }
               placeholder="Market default"
-              className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-sm text-white font-mono"
+              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-sm text-white font-mono"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Dividend Yield ($q$)</label>
+            <label className="block text-xs text-slate-400 mb-1">Dividend Yield ($q$)</label>
             <input
               type="number"
               step="0.001"
               value={inputs.dividend_yield ?? 0}
               onChange={(e) => updateField("dividend_yield", Number(e.target.value))}
-              className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-sm text-white font-mono"
+              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-sm text-white font-mono"
             />
           </div>
         </div>
       </div>
 
       {/* 2. Option Type & Strike Price */}
-      <div className="space-y-3 pt-3 border-t border-gray-700/60">
+      <div className="space-y-3 pt-3 border-t border-slate-700/60">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold uppercase tracking-wider text-blue-400">
             Contract Terms
           </label>
-          <div className="flex bg-gray-950 p-1 rounded border border-gray-700">
+          <div className="flex bg-slate-950 p-1 rounded border border-slate-700">
             <button
               type="button"
               onClick={() => updateField("option_type", "call")}
               className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
                 inputs.option_type === "call"
                   ? "bg-green-600 text-white"
-                  : "text-gray-400 hover:text-white"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               CALL
@@ -1079,7 +1079,7 @@ export function InputPanel({
               className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
                 inputs.option_type === "put"
                   ? "bg-red-600 text-white"
-                  : "text-gray-400 hover:text-white"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               PUT
@@ -1090,13 +1090,13 @@ export function InputPanel({
         {/* Strike Price Dual Input (Slider + Box) */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-xs text-gray-300">Strike Price ($K$)</label>
+            <label className="text-xs text-slate-300">Strike Price ($K$)</label>
             <input
               type="number"
               step="0.5"
               value={inputs.strike}
               onChange={(e) => updateField("strike", Number(e.target.value))}
-              className="w-24 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
           <input
@@ -1112,18 +1112,18 @@ export function InputPanel({
 
         {/* Expiry Date */}
         <div>
-          <label className="block text-xs text-gray-300 mb-1">Expiration Date</label>
+          <label className="block text-xs text-slate-300 mb-1">Expiration Date</label>
           <input
             type="date"
             value={inputs.expiry_date}
             onChange={(e) => updateField("expiry_date", e.target.value)}
-            className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white font-mono"
+            className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono"
           />
         </div>
       </div>
 
       {/* 3. Market Risk Parameters (Vol & Rate) */}
-      <div className="space-y-3 pt-3 border-t border-gray-700/60">
+      <div className="space-y-3 pt-3 border-t border-slate-700/60">
         <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
           Risk &amp; Volatility Parameters
         </label>
@@ -1131,7 +1131,7 @@ export function InputPanel({
         {/* Volatility Dual Input */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-xs text-gray-300">
+            <label className="text-xs text-slate-300">
               Volatility ($\sigma$): {(inputs.volatility * 100).toFixed(1)}%
             </label>
             <input
@@ -1139,7 +1139,7 @@ export function InputPanel({
               step="0.01"
               value={inputs.volatility}
               onChange={(e) => updateField("volatility", Number(e.target.value))}
-              className="w-24 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
           <input
@@ -1156,7 +1156,7 @@ export function InputPanel({
         {/* Risk-Free Rate Dual Input */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-xs text-gray-300">
+            <label className="text-xs text-slate-300">
               Risk-Free Rate ($r$): {(inputs.risk_free_rate * 100).toFixed(1)}%
             </label>
             <input
@@ -1164,7 +1164,7 @@ export function InputPanel({
               step="0.005"
               value={inputs.risk_free_rate}
               onChange={(e) => updateField("risk_free_rate", Number(e.target.value))}
-              className="w-24 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-right text-white"
             />
           </div>
           <input
@@ -1180,14 +1180,14 @@ export function InputPanel({
       </div>
 
       {/* 4. Simulation Engine Controls */}
-      <div className="space-y-3 pt-3 border-t border-gray-700/60">
+      <div className="space-y-3 pt-3 border-t border-slate-700/60">
         <label className="block text-xs font-bold uppercase tracking-wider text-blue-400">
           Simulation Controls
         </label>
 
         {/* N Simulations Presets */}
         <div>
-          <label className="block text-xs text-gray-300 mb-1">
+          <label className="block text-xs text-slate-300 mb-1">
             Simulations ($N$): {inputs.n_simulations.toLocaleString()}
           </label>
           <div className="grid grid-cols-5 gap-1 mb-2">
@@ -1196,10 +1196,10 @@ export function InputPanel({
                 key={nVal}
                 type="button"
                 onClick={() => updateField("n_simulations", nVal)}
-                className={`py-1 text-[10px] font-mono rounded transition-colors ${
+                className={`py-1 text-xs font-mono rounded transition-colors ${
                   inputs.n_simulations === nVal
                     ? "bg-blue-600 text-white font-bold"
-                    : "bg-gray-950 text-gray-400 hover:text-white border border-gray-800"
+                    : "bg-slate-950 text-slate-400 hover:text-white border border-slate-800"
                 }`}
               >
                 {nVal >= 1000000 ? `${nVal / 1000000}M` : `${nVal / 1000}k`}
@@ -1219,13 +1219,13 @@ export function InputPanel({
 
         {/* Variance Reduction Selector */}
         <div>
-          <label className="block text-xs text-gray-300 mb-1">Variance Reduction Method</label>
+          <label className="block text-xs text-slate-300 mb-1">Variance Reduction Method</label>
           <select
             value={inputs.variance_reduction}
             onChange={(e) =>
               updateField("variance_reduction", e.target.value as VarianceReductionMethod)
             }
-            className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-xs font-mono text-white"
+            className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white"
           >
             <option value="all">All 4 Estimators (Standard / Anti / CV / Combined)</option>
             <option value="standard">Standard Monte Carlo</option>
@@ -1237,20 +1237,20 @@ export function InputPanel({
 
         {/* Seed Control (Randomize + Lock Button) */}
         <div>
-          <label className="block text-xs text-gray-300 mb-1">RNG Seed</label>
+          <label className="block text-xs text-slate-300 mb-1">RNG Seed</label>
           <div className="flex items-center gap-2">
             <input
               type="number"
               value={inputs.seed}
               disabled={seedLocked}
               onChange={(e) => updateField("seed", Number(e.target.value))}
-              className="flex-1 bg-gray-950 border border-gray-700 rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50"
+              className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50"
             />
             <button
               type="button"
               onClick={handleRandomizeSeed}
               disabled={seedLocked}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50"
+              className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50"
             >
               🎲 Randomize
             </button>
@@ -1260,7 +1260,7 @@ export function InputPanel({
               className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors ${
                 seedLocked
                   ? "bg-amber-950 border-amber-700 text-amber-300"
-                  : "bg-gray-900 border-gray-700 text-gray-400 hover:text-white"
+                  : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
               }`}
             >
               {seedLocked ? "🔒 Locked" : "🔓 Unlocked"}

@@ -34,7 +34,7 @@ export function ExportControls({ fullResult, request }: ExportControlsProps) {
         <h4 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">
           Export &amp; Reporting Suite
         </h4>
-        <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+        <p className="text-xs text-slate-400 font-mono mt-0.5">
           Download PDF research report (backend streamed) or export client-side CSV
         </p>
       </div>

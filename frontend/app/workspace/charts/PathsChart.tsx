@@ -87,7 +87,7 @@ export function PathsChart({ request }: PathsChartProps) {
             Sample of 30 exact log-normal paths &bull; Spot: ${spotPrice.toFixed(2)} &bull; Strike: ${strikePrice.toFixed(2)}
           </p>
         </div>
-        <span className="text-[10px] bg-slate-950 border border-slate-800 text-slate-400 px-2 py-1 rounded font-mono">
+        <span className="text-xs bg-slate-950 border border-slate-800 text-slate-400 px-2 py-1 rounded font-mono">
           Seed: {request.seed}
         </span>
       </div>

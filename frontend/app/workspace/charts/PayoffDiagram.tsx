@@ -60,7 +60,7 @@ export function PayoffDiagram({ request, optionPrice }: PayoffDiagramProps) {
             Hockey-stick payoff &bull; Strike: ${K.toFixed(2)} &bull; Spot: ${S0.toFixed(2)} &bull; Breakeven: ${breakeven.toFixed(2)}
           </p>
         </div>
-        <span className="text-[10px] bg-slate-950 border border-slate-800 text-emerald-400 px-2 py-1 rounded font-mono font-bold uppercase">
+        <span className="text-xs bg-slate-950 border border-slate-800 text-emerald-400 px-2 py-1 rounded font-mono font-bold uppercase">
           {opt} Option Payoff
         </span>
       </div>

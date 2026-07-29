@@ -20,13 +20,12 @@ const PRESET_TICKERS: Array<{ ticker: string; market: MarketRegion; name: string
 ];
 
 export default function MarketOverviewPage() {
-  const [tickerInput, setTickerInput] = useState<string>("AAPL");
+  const [tickerInput, setTickerInput] = useState<string>("");
   const [marketInput, setMarketInput] = useState<MarketRegion>("US");
   const [quote, setQuote] = useState<MarketQuoteResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
 
-  // Manual fallback input state for 404 / resolution failures
   const [manualSpot, setManualSpot] = useState<string>("100.00");
   const [manualVol, setManualVol] = useState<string>("0.25");
   const [manualDiv, setManualDiv] = useState<string>("0.00");
@@ -55,28 +54,7 @@ export default function MarketOverviewPage() {
   };
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getMarketQuote("AAPL", "US");
-        setQuote(data);
-      } catch (err) {
-        if (err instanceof ApiError) {
-          setError(err);
-        } else {
-          setError(
-            new ApiError(500, {
-              error: "unknown_error",
-              message: "Failed to connect to backend market data service.",
-            })
-          );
-        }
-        setQuote(null);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    fetchQuote("AAPL", "US");
   }, []);
 
   const handleSearchSubmit = (e: FormEvent) => {
@@ -98,23 +76,23 @@ export default function MarketOverviewPage() {
         <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
           Market Overview
         </h1>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-slate-400">
           Inspect underlying asset market data, historical volatility windows, and dividend yields before pricing options.
         </p>
       </div>
 
       {/* Search Bar & Market Selector */}
-      <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6 mb-8">
+      <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 mb-8">
         <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-4">
           {/* Market Toggle */}
-          <div className="flex bg-gray-900 p-1 rounded border border-gray-700 w-full sm:w-auto">
+          <div className="flex bg-slate-950 p-1 rounded border border-slate-800 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setMarketInput("US")}
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
                 marketInput === "US"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-cyan-600 text-white"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               US Market
@@ -124,8 +102,8 @@ export default function MarketOverviewPage() {
               onClick={() => setMarketInput("IN")}
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
                 marketInput === "IN"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-cyan-600 text-white"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               IN Market (.NS)
@@ -139,10 +117,10 @@ export default function MarketOverviewPage() {
               value={tickerInput}
               onChange={(e) => setTickerInput(e.target.value.toUpperCase())}
               placeholder="Enter ticker (e.g. RELIANCE, AAPL, MSFT)"
-              className="w-full bg-gray-950 border border-gray-700 rounded px-4 py-2.5 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-slate-950 border border-slate-700 rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
             />
             {marketInput === "IN" && (
-              <span className="absolute right-3 top-3 text-xs text-gray-500 font-mono">
+              <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-mono">
                 Auto-appends .NS
               </span>
             )}
@@ -152,20 +130,20 @@ export default function MarketOverviewPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50"
+            className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50"
           >
             {loading ? "Fetching..." : "Fetch Quote"}
           </button>
         </form>
 
         {/* Preset Quick Tickers */}
-        <div className="mt-4 pt-4 border-t border-gray-700/60 flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-gray-400 mr-2 font-medium">Quick Presets:</span>
+        <div className="mt-4 pt-4 border-t border-slate-800/60 flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-slate-400 mr-2 font-medium">Quick Presets:</span>
           {PRESET_TICKERS.map((item) => (
             <button
               key={item.ticker}
               onClick={() => handlePresetClick(item.ticker, item.market)}
-              className="text-xs bg-gray-900 hover:bg-gray-700 border border-gray-700 text-gray-300 px-3 py-1 rounded transition-colors font-mono"
+              className="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-1 rounded transition-colors font-mono"
             >
               {item.ticker} ({item.market})
             </button>
@@ -175,14 +153,14 @@ export default function MarketOverviewPage() {
 
       {/* Loading Skeleton */}
       {loading && (
-        <div className="bg-gray-800/40 border border-gray-800 rounded-lg p-8 text-center animate-pulse">
-          <div className="h-6 bg-gray-700 rounded w-1/4 mx-auto mb-4"></div>
-          <div className="h-12 bg-gray-700 rounded w-1/2 mx-auto mb-6"></div>
+        <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-8 text-center animate-pulse">
+          <div className="h-6 bg-slate-800 rounded w-1/4 mx-auto mb-4"></div>
+          <div className="h-12 bg-slate-800 rounded w-1/2 mx-auto mb-6"></div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="h-20 bg-gray-700 rounded"></div>
-            <div className="h-20 bg-gray-700 rounded"></div>
-            <div className="h-20 bg-gray-700 rounded"></div>
-            <div className="h-20 bg-gray-700 rounded"></div>
+            <div className="h-20 bg-slate-800 rounded"></div>
+            <div className="h-20 bg-slate-800 rounded"></div>
+            <div className="h-20 bg-slate-800 rounded"></div>
+            <div className="h-20 bg-slate-800 rounded"></div>
           </div>
         </div>
       )}
@@ -212,8 +190,8 @@ export default function MarketOverviewPage() {
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
                   Manual Entry Available
                 </h4>
-                <p className="text-xs text-slate-500 mb-4">
-                  Enter parameters manually to proceed to the Pricing Workspace for <span className="text-slate-400 font-mono font-bold">{error.field || tickerInput}</span>.
+                <p className="text-xs text-slate-400 mb-4">
+                  Enter parameters manually to proceed to the Pricing Workspace for <span className="text-slate-300 font-mono font-bold">{error.field || tickerInput}</span>.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
@@ -224,7 +202,7 @@ export default function MarketOverviewPage() {
                       step="0.01"
                       value={manualSpot}
                       onChange={(e) => setManualSpot(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500"
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
                     />
                   </div>
                   <div>
@@ -234,7 +212,7 @@ export default function MarketOverviewPage() {
                       step="0.01"
                       value={manualVol}
                       onChange={(e) => setManualVol(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500"
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
                     />
                   </div>
                   <div>
@@ -244,7 +222,7 @@ export default function MarketOverviewPage() {
                       step="0.001"
                       value={manualDiv}
                       onChange={(e) => setManualDiv(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500"
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
                     />
                   </div>
                 </div>
@@ -253,10 +231,10 @@ export default function MarketOverviewPage() {
                   href={`/workspace?ticker=${encodeURIComponent(
                     tickerInput
                   )}&market=${marketInput}&spot_override=${manualSpot}&volatility=${manualVol}&dividend_yield=${manualDiv}`}
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
                 >
                   <span>Proceed to Workspace</span>
-                  <span className="text-blue-300">&rarr;</span>
+                  <span>&rarr;</span>
                 </Link>
               </div>
             )}
@@ -268,22 +246,22 @@ export default function MarketOverviewPage() {
       {!loading && quote && (
         <div className="space-y-6">
           {/* Top Metric Header */}
-          <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-3 mb-1">
                 <h2 className="text-2xl font-bold text-white tracking-tight">
                   {quote.ticker}
                 </h2>
-                <span className="text-xs px-2 py-0.5 rounded bg-gray-700 text-gray-300 font-mono">
+                <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
                   {quote.market} &bull; {quote.resolved_symbol}
                 </span>
                 {quote.currency && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 font-mono">
+                  <span className="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">
                     {quote.currency}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-400 font-mono">
+              <p className="text-xs text-slate-400 font-mono">
                 Delayed Data (yfinance) &bull; Last Updated: {formatDateTime(quote.last_updated)}
               </p>
             </div>
@@ -296,7 +274,7 @@ export default function MarketOverviewPage() {
               <div
                 className={`text-sm font-bold font-mono px-2.5 py-1 rounded ${
                   quote.daily_return >= 0
-                    ? "bg-green-950 text-green-400 border border-green-800"
+                    ? "bg-emerald-950 text-emerald-400 border border-emerald-800"
                     : "bg-red-950 text-red-400 border border-red-800"
                 }`}
               >
@@ -312,7 +290,7 @@ export default function MarketOverviewPage() {
               )}&market=${quote.market}&spot_override=${quote.spot_price}&volatility=${
                 quote.historical_volatility["252d"] || 0.25
               }&dividend_yield=${quote.dividend_yield}`}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-blue-900/40 flex items-center gap-2"
+              className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-cyan-950/40 flex items-center gap-2"
             >
               <span>Open in Pricing Workspace</span>
               <span>&rarr;</span>
@@ -330,33 +308,33 @@ export default function MarketOverviewPage() {
           )}
 
           {/* Historical Volatility Grid */}
-          <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6">
-            <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+            <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-4">
               Realized Historical Volatility (Close-to-Close Log Returns)
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-gray-950 p-4 rounded border border-gray-800">
-                <span className="text-xs text-gray-500 font-mono block mb-1">20-Day Vol</span>
+              <div className="bg-slate-950 p-4 rounded border border-slate-800">
+                <span className="text-xs text-slate-400 font-mono block mb-1">20-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["20d"] || 0)}
                 </span>
               </div>
-              <div className="bg-gray-950 p-4 rounded border border-gray-800">
-                <span className="text-xs text-gray-500 font-mono block mb-1">60-Day Vol</span>
+              <div className="bg-slate-950 p-4 rounded border border-slate-800">
+                <span className="text-xs text-slate-400 font-mono block mb-1">60-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["60d"] || 0)}
                 </span>
               </div>
-              <div className="bg-gray-950 p-4 rounded border border-gray-800">
-                <span className="text-xs text-gray-500 font-mono block mb-1">126-Day Vol</span>
+              <div className="bg-slate-950 p-4 rounded border border-slate-800">
+                <span className="text-xs text-slate-400 font-mono block mb-1">126-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["126d"] || 0)}
                 </span>
               </div>
-              <div className="bg-gray-950 p-4 rounded border border-gray-800">
-                <span className="text-xs text-gray-500 font-mono block mb-1">252-Day Vol (1 Year)</span>
-                <span className="text-xl font-bold font-mono text-blue-400">
+              <div className="bg-slate-950 p-4 rounded border border-slate-800">
+                <span className="text-xs text-slate-400 font-mono block mb-1">252-Day Vol (1 Year)</span>
+                <span className="text-xl font-bold font-mono text-cyan-400">
                   {formatPercent(quote.historical_volatility["252d"] || 0)}
                 </span>
               </div>
@@ -365,8 +343,8 @@ export default function MarketOverviewPage() {
 
           {/* Secondary Financial Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
                 Dividend Yield (q)
               </span>
               <span className="text-2xl font-bold font-mono text-white">
@@ -374,8 +352,8 @@ export default function MarketOverviewPage() {
               </span>
             </div>
 
-            <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
                 Market Capitalization
               </span>
               <span className="text-2xl font-bold font-mono text-white">
@@ -383,8 +361,8 @@ export default function MarketOverviewPage() {
               </span>
             </div>
 
-            <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-6">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
                 Quote Currency
               </span>
               <span className="text-2xl font-bold font-mono text-white">

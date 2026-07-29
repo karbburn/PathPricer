@@ -110,7 +110,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           fullResult ? (
             <TerminalDistributionChart fullResult={fullResult} />
           ) : (
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-500 font-mono text-sm">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-400 font-mono text-sm">
               Run full simulation to view downsampled terminal distribution histogram &amp; BS theoretical density overlay.
             </div>
           )
@@ -122,7 +122,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           fullResult ? (
             <ConvergenceChart fullResult={fullResult} />
           ) : (
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-500 font-mono text-sm">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-400 font-mono text-sm">
               Run full simulation to view log-log empirical convergence scatter &amp; fitted slope regression.
             </div>
           )
@@ -132,7 +132,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           fullResult ? (
             <ComparisonChart fullResult={fullResult} />
           ) : (
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-500 font-mono text-sm">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center text-slate-400 font-mono text-sm">
               Run full simulation to view MC estimator prices with 95% CI error bars.
             </div>
           )

@@ -98,7 +98,7 @@ export function TerminalDistributionChart({ fullResult }: TerminalDistributionCh
             Empirical histogram vs Black-Scholes theoretical $p(S_T)$ curve (Validation Visual)
           </p>
         </div>
-        <span className="text-[10px] bg-slate-950 border border-slate-800 text-slate-400 px-2 py-1 rounded font-mono">
+        <span className="text-xs bg-slate-950 border border-slate-800 text-slate-400 px-2 py-1 rounded font-mono">
           Sample: {sample.length.toLocaleString()} paths (Downsampled)
         </span>
       </div>
@@ -155,7 +155,7 @@ export function TerminalDistributionChart({ fullResult }: TerminalDistributionCh
         </ResponsiveContainer>
       </div>
 
-      <div className="text-[11px] text-slate-500 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
+      <div className="text-xs text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
         <span>
           Note: Downsampled sample capped at 5,000 terminal prices for API performance.
         </span>

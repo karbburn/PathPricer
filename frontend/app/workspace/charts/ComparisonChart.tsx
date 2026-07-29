@@ -105,7 +105,7 @@ export function ComparisonChart({ fullResult }: ComparisonChartProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="text-[11px] text-slate-500 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
+      <div className="text-xs text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
         <span>
           Cyan Reference Line = BS Benchmark. Yellow Caps = 95% Confidence Intervals.
         </span>

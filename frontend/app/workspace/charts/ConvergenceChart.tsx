@@ -69,7 +69,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
           <span className="text-sm font-extrabold font-mono text-cyan-300 block">
             Slope = {fit.slope.toFixed(3)}
           </span>
-          <span className="text-[10px] text-slate-500 font-mono">
+          <span className="text-xs text-slate-400 font-mono">
             R&sup2; = {fit.r_squared.toFixed(3)} &bull; Target: -0.500
           </span>
         </div>
@@ -129,7 +129,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="text-[11px] text-slate-500 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
+      <div className="text-xs text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
         <span>
           Theoretical Central Limit Theorem bound dictates slope = -0.500 ($\widehat{"{"}SE{"}"} \propto N^{-0.5}$).
         </span>

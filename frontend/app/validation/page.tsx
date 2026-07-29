@@ -54,7 +54,7 @@ export default function ValidationPage() {
         </div>
 
         <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded text-xs font-mono text-cyan-300">
-          <span className="text-slate-500 block text-[10px]">VERIFICATION SOURCE:</span>
+          <span className="text-slate-400 block text-xs">VERIFICATION SOURCE:</span>
           Static CI Artifact (GET /validation/summary)
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function ValidationPage() {
           <h3 className="text-lg font-bold text-slate-300 font-mono">
             Validation Summary Generated on CI
           </h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto font-mono">
+          <p className="text-sm text-slate-400 max-w-md mx-auto font-mono">
             Validation summary generated on CI — will appear after first run.
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function ValidationPage() {
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   200-Trial CI Coverage
                 </span>
-                <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono">
+                <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono">
                   Calibrated
                 </span>
               </div>
@@ -112,7 +112,7 @@ export default function ValidationPage() {
                 <div>Nominal Target: {(summary.ci_coverage.nominal_confidence * 100).toFixed(1)}%</div>
                 <div>Total Trials: {summary.ci_coverage.trials}</div>
                 {summary.ci_coverage.last_run && (
-                  <div className="text-slate-500 text-[10px] pt-1 border-t border-slate-800 mt-2">
+                  <div className="text-slate-400 text-xs pt-1 border-t border-slate-800 mt-2">
                     Last Run: {formatDateTime(summary.ci_coverage.last_run)}
                   </div>
                 )}
@@ -125,7 +125,7 @@ export default function ValidationPage() {
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Edge-Case Test Suite
                 </span>
-                <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-2 py-0.5 rounded font-mono">
+                <span className="text-xs bg-cyan-950 text-cyan-300 border border-cyan-800 px-2 py-0.5 rounded font-mono">
                   ✓ 100% Passed
                 </span>
               </div>
@@ -138,7 +138,7 @@ export default function ValidationPage() {
                 <div>Analytical boundary checks (T&rarr;0, &sigma;&rarr;0)</div>
                 <div>Put-Call Parity residuals &le; 1e-5</div>
                 {summary.edge_cases.last_run && (
-                  <div className="text-slate-500 text-[10px] pt-1 border-t border-slate-800 mt-2">
+                  <div className="text-slate-400 text-xs pt-1 border-t border-slate-800 mt-2">
                     Last Run: {formatDateTime(summary.edge_cases.last_run)}
                   </div>
                 )}
@@ -151,7 +151,7 @@ export default function ValidationPage() {
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Greeks Validation Suite
                 </span>
-                <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono">
+                <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono">
                   All Tolerances Met
                 </span>
               </div>
@@ -193,7 +193,7 @@ export default function ValidationPage() {
                     </td>
                     <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
-                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
                       </span>
                     </td>
@@ -206,7 +206,7 @@ export default function ValidationPage() {
                     </td>
                     <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
-                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
                       </span>
                     </td>
@@ -219,7 +219,7 @@ export default function ValidationPage() {
                     </td>
                     <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
-                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
                       </span>
                     </td>
@@ -232,7 +232,7 @@ export default function ValidationPage() {
                     </td>
                     <td className="p-3 text-center text-slate-400">One-Sided Difference</td>
                     <td className="p-3 text-center">
-                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
                       </span>
                     </td>
@@ -245,7 +245,7 @@ export default function ValidationPage() {
                     </td>
                     <td className="p-3 text-center text-slate-400">CRN Paired Bump (+h / -h)</td>
                     <td className="p-3 text-center">
-                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
                         ✓ PASSED
                       </span>
                     </td>
@@ -266,15 +266,15 @@ export default function ValidationPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-500 block mb-1">Empirical Fitted Slope</span>
+                <span className="text-xs text-slate-400 block mb-1">Empirical Fitted Slope</span>
                 <div className="text-2xl font-extrabold text-cyan-300">-0.497</div>
-                <span className="text-[10px] text-slate-500 mt-1 block">Target: -0.500 (Central Limit Theorem)</span>
+                <span className="text-xs text-slate-400 mt-1 block">Target: -0.500 (Central Limit Theorem)</span>
               </div>
 
               <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-500 block mb-1">Goodness of Fit ($R^2$)</span>
+                <span className="text-xs text-slate-400 block mb-1">Goodness of Fit ($R^2$)</span>
                 <div className="text-2xl font-extrabold text-emerald-400">0.998</div>
-                <span className="text-[10px] text-slate-500 mt-1 block">Target: &gt; 0.990 (Strong Log-Log Linearity)</span>
+                <span className="text-xs text-slate-400 mt-1 block">Target: &gt; 0.990 (Strong Log-Log Linearity)</span>
               </div>
             </div>
           </div>
