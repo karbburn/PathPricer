@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -9,11 +9,19 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  ReferenceArea,
 } from "recharts";
 import { PricingFullResponse } from "@/lib/types";
 
 interface ConvergenceChartProps {
   fullResult: PricingFullResponse;
+}
+
+interface ZoomArea {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
 }
 
 export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
@@ -54,6 +62,56 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
     return { chartData: formattedData, minLogN: minLog, maxLogN: maxLog };
   }, [dataPoints, fit]);
 
+  const [zoom, setZoom] = useState<ZoomArea | null>(null);
+  const [refAreaLeft, setRefAreaLeft] = useState<string | null>(null);
+  const [refAreaRight, setRefAreaRight] = useState<string | null>(null);
+
+  const zoomedData = useMemo(() => {
+    if (!zoom) return chartData;
+    const xMin = Math.min(zoom.x1, zoom.x2);
+    const xMax = Math.max(zoom.x1, zoom.x2);
+    const yMin = Math.min(zoom.y1, zoom.y2);
+    const yMax = Math.max(zoom.y1, zoom.y2);
+    return chartData.filter(
+      (d) => d.logN >= xMin && d.logN <= xMax && d.logSe >= yMin && d.logSe <= yMax
+    );
+  }, [chartData, zoom]);
+
+  const handleMouseDown = useCallback((e: { activeLabel?: string | number }) => {
+    if (e.activeLabel != null) setRefAreaLeft(String(e.activeLabel));
+  }, []);
+
+  const handleMouseMove = useCallback((e: { activeLabel?: string | number }) => {
+    if (refAreaLeft && e.activeLabel != null) {
+      setRefAreaRight(String(e.activeLabel));
+    }
+  }, [refAreaLeft]);
+
+  const handleMouseUp = useCallback(() => {
+    if (!refAreaLeft || !refAreaRight || refAreaLeft === refAreaRight) {
+      setRefAreaLeft(null);
+      setRefAreaRight(null);
+      return;
+    }
+    const left = Math.min(Number(refAreaLeft), Number(refAreaRight));
+    const right = Math.max(Number(refAreaLeft), Number(refAreaRight));
+    const pointsInZoom = chartData.filter((d) => d.logN >= left && d.logN <= right);
+    if (pointsInZoom.length < 2) {
+      setRefAreaLeft(null);
+      setRefAreaRight(null);
+      return;
+    }
+    const yMin = Math.min(...pointsInZoom.map((d) => d.logSe));
+    const yMax = Math.max(...pointsInZoom.map((d) => d.logSe));
+    setZoom({ x1: left, y1: yMin, x2: right, y2: yMax });
+    setRefAreaLeft(null);
+    setRefAreaRight(null);
+  }, [refAreaLeft, refAreaRight, chartData]);
+
+  const handleResetZoom = useCallback(() => {
+    setZoom(null);
+  }, []);
+
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -75,13 +133,30 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         </div>
       </div>
 
+      {zoom && (
+        <button
+          type="button"
+          onClick={handleResetZoom}
+          className="text-xs font-mono text-cyan-400 hover:text-cyan-300 border border-cyan-800 rounded px-2 py-1 transition-colors"
+        >
+          Reset zoom
+        </button>
+      )}
+
       <div className="h-[320px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+          <ComposedChart
+            data={zoomedData}
+            margin={{ top: 10, right: 20, left: 10, bottom: 20 }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onDoubleClick={handleResetZoom}
+          >
             <XAxis
               dataKey="logN"
               type="number"
-              domain={[minLogN, maxLogN]}
+              domain={zoom ? [zoom.x1, zoom.x2] : [minLogN, maxLogN]}
               stroke="#64748b"
               fontSize={11}
               fontFamily="monospace"
@@ -91,7 +166,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
             <YAxis
               dataKey="logSe"
               type="number"
-              domain={["auto", "auto"]}
+              domain={zoom ? [zoom.y1, zoom.y2] : ["auto", "auto"]}
               stroke="#64748b"
               fontSize={11}
               fontFamily="monospace"
@@ -106,16 +181,15 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
                 fontFamily: "monospace",
                 color: "#e2e8f0",
               }}
+              cursor={{ stroke: "#06b6d4", strokeWidth: 1, strokeDasharray: "4 4" }}
               formatter={(val: unknown, name: unknown) => [
                 Number(val).toFixed(4),
                 name === "logSe" ? "Empirical log10(SE)" : "Fitted log10(SE)",
               ]}
             />
 
-            {/* Empirical Scatter Points */}
             <Scatter name="logSe" dataKey="logSe" fill="#06b6d4" />
 
-            {/* Fitted Linear Regression Line */}
             <Line
               type="linear"
               dataKey="fittedLogSe"
@@ -125,6 +199,16 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
               dot={false}
               isAnimationActive={false}
             />
+
+            {refAreaLeft && refAreaRight && (
+              <ReferenceArea
+                x1={Number(refAreaLeft)}
+                x2={Number(refAreaRight)}
+                strokeOpacity={0.3}
+                fill="#06b6d4"
+                fillOpacity={0.1}
+              />
+            )}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
