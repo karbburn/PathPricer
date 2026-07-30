@@ -120,7 +120,7 @@ export function ResultsPanel({
     }
 
     return (
-      <div className="bg-[#161b22] border border-[#58a6ff]/40 rounded-xl overflow-hidden shadow-xl space-y-6 p-6">
+      <div className="card bg-[#161b22] border border-[#58a6ff]/40 rounded-xl overflow-hidden shadow-xl space-y-6 p-6">
         <div className="flex items-center justify-between border-b border-[#21262d] pb-4">
           <div>
             <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
@@ -261,7 +261,7 @@ export function ResultsPanel({
     ];
 
     return (
-      <div className="bg-[#161b22] border border-[#58a6ff]/40 rounded-xl overflow-hidden shadow-xl space-y-6 p-6">
+      <div className="card bg-[#161b22] border border-[#58a6ff]/40 rounded-xl overflow-hidden shadow-xl space-y-6 p-6">
         <div className="flex items-center justify-between border-b border-[#21262d] pb-4">
           <div>
             <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
@@ -411,7 +411,7 @@ export function ResultsPanel({
     const maxEfficiency = Math.max(...mcWithEfficiency.map((m) => m.relative_efficiency), 1.0);
 
     return (
-      <div className="space-y-6">
+      <div className="card space-y-6">
         {/* Header Strip with Validated PreviewBadge */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#161b22] border-2 border-[#58a6ff]/80 rounded-lg p-4 gap-4 shadow-lg shadow-[#0d1117]/40">
           <div>
@@ -457,7 +457,7 @@ export function ResultsPanel({
         </div>
 
         {/* 2. Analytical Greeks Table (all 5 side-by-side) */}
-        <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5">
+        <div className="section bg-[#161b22] border border-[#21262d] rounded-lg p-5">
           <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider mb-3">
             Analytical Greeks (Black-Scholes Closed-Form)
           </h3>
@@ -496,7 +496,7 @@ export function ResultsPanel({
         </div>
 
         {/* 3. Monte Carlo Estimator Comparison — Variance Reduction & Relative Efficiency */}
-        <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5">
+        <div className="section bg-[#161b22] border border-[#21262d] rounded-lg p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider">
               Monte Carlo Estimator Comparison &amp; Variance Reduction
@@ -507,52 +507,52 @@ export function ResultsPanel({
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-xs font-mono text-left">
-              <thead className="bg-[#0d1117] text-[#6e7681] border-b border-[#21262d]">
-                <tr>
-                  <th className="p-2.5">Method</th>
-                  <th className="p-2.5 text-right">Price</th>
-                  <th className="p-2.5 text-right">Std Error (SE)</th>
-                  <th className="p-2.5 text-right">95% CI Width</th>
-                  <th className="p-2.5 text-right">Runtime</th>
-                  <th className="p-2.5 text-right">N_eff</th>
-                  <th className="p-2.5 text-center">Relative Efficiency</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
-                {mcWithEfficiency.map((mc) => {
-                  const barPercent = Math.min(100, (mc.relative_efficiency / maxEfficiency) * 100);
-                  const isFocalPoint = mc.relative_efficiency > 1.05;
+              <table className="w-full text-xs font-mono text-left">
+                <thead className="bg-[#0d1117] text-[#6e7681] border-b border-[#21262d]">
+                  <tr>
+                    <th className="table-cell p-2.5">Method</th>
+                    <th className="table-cell p-2.5 text-right">Price</th>
+                    <th className="table-cell p-2.5 text-right">Std Error (SE)</th>
+                    <th className="table-cell p-2.5 text-right">95% CI Width</th>
+                    <th className="table-cell p-2.5 text-right">Runtime</th>
+                    <th className="table-cell p-2.5 text-right">N_eff</th>
+                    <th className="table-cell p-2.5 text-center">Relative Efficiency</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
+                  {mcWithEfficiency.map((mc) => {
+                    const barPercent = Math.min(100, (mc.relative_efficiency / maxEfficiency) * 100);
+                    const isFocalPoint = mc.relative_efficiency > 1.05;
 
-                  return (
-                    <tr key={mc.method} className="hover:bg-[#21262d]/40">
-                      <td className="p-2.5 font-bold text-[#79c0ff]">
-                        {mc.method === "quasi_monte_carlo"
-                          ? "Randomized QMC (Sobol)"
-                          : mc.method === "antithetic_cv"
-                          ? "Combined Antithetic + CV"
-                          : mc.method === "control_variate"
-                          ? "Control Variates (S_T)"
-                          : mc.method.replace(/_/g, " ")}
-                      </td>
-                      <td className="p-2.5 text-right font-extrabold text-white">
-                        {currencySymbol}{mc.price.toFixed(4)}
-                      </td>
-                      <td className="p-2.5 text-right text-[#58a6ff] font-bold">
-                        &plusmn;${mc.standard_error.toFixed(4)}
-                      </td>
-                      <td className="p-2.5 text-right text-[#6e7681]">
-                        ${mc.ci_width.toFixed(4)}
-                      </td>
-                      <td className="p-2.5 text-right text-[#6e7681]">
-                        {mc.runtime_ms.toFixed(1)}ms
-                      </td>
-                      <td className="p-2.5 text-right text-[#6e7681]">
-                        {mc.n_effective.toLocaleString()}
-                      </td>
+                    return (
+                      <tr key={mc.method} className="hover:bg-[#21262d]/40">
+                        <td className="table-cell p-2.5 font-bold text-[#79c0ff]">
+                          {mc.method === "quasi_monte_carlo"
+                            ? "Randomized QMC (Sobol)"
+                            : mc.method === "antithetic_cv"
+                            ? "Combined Antithetic + CV"
+                            : mc.method === "control_variate"
+                            ? "Control Variates (S_T)"
+                            : mc.method.replace(/_/g, " ")}
+                        </td>
+                        <td className="table-cell p-2.5 text-right font-extrabold text-white">
+                          {currencySymbol}{mc.price.toFixed(4)}
+                        </td>
+                        <td className="table-cell p-2.5 text-right text-[#58a6ff] font-bold">
+                          &plusmn;${mc.standard_error.toFixed(4)}
+                        </td>
+                        <td className="table-cell p-2.5 text-right text-[#6e7681]">
+                          ${mc.ci_width.toFixed(4)}
+                        </td>
+                        <td className="table-cell p-2.5 text-right text-[#6e7681]">
+                          {mc.runtime_ms.toFixed(1)}ms
+                        </td>
+                        <td className="table-cell p-2.5 text-right text-[#6e7681]">
+                          {mc.n_effective.toLocaleString()}
+                        </td>
 
-                      {/* Relative Efficiency — bar-in-cell visual treatment */}
-                      <td className="p-2.5 text-right font-bold">
+                        {/* Relative Efficiency — bar-in-cell visual treatment */}
+                        <td className="table-cell p-2.5 text-right font-bold">
                         <div className="flex items-center justify-end gap-2">
                           <div className="w-16 bg-[#0d1117] h-2 rounded overflow-hidden border border-[#21262d]">
                             <div
@@ -582,7 +582,7 @@ export function ResultsPanel({
         </div>
 
         {/* 4. Greeks Comparison — Analytical BS vs Finite-Difference MC */}
-        <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5">
+        <div className="section bg-[#161b22] border border-[#21262d] rounded-lg p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider">
               Greeks Comparison: Analytical BS vs Finite-Difference MC (CRN)
@@ -596,12 +596,12 @@ export function ResultsPanel({
             <table className="w-full text-xs font-mono text-left">
               <thead className="bg-[#0d1117] text-[#6e7681] border-b border-[#21262d]">
                 <tr>
-                  <th className="p-2.5">Greek</th>
-                  <th className="p-2.5 text-right">Analytical BS</th>
-                  <th className="p-2.5 text-right">FD Monte Carlo</th>
-                  <th className="p-2.5 text-right">Delta (Difference)</th>
-                  <th className="p-2.5 text-right">Rel Error</th>
-                  <th className="p-2.5 text-center">Status</th>
+                  <th className="table-cell p-2.5">Greek</th>
+                  <th className="table-cell p-2.5 text-right">Analytical BS</th>
+                  <th className="table-cell p-2.5 text-right">FD Monte Carlo</th>
+                  <th className="table-cell p-2.5 text-right">Delta (Difference)</th>
+                  <th className="table-cell p-2.5 text-right">Rel Error</th>
+                  <th className="table-cell p-2.5 text-center">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
@@ -618,28 +618,28 @@ export function ResultsPanel({
 
                   return (
                     <tr key={key} className="hover:bg-[#21262d]/40">
-                      <td className="p-2.5 font-bold text-white">
+                      <td className="table-cell p-2.5 font-bold text-white">
                         {meta.name} ({meta.symbol})
                       </td>
-                      <td className="p-2.5 text-right text-[#8b949e] font-bold">
+                      <td className="table-cell p-2.5 text-right text-[#8b949e] font-bold">
                         {bsVal.toFixed(5)}
                       </td>
-                      <td className="p-2.5 text-right text-[#79c0ff] font-bold">
+                      <td className="table-cell p-2.5 text-right text-[#79c0ff] font-bold">
                         {fdVal.toFixed(5)}
                       </td>
                       {/* Delta column — explicit difference display */}
                       <td
-                        className={`p-2.5 text-right font-bold ${
+                        className={`table-cell p-2.5 text-right font-bold ${
                           diff >= 0 ? "text-[#3fb950]" : "text-[#f85149]"
                         }`}
                       >
                         {diff >= 0 ? "+" : ""}
                         {diff.toFixed(5)}
                       </td>
-                      <td className="p-2.5 text-right text-[#6e7681]">
+                      <td className="table-cell p-2.5 text-right text-[#6e7681]">
                         {isNearZero ? "N/A (near 0)" : `${(relErr * 100).toFixed(2)}%`}
                       </td>
-                      <td className="p-2.5 text-center">
+                      <td className="table-cell p-2.5 text-center">
                         {isWithinTolerance ? (
                           <span className="px-2 py-0.5 rounded bg-[#0d1117] text-[#3fb950] border border-[#30363d] text-xs font-bold">
                             ✓ Pass ({isNearZero ? "< 0.01" : `&le; ${(meta.tolerance * 100).toFixed(0)}%`})
@@ -659,7 +659,7 @@ export function ResultsPanel({
         </div>
 
         {/* 5. Diagnostics Panel */}
-        <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5">
+        <div className="section bg-[#161b22] border border-[#21262d] rounded-lg p-5">
           <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider mb-3">
             Simulation Diagnostics Panel
           </h3>
@@ -730,7 +730,7 @@ export function ResultsPanel({
   const currentBadgeTier: PrecisionTier = microState === "pending" ? "pending" : "preview";
 
   return (
-    <div className="space-y-6">
+    <div className="card space-y-6">
       {/* Header Strip with Muted PreviewBadge */}
       <div className="flex items-center justify-between bg-[#161b22]/60 border border-[#21262d] rounded-lg p-4">
         <div>

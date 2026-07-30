@@ -179,7 +179,7 @@ export function InputPanel({
 
   return (
     <div
-      className={`bg-[#161b22] border border-[#21262d] rounded-xl shadow-xl space-y-6 ${
+      className={`card bg-[#161b22] border border-[#21262d] rounded-xl shadow-xl space-y-6 ${
         density === "compact" ? "p-4" : "p-6"
       }`}
     >
@@ -237,7 +237,7 @@ export function InputPanel({
 
 
       {/* 1. Underlying Ticker & Market Selection */}
-      <div className="space-y-3">
+      <div className="section space-y-3">
         <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
           Underlying Asset
         </label>
@@ -299,7 +299,7 @@ export function InputPanel({
                 updateField("spot_override", e.target.value ? roundClean(Number(e.target.value), 2) : null)
               }
               placeholder="Market default"
-              className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
           <div>
@@ -309,7 +309,7 @@ export function InputPanel({
               step="0.001"
               value={inputs.dividend_yield ?? 0}
               onChange={(e) => updateField("dividend_yield", roundClean(Number(e.target.value), 4))}
-              className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
             {(!inputs.dividend_yield || inputs.dividend_yield === 0) && (
               <p className="text-[10px] text-[#58a6ff]/90 mt-1 font-mono flex items-center gap-1">
@@ -321,7 +321,7 @@ export function InputPanel({
       </div>
 
       {/* 2. Option Type & Strike Price */}
-      <div className="space-y-3 pt-3">
+      <div className="section space-y-3 pt-3">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             Contract Terms
@@ -361,7 +361,7 @@ export function InputPanel({
               step={strikeStep}
               value={inputs.strike}
               onChange={(e) => updateField("strike", Number(e.target.value))}
-              className="w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
           <input
@@ -382,13 +382,13 @@ export function InputPanel({
             type="date"
             value={inputs.expiry_date}
             onChange={(e) => updateField("expiry_date", e.target.value)}
-            className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+            className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           />
         </div>
       </div>
 
       {/* 3. Market Risk Parameters */}
-      <div className="space-y-3 pt-3">
+      <div className="section space-y-3 pt-3">
         <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
           {workspaceMode === "implied_vol" ? "Target Market Price & Rates" : "Risk & Volatility Parameters"}
         </label>
@@ -406,7 +406,7 @@ export function InputPanel({
               min="0.01"
               value={marketPrice}
               onChange={(e) => onMarketPriceChange && onMarketPriceChange(Number(e.target.value))}
-              className="w-full bg-[#0d1117] border border-[#58a6ff]/60 focus:border-[#58a6ff] rounded px-3 py-2 text-sm font-mono text-white font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className="input-field w-full bg-[#0d1117] border border-[#58a6ff]/60 focus:border-[#58a6ff] rounded px-3 py-2 text-sm font-mono text-white font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               placeholder="e.g. 5.25"
             />
           </div>
@@ -421,7 +421,7 @@ export function InputPanel({
                 step="0.01"
                 value={inputs.volatility}
                 onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
-                className="w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -440,15 +440,15 @@ export function InputPanel({
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="text-xs text-[#8b949e]">
-              Risk-Free Rate (r): {(inputs.risk_free_rate * 100).toFixed(1)}%
-            </label>
-            <input
-              type="number"
-              step="0.005"
-              value={inputs.risk_free_rate}
-              onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
-              className="w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
-            />
+                Risk-Free Rate (r): {(inputs.risk_free_rate * 100).toFixed(1)}%
+              </label>
+              <input
+                type="number"
+                step="0.005"
+                value={inputs.risk_free_rate}
+                onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
+                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              />
           </div>
           <input
             type="range"
@@ -464,7 +464,7 @@ export function InputPanel({
 
       {/* 4. Simulation Engine Controls (Pricing Mode Only) */}
       {workspaceMode === "pricing" && (
-        <div className="space-y-3 pt-3">
+        <div className="section space-y-3 pt-3">
           <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             Simulation Controls
           </label>
@@ -509,7 +509,7 @@ export function InputPanel({
               onChange={(e) =>
                 updateField("variance_reduction", e.target.value as VarianceReductionMethod)
               }
-              className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-xs font-mono text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-xs font-mono text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               <option value="all">All 5 Estimators (Standard / Anti / CV / Combined / RQMC)</option>
               <option value="standard">Standard Monte Carlo</option>
@@ -529,7 +529,7 @@ export function InputPanel({
                 value={inputs.seed}
                 disabled={seedLocked}
                 onChange={(e) => updateField("seed", Number(e.target.value))}
-                className="flex-1 bg-[#0d1117] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field flex-1 bg-[#0d1117] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
               <button
                 type="button"
@@ -557,7 +557,7 @@ export function InputPanel({
 
       {/* 4. Scenario Shift Parameters (P&L Explain Mode Only) */}
       {workspaceMode === "pnl_explain" && (
-        <div className="space-y-3 pt-3 border-t border-[#21262d]">
+        <div className="section space-y-3 pt-3 border-t border-[#21262d]">
           <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             Hypothetical Scenario Shifts
           </label>
@@ -575,7 +575,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
                 }
-                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -604,7 +604,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
                 }
-                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -635,7 +635,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.max(0, Number(e.target.value)) })
                 }
-                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -664,7 +664,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
                 }
-                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
