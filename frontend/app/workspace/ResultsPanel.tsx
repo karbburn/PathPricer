@@ -419,7 +419,7 @@ export function ResultsPanel({
               Validated Pricing Results
             </h2>
             <p className="text-xs text-[#8b949e] font-mono mt-0.5">
-              Risk-neutral measure $\mathbb{"{"}Q{"}"}$ &bull; Seed: {fullResult.request_echo.seed}
+              Risk-neutral measure ℚ &bull; Seed: {fullResult.request_echo.seed}
             </p>
           </div>
           <PreviewBadge
