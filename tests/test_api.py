@@ -1,6 +1,6 @@
 """API endpoint tests using FastAPI TestClient.
 
-Verifies all routes match Doc 6 JSON shapes, input validation rejects
+Verifies all routes return correct JSON shapes, input validation rejects
 invalid requests with 400, and error paths return structured errors.
 """
 

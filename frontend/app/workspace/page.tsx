@@ -103,7 +103,7 @@ function WorkspaceContent() {
     onShowHelp: () => setShowHelp(true),
   });
 
-  // Full Simulation Trigger Handler (Doc 7 §6 — Never automatic)
+  // Full Simulation Trigger Handler — Never automatic, requires user action
   const handleRunFullSimulation = async (targetInputs: PricingRequest) => {
     setIsFullSimulating(true);
     setError(null);

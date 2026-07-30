@@ -1,5 +1,5 @@
 /**
- * Shared Numeric Formatting Helpers (Doc 8 §7).
+ * Shared Numeric Formatting Helpers.
  *
  * Ensures consistent number formatting across UI, reports, and data grids,
  * preventing silent formatting path divergence.

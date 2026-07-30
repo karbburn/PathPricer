@@ -114,7 +114,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           </button>
         </div>
 
-        {/* Per-Chart PNG Export Button (Doc 7 §7) */}
+        {/* Per-Chart PNG Export Button */}
         <button
           type="button"
           onClick={handleExportPng}

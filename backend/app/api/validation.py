@@ -1,7 +1,7 @@
 """Validation summary API endpoint.
 
 GET /validation/summary — serves static CI-time validation artifact JSON.
-Doc 6 §5: STATIC CI ARTIFACT ONLY. NEVER calls /price/full or computes live.
+Static CI artifact only. Never calls /price/full or computes live.
 """
 
 from __future__ import annotations

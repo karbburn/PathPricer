@@ -1,5 +1,5 @@
 /**
- * Export helpers for CSV, PNG, and PDF report downloads (Doc 7 §7).
+ * Export helpers for CSV, PNG, and PDF report downloads.
  */
 
 import { fetchReportPdf } from "./api-client";
@@ -7,7 +7,6 @@ import { PricingFullResponse, PricingRequest } from "./types";
 
 /**
  * Generate and trigger a CSV download client-side from PricingFullResponse data.
- * No backend endpoint required (Doc 7 §7).
  */
 export function downloadCsv(fullResult: PricingFullResponse) {
   const req = fullResult.request_echo;

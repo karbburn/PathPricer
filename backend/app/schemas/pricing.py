@@ -1,6 +1,6 @@
 """Pydantic schemas for API request/response models.
 
-Mirrors Doc 6 API Specification JSON shapes exactly. Preview and Full
+Mirrors API Specification JSON shapes exactly. Preview and Full
 response types are deliberately distinct to enforce the two-tier compute
 model at the schema level.
 """
