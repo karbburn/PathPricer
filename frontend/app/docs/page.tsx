@@ -1,369 +1,486 @@
 import React from "react";
+import "katex/dist/katex.min.css";
+import { InlineMath, BlockMath } from "react-katex";
+
+const toc = [
+  { id: "gbm", label: "1. GBM" },
+  { id: "bsm", label: "2. BSM & Greeks" },
+  { id: "why-mc", label: "3. Why MC?" },
+  { id: "mc-est", label: "4. MC Estimator" },
+  { id: "var-red", label: "5. Variance Reduction" },
+  { id: "qmc", label: "6. RQMC" },
+  { id: "fd-greeks", label: "7. FD Greeks" },
+  { id: "iv", label: "8. IV Solver" },
+  { id: "pnl", label: "9. P&L Explain" },
+  { id: "risk-grid", label: "10. Risk Grid" },
+  { id: "assumptions", label: "11. Assumptions" },
+  { id: "design", label: "12. Design Decisions" },
+];
+
+function SectionCard({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) {
+  return (
+    <section id={id} className={`border-b border-[#21262d]/60 pb-8 mb-8 scroll-mt-20 ${className ?? ""}`}>
+      <h2 className="text-xl font-bold text-[#58a6ff] mb-4 tracking-tight">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function Callout({ title, children, accent = "blue" }: { title: string; children: React.ReactNode; accent?: "blue" | "green" | "red" }) {
+  const accentColors = { blue: "border-[#58a6ff] text-[#79c0ff]", green: "border-[#3fb950] text-[#3fb950]", red: "border-[#f85149] text-[#f85149]" };
+  return (
+    <div className={`border-l-4 ${accent === "blue" ? "border-[#58a6ff]" : accent === "green" ? "border-[#3fb950]" : "border-[#f85149]"} bg-[#0d1117]/50 pl-4 pr-3 py-3 space-y-1.5`}>
+      <div className={`font-semibold text-xs uppercase tracking-wider ${accentColors[accent]}`}>{title}</div>
+      <div className="text-sm text-[#8b949e] leading-relaxed">{children}</div>
+    </div>
+  );
+}
+
+function ParamGrid({ items }: { items: { sym: string; desc: string }[] }) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs">
+      {items.map((x) => (
+        <div key={x.sym} className="bg-[#0d1117]/60 px-3 py-2 rounded border border-[#21262d]">
+          <span className="font-mono text-[#79c0ff] block">{x.sym}</span>
+          <span className="text-[#8b949e]">{x.desc}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function DocsPage() {
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 space-y-12">
-      {/* Document Header */}
-      <div className="border-b border-[#21262d] pb-6">
-        <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
-          Quantitative Methodology &amp; Mathematical Specification
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      {/* ── Header ── */}
+      <div className="mb-8 pb-6 border-b border-[#21262d]">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
+          Quantitative Methodology & Mathematical Specification
         </h1>
         <p className="text-sm text-[#8b949e]">
-          Single source of truth for all mathematical models, Monte Carlo variance-reduction algorithms, Greeks derivations, and defensible architectural decisions.
+          All mathematical models, Monte Carlo estimators, Greeks derivations, and defensible design decisions.
         </p>
       </div>
 
-      {/* 1. Geometric Brownian Motion */}
-      <section className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-bold text-[#58a6ff] flex items-center gap-2">
-          <span>1. The Model: Geometric Brownian Motion (GBM)</span>
-        </h2>
+      {/* ── TOC ── */}
+      <nav className="flex flex-wrap gap-x-5 gap-y-1.5 mb-10 text-sm">
+        {toc.map((x) => (
+          <a key={x.id} href={`#${x.id}`} className="text-[#58a6ff] hover:text-[#79c0ff] transition-colors border-b border-transparent hover:border-[#58a6ff]">
+            {x.label}
+          </a>
+        ))}
+      </nav>
 
-        <p className="text-sm text-[#8b949e] leading-relaxed">
-          The underlying stock price S_t follows the risk-neutral Stochastic Differential Equation (SDE):
+      {/* ════════════════════════════════════════════════════════════ 1. GBM */}
+      <SectionCard id="gbm" title="1. The Model: Geometric Brownian Motion (GBM)">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          The underlying stock price <InlineMath math="S_t" /> evolves under the risk-neutral measure according to:
         </p>
 
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#79c0ff] overflow-x-auto py-2">
-          <div className="min-w-max">dS_t = (r - q) S_t dt + σ S_t dW_t</div>
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\text{d}S_t = (r - q)S_t\,\text{d}t + \sigma S_t\,\text{d}W_t" />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono text-[#8b949e] py-2">
-          <div className="bg-[#0d1117]/60 p-2.5 rounded border border-[#21262d]">
-            <span className="text-[#8b949e] block">S_t</span> Stock price at time t
-          </div>
-          <div className="bg-[#0d1117]/60 p-2.5 rounded border border-[#21262d]">
-            <span className="text-[#8b949e] block">r</span> Risk-free rate (annualized)
-          </div>
-          <div className="bg-[#0d1117]/60 p-2.5 rounded border border-[#21262d]">
-            <span className="text-[#8b949e] block">q</span> Continuous dividend yield
-          </div>
-          <div className="bg-[#0d1117]/60 p-2.5 rounded border border-[#21262d]">
-            <span className="text-[#8b949e] block">σ</span> Volatility (annualized)
-          </div>
-        </div>
+        <ParamGrid items={[
+          { sym: "S_t", desc: "Stock price at t" },
+          { sym: "r", desc: "Risk-free rate" },
+          { sym: "q", desc: "Dividend yield" },
+          { sym: "σ", desc: "Volatility (annualised)" },
+          { sym: "W_t", desc: "Standard Brownian motion" },
+        ]} />
 
-        <h3 className="text-sm font-bold text-[#e6edf3] pt-2">Exact Closed-Form Solution</h3>
-        <p className="text-sm text-[#8b949e] leading-relaxed">
-          Applying Itô&apos;s Lemma to ln(S_t) yields the exact (non-discretized) terminal price solution:
+        <h3 className="text-sm font-semibold text-[#e6edf3] mt-5 mb-2">Exact Closed-Form Solution</h3>
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Applying Itô&rsquo;s Lemma to <InlineMath math="\ln S_t" /> gives the exact terminal price:
         </p>
 
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#3fb950] overflow-x-auto py-2">
-          <div className="min-w-max">S_T = S_0 exp[(r - q - 0.5 σ²) T + σ √T Z], Z ~ N(0, 1)</div>
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="S_T = S_0 \exp\left[\left(r - q - \tfrac{1}{2}\sigma^2\right)T + \sigma\sqrt{T}\,Z\right], \quad Z \sim N(0,1)" />
         </div>
 
-        <div className="bg-[#0d1117]/80 border-l-4 border-[#58a6ff] p-4 text-xs text-[#8b949e] space-y-2">
-          <div className="font-bold text-[#79c0ff]">Why exact solution and not Euler-Maruyama discretization?</div>
-          <p className="leading-relaxed">
-            For plain GBM with constant parameters, the exact terminal log-normal density is known in closed form, eliminating all discretization bias. Euler-Maruyama is required for path-dependent options (Asians, barriers) or models without closed-form transition densities (Heston). Using Euler here would introduce unnecessary bias for zero benefit.
-          </p>
-        </div>
-      </section>
+        <Callout title="Why exact GBM sampling?">
+          The SDE has a known closed-form solution for constant parameters, so Euler-Maruyama discretisation would introduce unnecessary bias. Path-wise simulation for charts uses the same exact formula stepwise.
+        </Callout>
+      </SectionCard>
 
-      {/* 2. Why Monte Carlo for a Solved Problem? */}
-      <section className="bg-[#0d1117]/40 border-2 border-[#58a6ff]/80 rounded-lg p-6 space-y-4 shadow-xl shadow-[#0d1117]/30">
-        <div className="flex items-center justify-between border-b border-[#161b22]/80 pb-3">
-          <h2 className="text-xl font-extrabold text-[#79c0ff] tracking-tight flex items-center gap-2">
-            <span>2. Why Monte Carlo for a Problem Black-Scholes Already Solves?</span>
-          </h2>
-          <span className="text-xs px-2.5 py-0.5 rounded bg-[#161b22] text-[#79c0ff] border border-[#30363d] font-mono font-bold">
-            Core Intellectual Claim
-          </span>
-        </div>
-
-        <p className="text-sm text-[#e6edf3] font-semibold leading-relaxed">
-          This is the single most important conceptual question in PathPricer: why build Monte Carlo simulation for European vanilla options when Black-Scholes is exact and instant?
+      {/* ════════════════════════════════════════════════════════════ 2. BSM */}
+      <SectionCard id="bsm" title="2. Black-Scholes-Merton Analytical Benchmark & Greeks">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Closed-form formulas with continuous dividend yield <InlineMath math="q" /> (Merton 1973):
         </p>
 
-        <div className="space-y-3 text-sm text-[#8b949e] leading-relaxed">
-          <div className="bg-[#161b22]/90 p-4 rounded border border-[#21262d]">
-            <h4 className="font-bold text-[#f85149] mb-1">The Honest Assessment:</h4>
-            <p className="text-xs text-[#8b949e]">
-              For vanilla European options under GBM, Monte Carlo is <strong>strictly worse</strong> than Black-Scholes on every axis that matters in production: it is slower, introduces sampling noise, and estimates a quantity Black-Scholes computes exactly in closed form.
-            </p>
-          </div>
-
-          <div className="bg-[#161b22]/90 p-4 rounded border border-[#21262d]">
-            <h4 className="font-bold text-[#79c0ff] mb-1">Why Institutions Still Depend on Monte Carlo:</h4>
-            <p className="text-xs text-[#8b949e]">
-              Monte Carlo generalizes to real-world problems with <strong>no closed-form solution</strong>: path-dependent payoffs (Asians, barriers), high-dimensional basket options, American/Bermudan exercise (via Longstaff-Schwartz), and stochastic volatility/jump models (Heston, SABR, Dupire). Black-Scholes is the rare exception with an exact formula; most derivatives pricing has none.
-            </p>
-          </div>
-
-          <div className="bg-[#161b22]/90 p-4 rounded border border-[#21262d]">
-            <h4 className="font-bold text-[#3fb950] mb-1">What PathPricer Demonstrates:</h4>
-            <p className="text-xs text-[#8b949e]">
-              PathPricer builds and validates numerical machinery — variance reduction, empirical convergence rate tracking (O(N⁻¹/²)), confidence interval calibration, and finite-difference Greeks with CRN — against a case where <strong>ground truth is independently known</strong>. Validating simulation infrastructure against known analytical truth is the prerequisite for trusting that same machinery on unsolvable problems.
-            </p>
-          </div>
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="d_1 = \frac{\ln(S_0/K) + (r - q + \tfrac{1}{2}\sigma^2)T}{\sigma\sqrt{T}}, \quad d_2 = d_1 - \sigma\sqrt{T}" />
+          <BlockMath math="C = S_0 e^{-qT}N(d_1) - K e^{-rT}N(d_2)" />
+          <BlockMath math="P = K e^{-rT}N(-d_2) - S_0 e^{-qT}N(-d_1)" />
         </div>
-      </section>
 
-      {/* 3. Black-Scholes-Merton Analytical Benchmark & Greeks */}
-      <section className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-bold text-[#58a6ff]">
-          3. Black-Scholes-Merton Analytical Benchmark &amp; Greeks
-        </h2>
-
-        <p className="text-sm text-[#8b949e] leading-relaxed">
-          Closed-form formulas incorporating continuous dividend yield q (Merton 1973 extension):
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Under the risk-neutral measure, the option price is the discounted expected payoff:{" "}
+          <InlineMath math="V_0 = e^{-rT}\mathbb{E}^{\mathbb{Q}}[\text{payoff}(S_T)]" />.
+          Monte Carlo estimates this same expectation numerically.
         </p>
 
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-xs text-[#79c0ff] space-y-2">
-          <div>d1 = [ln(S0/K) + (r - q + 0.5 σ²) T] / (σ √T)</div>
-          <div>d2 = d1 - σ √T</div>
-          <div className="pt-2 text-[#3fb950] font-bold">
-            Call = S0 e^(-qT) N(d1) - K e^(-rT) N(d2)
-          </div>
-          <div className="text-[#3fb950] font-bold">
-            Put = K e^(-rT) N(-d2) - S0 e^(-qT) N(-d1)
-          </div>
-        </div>
-
-        <h3 className="text-sm font-bold text-[#e6edf3] pt-2">Analytical Greeks Table</h3>
-        <div className="overflow-x-auto">
+        <h3 className="text-sm font-semibold text-[#e6edf3] mt-5 mb-2">Analytical Greeks</h3>
+        <div className="overflow-x-auto mb-3">
           <table className="w-full text-xs font-mono text-left">
             <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
-              <tr>
-                <th className="p-2.5">Greek</th>
-                <th className="p-2.5">Call Formula</th>
-                <th className="p-2.5">Put Formula</th>
-                <th className="p-2.5">Convention</th>
-              </tr>
+              <tr><th className="p-2.5">Greek</th><th className="p-2.5">Call</th><th className="p-2.5">Put</th><th className="p-2.5">Meaning</th></tr>
             </thead>
             <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
-              <tr>
-                <td className="p-2.5 font-bold text-white">Delta (&Delta;)</td>
-                <td className="p-2.5 text-[#79c0ff]">e^(-qT) N(d1)</td>
-                <td className="p-2.5 text-[#79c0ff]">-e^(-qT) N(-d1)</td>
-                <td className="p-2.5 text-[#8b949e]">Directional spot sensitivity</td>
-              </tr>
-              <tr>
-                <td className="p-2.5 font-bold text-white">Gamma (&Gamma;)</td>
-                <td className="p-2.5 text-[#79c0ff]">e^(-qT) &phi;(d1) / (S0 &sigma; &radic;T)</td>
-                <td className="p-2.5 text-[#79c0ff]">Identical to Call</td>
-                <td className="p-2.5 text-[#8b949e]">Convexity (curvature)</td>
-              </tr>
-              <tr>
-                <td className="p-2.5 font-bold text-white">Vega (&nu;)</td>
-                <td className="p-2.5 text-[#79c0ff]">S0 e^(-qT) &phi;(d1) &radic;T</td>
-                <td className="p-2.5 text-[#79c0ff]">Identical to Call</td>
-                <td className="p-2.5 text-[#8b949e]">Volatility sensitivity</td>
-              </tr>
-              <tr>
-                <td className="p-2.5 font-bold text-white">Theta (&theta;)</td>
-                <td className="p-2.5 text-[#79c0ff]">Annualized / 365</td>
-                <td className="p-2.5 text-[#79c0ff]">Annualized / 365</td>
-                <td className="p-2.5 text-[#8b949e]">Reported per calendar day</td>
-              </tr>
-              <tr>
-                <td className="p-2.5 font-bold text-white">Rho (&rho;)</td>
-                <td className="p-2.5 text-[#79c0ff]">K T e^(-rT) N(d2)</td>
-                <td className="p-2.5 text-[#79c0ff]">-K T e^(-rT) N(-d2)</td>
-                <td className="p-2.5 text-[#8b949e]">Interest rate sensitivity</td>
-              </tr>
+              {[
+                ["Delta (Δ)", "e^{-qT}N(d_1)", "-e^{-qT}N(-d_1)", "Spot sensitivity"],
+                ["Gamma (Γ)", "\\frac{e^{-qT}\\phi(d_1)}{S_0\\sigma\\sqrt{T}}", "Same", "Convexity"],
+                ["Vega (ν)", "S_0 e^{-qT}\\phi(d_1)\\sqrt{T}", "Same", "Vol sensitivity"],
+                ["Theta (Θ)", "\\text{Annualised} / 365", "Same", "Time decay / day"],
+                ["Rho (ρ)", "K T e^{-rT} N(d_2)", "-K T e^{-rT} N(-d_2)", "Rate sensitivity"],
+              ].map(([greek, call, put, meaning]) => (
+                <tr key={greek}>
+                  <td className="p-2.5 font-bold text-white">{greek}</td>
+                  <td className="p-2.5 text-[#79c0ff]"><InlineMath math={call} /></td>
+                  <td className="p-2.5 text-[#79c0ff]">{put === "Same" ? "Identical to Call" : <InlineMath math={put} />}</td>
+                  <td className="p-2.5 text-[#8b949e]">{meaning}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </section>
+      </SectionCard>
 
-      {/* 4. Monte Carlo Estimator & Convergence Rate */}
-      <section className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-bold text-[#58a6ff]">
-          4. Monte Carlo Estimator &amp; O(N⁻¹/²) Convergence
-        </h2>
-
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#79c0ff] overflow-x-auto py-2">
-          <div className="min-w-max">V̂ = e^(-rT) &bull; (1/N) &sum; h(S_T^(i)), h(S_T) = max(S_T - K, 0)</div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
-            <span className="text-[#8b949e] font-bold block mb-1">Standard Error (SE):</span>
-            <div className="text-[#79c0ff] text-sm">SE = s / &radic;N</div>
-            <p className="text-[#8b949e] text-xs mt-2">
-              Sample variance s&sup2; computed over i.i.d. discounted payoffs.
-            </p>
-          </div>
-
-          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
-            <span className="text-[#8b949e] font-bold block mb-1">95% Confidence Interval:</span>
-            <div className="text-[#79c0ff] text-sm">95% CI = V̂ &plusmn; 1.96 &bull; SE</div>
-            <p className="text-[#8b949e] text-xs mt-2">
-              Normal-approximation CI justified by Central Limit Theorem (CLT).
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-[#0d1117]/80 border-l-4 border-[#3fb950] p-4 text-xs text-[#8b949e] space-y-1">
-          <div className="font-bold text-[#3fb950]">Why Normal-Approximation CI and not Bootstrap?</div>
-          <p className="leading-relaxed">
-            Discounted payoffs e^(-rT) h(S_T^(i)) are i.i.d. with finite variance, so the Central Limit Theorem applies cleanly for N &ge; 10⁴. Bootstrap CIs would target the same asymptotic result at much higher compute cost without improving accuracy.
-          </p>
-        </div>
-      </section>
-
-      {/* 5. Variance Reduction Techniques */}
-      <section className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-bold text-[#58a6ff]">
-          5. Variance Reduction Techniques
-        </h2>
-
-        <div className="space-y-4 text-sm text-[#8b949e]">
-          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
-            <h3 className="font-bold text-white mb-1">5.1 Antithetic Variates</h3>
+      {/* ════════════════════════════════════════════════════════════ 3. Why MC */}
+      <SectionCard id="why-mc" title="3. Why Monte Carlo for a Problem Black-Scholes Already Solves?">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+            <div className="font-bold text-[#f85149] mb-1">Honest Assessment</div>
             <p className="text-xs text-[#8b949e] leading-relaxed">
-              For each standard normal draw +Z_i, also evaluate payoff at -Z_i. Monotonic option payoffs guarantee negative correlation between paired paths, reducing variance of their average.
+              For European vanillas under GBM, Monte Carlo is <strong>strictly worse</strong> than Black-Scholes: slower, noisier, estimates what BS computes exactly.
             </p>
           </div>
+          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+            <div className="font-bold text-[#79c0ff] mb-1">Why Institutions Use MC</div>
+            <p className="text-xs text-[#8b949e] leading-relaxed">
+              MC generalises where no closed form exists: path-dependent payoffs, baskets, American exercise (LSM), stochastic volatility. BS is the exception, not the rule.
+            </p>
+          </div>
+          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+            <div className="font-bold text-[#3fb950] mb-1">What PathPricer Demonstrates</div>
+            <p className="text-xs text-[#8b949e] leading-relaxed">
+              Numerical machinery validated against known truth before applying it where truth is unknown. This is the intellectual foundation of the project.
+            </p>
+          </div>
+        </div>
+      </SectionCard>
 
-          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
-            <h3 className="font-bold text-white mb-1">5.2 Control Variates (Terminal Asset Price S_T)</h3>
+      {/* ════════════════════════════════════════════════════════════ 4. MC Standard */}
+      <SectionCard id="mc-est" title="4. Monte Carlo Estimator & O(N^{-1/2}) Convergence">
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\hat{V} = e^{-rT}\cdot\frac{1}{N}\sum_{i=1}^{N} h(S_T^{(i)}), \quad h(S_T) = \max(S_T - K,\,0)" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Standard Error</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\widehat{SE} = s/\sqrt{N}" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">Sample std dev of i.i.d. discounted payoffs</div>
+          </div>
+          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">95% Confidence Interval</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\hat{V} \pm 1.96\cdot\widehat{SE}" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">Normal approx justified by CLT for N ≥ 10⁴</div>
+          </div>
+        </div>
+
+        <Callout title="Why Normal CI?" accent="green">
+          Discounted payoffs are i.i.d. with finite variance, so the CLT applies. Bootstrap targets the same asymptotics at higher cost for no benefit here.
+        </Callout>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mt-3">
+          Convergence rate: <InlineMath math="\mathcal{O}(N^{-1/2})" /> — halving error requires 4× paths. Empirically validated by regressing{" "}
+          <InlineMath math="\log\widehat{SE}" /> on <InlineMath math="\log N" /> across a geometric grid and confirming slope ≈ −0.5.
+        </p>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 5. Variance Reduction */}
+      <SectionCard id="var-red" title="5. Variance Reduction Techniques">
+        <div className="space-y-3 text-sm">
+          <div className="bg-[#0d1117]/40 p-4 rounded border border-[#21262d]">
+            <h3 className="font-semibold text-white mb-1">5.1 Antithetic Variates</h3>
             <p className="text-xs text-[#8b949e] leading-relaxed mb-2">
-              Uses terminal asset price S_T as control variate with known expectation E^Q[S_T] = S0 e^((r-q)T) (Boyle 1977).
+              For each draw <InlineMath math="Z_i" />, also evaluate payoff at <InlineMath math="-Z_i" />. Monotonic payoffs guarantee negatively correlated pairs.
             </p>
-            <div className="font-mono text-xs text-[#79c0ff] bg-[#161b22] p-2 rounded">
-              V̂_CV = e^(-rT) &bull; (1/N) &sum; [ h(S_T^(i)) - &beta;* (S_T^(i) - E[S_T]) ]
+            <div className="bg-[#0d1117]/80 px-3 py-2 rounded text-xs font-mono text-[#79c0ff] overflow-x-auto">
+              <BlockMath math="\hat{V}_{AV} = e^{-rT}\cdot\frac{1}{N}\sum_{i=1}^{N}\frac{h(S_T^{(i,+)}) + h(S_T^{(i,-)})}{2}" />
             </div>
-            <p className="text-xs text-[#8b949e] mt-2 font-mono">
-              Why S_T and NOT BS price as control? BS price is the benchmark being validated, so using it as a control would be circular. S_T has a known expectation independent of the option price.
-            </p>
           </div>
 
-          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
-            <h3 className="font-bold text-white mb-1">5.3 Combined Antithetic + Control Variates</h3>
+          <div className="bg-[#0d1117]/40 p-4 rounded border border-[#21262d]">
+            <h3 className="font-semibold text-white mb-1">5.2 Control Variates (S_T)</h3>
+            <p className="text-xs text-[#8b949e] leading-relaxed mb-2">
+              Uses <InlineMath math="S_T" /> as control with known expectation{" "}
+              <InlineMath math="\mathbb{E}^{\mathbb{Q}}[S_T] = S_0 e^{(r-q)T}" /> (Boyle 1977).
+            </p>
+            <div className="bg-[#0d1117]/80 px-3 py-2 rounded text-xs font-mono text-[#79c0ff] overflow-x-auto">
+              <BlockMath math="\hat{V}_{CV} = e^{-rT}\cdot\frac{1}{N}\sum_{i=1}^{N}\left[h(S_T^{(i)}) - \beta^*\left(S_T^{(i)} - \mathbb{E}^{\mathbb{Q}}[S_T]\right)\right]" />
+            </div>
+            <Callout title="Why S_T and not BS price?" accent="red">
+              BS price is the benchmark being validated. Using it as a control would be circular. S_T has a known expectation independent of the option price.
+            </Callout>
+          </div>
+
+          <div className="bg-[#0d1117]/40 p-4 rounded border border-[#21262d]">
+            <h3 className="font-semibold text-white mb-1">5.3 Combined Antithetic + CV</h3>
             <p className="text-xs text-[#8b949e] leading-relaxed">
-              Applies antithetic pairing first, then applies control variate correction to paired averages. Stacked techniques achieve maximal variance reduction without redundancy.
+              Apply antithetic pairing first, then CV correction to paired averages. The techniques target different variance components and stack without redundancy.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* 6. Assumptions & Limitations Table */}
-      <section className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-[#21262d] pb-3">
-          <h2 className="text-xl font-bold text-[#58a6ff]">
-            6. Assumptions &amp; Limitations Table
-          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs font-mono text-left">
+              <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
+                <tr><th className="p-2.5">Method</th><th className="p-2.5">Paths</th><th className="p-2.5">Std Error</th><th className="p-2.5">Rel. Efficiency</th></tr>
+              </thead>
+              <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
+                {[
+                  ["Standard MC", "N", "SE_{std}", "1.0 (ref)"],
+                  ["Antithetic", "2N", "SE_{AV}", "Var_{std}/Var_{AV}"],
+                  ["Control Variates", "N", "SE_{CV}", "Var_{std}/Var_{CV}"],
+                  ["Antithetic + CV", "2N", "SE_{AV+CV}", "Var_{std}/Var_{AV+CV}"],
+                  ["RQMC (Sobol)", "N", "SE_{RQMC}", "Var_{std}/Var_{RQMC}"],
+                ].map(([method, paths, se, eff]) => (
+                  <tr key={method}>
+                    <td className="p-2.5 font-bold text-white">{method}</td>
+                    <td className="p-2.5 text-[#8b949e]">{paths}</td>
+                    <td className="p-2.5 text-[#79c0ff]">{se}</td>
+                    <td className="p-2.5 text-[#8b949e]"><InlineMath math={eff} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 6. RQMC */}
+      <SectionCard id="qmc" title="6. Randomized Quasi-Monte Carlo (Sobol)">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Replaces pseudo-random <InlineMath math="N(0,1)" /> draws with <strong>low-discrepancy sequences</strong> — deterministic point sets covering{" "}
+          <InlineMath math="[0,1]^d" /> more uniformly than random sampling — then randomises them via Owen scrambling for error estimation.
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="Z_i = \Phi^{-1}(u_i), \quad u_i \in \text{Sobol sequence}" />
+          <BlockMath math="\hat{V}_{RQMC} = \frac{1}{M}\sum_{j=1}^{M} \hat{V}_j, \quad \widehat{SE}_{RQMC} = \frac{s}{\sqrt{M}}, \quad M=20" />
         </div>
 
-        <div className="overflow-x-auto">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          <InlineMath math="N" /> is enforced to a power of 2 — the natural regime for Sobol optimal equidistribution. For smooth integrands, RQMC converges at{" "}
+          <InlineMath math="\mathcal{O}(N^{-1})" /> vs standard MC&rsquo;s <InlineMath math="\mathcal{O}(N^{-1/2})" />: halving error requires only 2× paths, not 4×.
+        </p>
+
+        <Callout title="Honest Caveat: CI Interpretation" accent="red">
+          The CI uses a t-distribution on <InlineMath math="M=20" /> replications. Variance between replications captures only scrambling noise, not full sampling error. The CI is a heuristic measure of uncertainty, not a strict 95% confidence statement.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 7. FD Greeks */}
+      <SectionCard id="fd-greeks" title="7. Finite-Difference Greeks (Common Random Numbers)">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Central differences on Monte Carlo prices, reusing the same seed across base and bumped scenarios:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\Delta \approx \frac{\hat{V}(S_0+h) - \hat{V}(S_0-h)}{2h}, \quad \Gamma \approx \frac{\hat{V}(S_0+h) - 2\hat{V}(S_0) + \hat{V}(S_0-h)}{h^2}" />
+        </div>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Analogous central differences for Vega (<InlineMath math="\sigma" /> bump), Theta (<InlineMath math="T" /> one-sided), and Rho (<InlineMath math="r" /> bump).
+          Default bump: 0.5–1% of the parameter value.
+        </p>
+
+        <Callout title="Why Common Random Numbers?" accent="blue">
+          Without CRN, finite-difference Greeks on Monte Carlo prices are dominated by simulation noise rather than true sensitivity. Same seed across the bump pair isolates the parameter change from sampling variance.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 8. IV Solver */}
+      <SectionCard id="iv" title="8. Implied Volatility Solver">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Given a market price, find <InlineMath math="\sigma" /> such that:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\text{BS}_{\text{price}}(S_0, K, T, r, q, \sigma, \text{type}) = P_{\text{market}}" />
+        </div>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          No closed-form inverse exists (BS is transcendental in <InlineMath math="\sigma" />), so numerical root-finding is required.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Newton-Raphson (Primary)</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\sigma_{n+1} = \sigma_n - \frac{\text{BS}_{\text{price}}(\sigma_n) - P_{\text{market}}}{\text{Vega}(\sigma_n)}" /></div>
+          </div>
+          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Brenner-Subrahmanyam Init</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\sigma_0 \approx \sqrt{2\pi/T} \cdot P_{\text{market}} / S_0" /></div>
+          </div>
+        </div>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          <strong>Fallback — Brent&rsquo;s method:</strong> Activates when Vega → 0 (deep ITM/OTM, near-expiry). Brent&rsquo;s method requires no derivative and is guaranteed to converge on a bracketed interval.
+        </p>
+
+        <Callout title="Why This Is the Most Common Desk Task" accent="green">
+          Market prices are quoted in price space; traders think in vol space. The bid-ask spread in implied vol is informative across strikes; price is not. All volatility surface construction begins here.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 9. P&L */}
+      <SectionCard id="pnl" title="9. P&L Attribution (P&L Explain)">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Decomposes a scenario price change into component contributions by Greek:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\text{PnL} = \Delta\cdot\Delta S + \tfrac{1}{2}\Gamma(\Delta S)^2 + \mathcal{V}\cdot\Delta\sigma + \Theta\cdot\Delta t + \rho\cdot\Delta r + \varepsilon" />
+        </div>
+
+        <div className="overflow-x-auto mb-3">
           <table className="w-full text-xs font-mono text-left">
             <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
-              <tr>
-                <th className="p-3">Model Assumption</th>
-                <th className="p-3">Market Reality</th>
-                <th className="p-3">v1 Treatment in PathPricer</th>
-                <th className="p-3">Future Fix / Institutional Extension</th>
-              </tr>
+              <tr><th className="p-2.5">Term</th><th className="p-2.5">Greek</th><th className="p-2.5">Driver</th><th className="p-2.5">Interpretation</th></tr>
             </thead>
             <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
-              <tr>
-                <td className="p-3 font-bold text-white">Constant Volatility</td>
-                <td className="p-3 text-[#8b949e]">Implied vol varies by strike &amp; expiry (smile/skew)</td>
-                <td className="p-3 text-[#79c0ff]">Single &sigma; input (historical or manual)</td>
-                <td className="p-3 text-[#3fb950]">SABR / Local Volatility (Dupire)</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">GBM / Log-Normal Returns</td>
-                <td className="p-3 text-[#8b949e]">Real returns exhibit fat tails &amp; negative skew</td>
-                <td className="p-3 text-[#79c0ff]">GBM log-normal exact sampling</td>
-                <td className="p-3 text-[#3fb950]">Merton Jump-Diffusion / Heston</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Constant Risk-Free Rate</td>
-                <td className="p-3 text-[#8b949e]">Rates have term structure &amp; evolve stochastically</td>
-                <td className="p-3 text-[#79c0ff]">Flat r rate input</td>
-                <td className="p-3 text-[#3fb950]">BondFactor Yield Curve Provider Hook</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Continuous Dividend Yield</td>
-                <td className="p-3 text-[#8b949e]">Real dividends are discrete cash payments</td>
-                <td className="p-3 text-[#79c0ff]">Continuous q yield approximation</td>
-                <td className="p-3 text-[#3fb950]">Scheduled Ex-Dividend Escrow Modeling</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">European Exercise Only</td>
-                <td className="p-3 text-[#8b949e]">Most US single-name equity options are American</td>
-                <td className="p-3 text-[#79c0ff]">Explicit scope limitation</td>
-                <td className="p-3 text-[#3fb950]">Longstaff-Schwartz LSM Monte Carlo</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Frictionless Markets</td>
-                <td className="p-3 text-[#8b949e]">Real trading has bid-ask spreads &amp; market impact</td>
-                <td className="p-3 text-[#79c0ff]">Not modeled in pricing engine</td>
-                <td className="p-3 text-[#3fb950]">Pricing Model vs Execution System distinction</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Risk-Neutral Measure Q</td>
-                <td className="p-3 text-[#8b949e]">Physical measure drift &ne; risk-neutral drift</td>
-                <td className="p-3 text-[#79c0ff]">Priced strictly under risk-neutral measure Q</td>
-                <td className="p-3 text-[#3fb950]">Appropriate for pricing/hedging, not forecasting</td>
-              </tr>
+              {[
+                ["Δ·ΔS", "Delta", "Spot", "Directional exposure"],
+                ["\\tfrac12\\Gamma(\\Delta S)^2", "Gamma", "Spot² (convexity)", "Profit from large moves; always +ve for long options"],
+                ["𝒱·Δσ", "Vega", "Vol", "Volatility exposure"],
+                ["Θ·Δt", "Theta", "Time", "Cost of optionality; −ve for long options"],
+                ["ρ·Δr", "Rho", "Rate", "Interest rate exposure"],
+                ["ε", "Residual", "Cross-terms", "Vanna, Volga, cross-Gamma, higher-order"],
+              ].map(([term, greek, driver, interp]) => (
+                <tr key={greek}>
+                  <td className="p-2.5 font-bold text-white"><InlineMath math={term} /></td>
+                  <td className="p-2.5 text-[#79c0ff]">{greek}</td>
+                  <td className="p-2.5 text-[#8b949e]">{driver}</td>
+                  <td className="p-2.5 text-[#8b949e]">{interp}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </section>
 
-      {/* 7. Design Decisions & Interview Prep Cheat Sheet */}
-      <section className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-bold text-[#58a6ff]">
-          7. Summary of Defensible Design Decisions (Interview Prep Cheat Sheet)
-        </h2>
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          The residual <InlineMath math="\varepsilon" /> captures everything the second-order expansion misses: Vanna (<InlineMath math="\partial\Delta/\partial\sigma" />), Volga (<InlineMath math="\partial\mathcal{V}/\partial\sigma" />), cross-Gamma interactions, and higher-order Taylor terms. For small scenario moves, first-order terms (especially Delta) dominate.
+        </p>
 
-        <div className="overflow-x-auto">
+        <Callout title="Operational Significance">
+          P&L attribution distinguishes &ldquo;we made money because spot moved our way&rdquo; from &ldquo;we made money because vol dropped.&rdquo; Essential for risk management and strategy evaluation.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 10. Risk Grid */}
+      <SectionCard id="risk-grid" title="10. 2D Risk Grid">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          A <InlineMath math="25 \times 25" /> surface (625 points) computed across dual parameter axes. Every cell is evaluated in a single broadcast operation — no nested Python loops:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\text{price}_{ij} = \text{BS}_{\text{price}}(S_i, K, T, r, q, \sigma_j, \text{type}), \quad i,j = 1,\dots,25" />
+        </div>
+
+        <div className="overflow-x-auto mb-3">
           <table className="w-full text-xs font-mono text-left">
             <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
-              <tr>
-                <th className="p-3">Interview Question</th>
-                <th className="p-3">One-Line Defensible Answer</th>
-                <th className="p-3">Mathematical Reasoning</th>
-              </tr>
+              <tr><th className="p-2.5">Axis Pair</th><th className="p-2.5">What It Reveals</th></tr>
             </thead>
             <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
-              <tr>
-                <td className="p-3 font-bold text-white">Why MC for a problem BS solves?</td>
-                <td className="p-3 text-[#79c0ff]">Validation infrastructure for machinery meant to generalize to unsolvable cases</td>
-                <td className="p-3 text-[#8b949e]">Testing MC against BS on solvable case validates code before applying to path-dependent/American options</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Why S_T and not BS price as control?</td>
-                <td className="p-3 text-[#79c0ff]">BS price is the benchmark; using it as control would be circular</td>
-                <td className="p-3 text-[#8b949e]">S_T has a known expectation E^Q[S_T] = S0 e^(r-q)T independent of option price</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Why exact GBM sampling, not Euler?</td>
-                <td className="p-3 text-[#79c0ff]">No discretization error needed or wanted for European terminal payoffs</td>
-                <td className="p-3 text-[#8b949e]">Log-normal transition density is known in closed form; Euler adds bias</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Why normal CI, not Bootstrap?</td>
-                <td className="p-3 text-[#79c0ff]">CLT applies cleanly to i.i.d. finite-variance draws; bootstrap adds cost with no benefit</td>
-                <td className="p-3 text-[#8b949e]">Sample size N &ge; 10k guarantees sample mean is asymptotically normal</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Why FD Greeks need CRN?</td>
-                <td className="p-3 text-[#79c0ff]">Without CRN, finite-difference bumps are swamped by MC simulation noise</td>
-                <td className="p-3 text-[#8b949e]">Reusing same random seed across bump pair cancels path noise</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Why continuous dividend yield?</td>
-                <td className="p-3 text-[#79c0ff]">Free market data lacks reliable ex-dividend schedules; explicitly named gap</td>
-                <td className="p-3 text-[#8b949e]">Merton continuous approximation is standard for equity index &amp; trailing yields</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Why close-to-close vol, not range?</td>
-                <td className="p-3 text-[#79c0ff]">Data quality consistency across US/IN tickers matters more than marginal efficiency</td>
-                <td className="p-3 text-[#8b949e]">Close price is guaranteed across all exchanges; intraday range data is noisy</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-white">Why default_rng, not RandomState?</td>
-                <td className="p-3 text-[#79c0ff]">PCG64 is statistically superior and avoids shared global state in backend</td>
-                <td className="p-3 text-[#8b949e]">Request-scoped isolated generator prevents race conditions in API server</td>
-              </tr>
+              {[
+                ["Spot × Vol", "Gamma as curvature along spot axis; Volga along vol axis"],
+                ["Strike × Expiry", "Term structure of option value across strikes"],
+                ["Spot × Time", "Option decay as expiry approaches at different moneyness"],
+              ].map(([pair, reveals]) => (
+                <tr key={pair}>
+                  <td className="p-2.5 font-bold text-white">{pair}</td>
+                  <td className="p-2.5 text-[#8b949e]">{reveals}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </section>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed">
+          Vectorisation via NumPy broadcasting: <InlineMath math="S_{\text{grid}}" /> shape <InlineMath math="(25,1)" />,{" "}
+          <InlineMath math="\sigma_{\text{grid}}" /> shape <InlineMath math="(1,25)" /> → broadcast to <InlineMath math="(25,25)" />.
+          The heatmap renders colour intensity proportional to price, with crosshairs at the base-case parameters.
+        </p>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 11. Assumptions */}
+      <SectionCard id="assumptions" title="11. Assumptions & Limitations">
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs font-mono text-left">
+            <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
+              <tr><th className="p-2.5">Assumption</th><th className="p-2.5">Reality</th><th className="p-2.5">Treatment</th></tr>
+            </thead>
+            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
+              {[
+                ["Constant volatility", "Smile/skew varies by strike & expiry", "Single σ input; SABR / local vol as future work"],
+                ["GBM / log-normal returns", "Fat tails & negative skew", "GBM; Merton jump-diffusion as extension"],
+                ["Constant risk-free rate", "Term structure, stochastic rates", "Flat r; bond curve integration as fix"],
+                ["Continuous dividend yield", "Discrete cash payments", "Continuous q approx; discrete modeling as gap"],
+                ["European exercise only", "Most US options are American", "Explicit scope; Longstaff-Schwartz LSM as fix"],
+                ["Frictionless markets", "Bid-ask spreads, market impact", "Not modeled; pricing vs trading system distinction"],
+                ["Risk-neutral measure Q", "Physical drift ≠ risk-neutral drift", "Priced under Q; appropriate for hedging, not forecasting"],
+              ].map(([assumption, reality, treatment]) => (
+                <tr key={assumption}>
+                  <td className="p-2.5 font-bold text-white">{assumption}</td>
+                  <td className="p-2.5 text-[#8b949e] leading-relaxed">{reality}</td>
+                  <td className="p-2.5 text-[#79c0ff] leading-relaxed">{treatment}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 12. Cheat Sheet */}
+      <SectionCard id="design" title="12. Defensible Design Decisions (Interview Cheat Sheet)">
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs font-mono text-left">
+            <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
+              <tr><th className="p-2.5">Question</th><th className="p-2.5">One-Line Answer</th></tr>
+            </thead>
+            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
+              {[
+                ["Why MC for something BS solves?", "Validation infrastructure for machinery meant to generalise to unsolvable cases"],
+                ["Why S_T as control, not BS price?", "BS is the benchmark; using it as control would be circular"],
+                ["Why exact GBM sampling?", "Closed-form terminal density makes Euler bias unnecessary"],
+                ["Why normal CI, not bootstrap?", "CLT applies cleanly to i.i.d. draws; bootstrap adds cost with no benefit"],
+                ["Why FD Greeks need CRN?", "Without CRN, bumps are swamped by MC noise, not sensitivity"],
+                ["Why continuous dividend yield?", "Free data lacks reliable ex-div schedules; explicitly named gap"],
+                ["Why close-to-close vol?", "Data quality across US/IN tickers matters more than marginal efficiency"],
+                ["Why default_rng not RandomState?", "PCG64 is superior; avoids shared global state in concurrent backend"],
+                ["Why Newton-Raphson + Brent?", "NR fast near root; Brent handles near-zero-Vega without derivative"],
+                ["Why residual in P&L explain?", "Taylor expansion exact only for infinitesimal moves; residual = cross-Greeks + higher-order"],
+                ["Why vectorise the risk grid?", "625 cell-level loops dominate runtime; broadcast evaluates all at NumPy speed"],
+                ["Why RQMC instead of standard MC?", "O(N^{-1}) vs O(N^{-1/2}) convergence for smooth integrands; CI is heuristic"],
+              ].map(([q, a]) => (
+                <tr key={q}>
+                  <td className="p-2.5 font-bold text-white">{q}</td>
+                  <td className="p-2.5 text-[#79c0ff] leading-relaxed">{a}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      {/* ── Footer ── */}
+      <div className="text-xs text-[#484f58] text-center pt-6 border-t border-[#21262d]">
+        Full mathematical specification available in the project&rsquo;s Quantitative Methodology document.
+      </div>
     </div>
   );
 }
