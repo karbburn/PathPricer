@@ -28,6 +28,10 @@ export function DensityProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  useEffect(() => {
+    document.documentElement.setAttribute("data-density", density);
+  }, [density]);
+
   const toggle = () => {
     setDensity((prev) => {
       const next = prev === "compact" ? "comfortable" : "compact";

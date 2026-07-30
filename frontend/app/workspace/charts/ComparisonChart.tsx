@@ -51,19 +51,19 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
             MC Estimator Prices &amp; 95% Confidence Intervals vs BS Benchmark
           </h3>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
             Error bars reflect [&plusmn;1.96 SE] confidence width &bull; Reference line = BS analytical benchmark
           </p>
         </div>
-        <span className="text-xs font-mono font-bold text-amber-300 bg-slate-950 px-2.5 py-1 rounded border border-slate-800">
+        <span className="text-xs font-mono font-bold text-cyan-300 bg-slate-950 px-2.5 py-1 rounded border border-slate-800">
           BS: {currencySymbol}{bsPrice.toFixed(4)}
         </span>
       </div>
 
-      <div className="h-[320px] w-full">
+      <div className="h-[380px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 15, right: 20, left: 10, bottom: 25 }}>
             <XAxis

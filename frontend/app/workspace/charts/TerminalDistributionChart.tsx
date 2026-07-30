@@ -92,7 +92,7 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
             Terminal Price Distribution ($S_T$) &amp; Log-Normal Density Overlay
           </h3>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
@@ -104,7 +104,7 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
         </span>
       </div>
 
-      <div className="h-[320px] w-full">
+      <div className="h-[380px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <XAxis
@@ -160,7 +160,7 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
         <span>
           Note: Downsampled sample capped at 5,000 terminal prices for API performance.
         </span>
-        <span className="text-amber-400 font-semibold">Amber Curve = Theoretical BS PDF</span>
+        <span className="text-cyan-400 font-semibold">Amber Curve = Theoretical BS PDF</span>
       </div>
     </div>
   );

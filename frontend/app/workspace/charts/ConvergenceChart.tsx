@@ -116,7 +116,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
             Monte Carlo Empirical Convergence Rate ($\log \widehat{"{"}SE{"}"}$ vs $\log N$)
           </h3>
           <p className="text-xs text-slate-300 font-mono mt-0.5">
@@ -124,7 +124,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
           </p>
         </div>
         <div className="text-right">
-          <span className="text-sm font-extrabold font-mono text-amber-300 block">
+          <span className="text-sm font-extrabold font-mono text-cyan-300 block">
             Slope = {fit.slope.toFixed(3)}
           </span>
           <span className="text-xs text-slate-300 font-mono">
@@ -137,13 +137,13 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         <button
           type="button"
           onClick={handleResetZoom}
-          className="text-xs font-mono text-amber-400 hover:text-amber-300 border border-amber-800 rounded px-2 py-1 transition-colors"
+          className="text-xs font-mono text-cyan-400 hover:text-cyan-300 border border-cyan-800 rounded px-2 py-1 transition-colors"
         >
           Reset zoom
         </button>
       )}
 
-      <div className="h-[320px] w-full">
+      <div className="h-[380px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={zoomedData}
@@ -217,7 +217,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         <span>
           Theoretical Central Limit Theorem bound dictates slope = -0.500 ($\widehat{"{"}SE{"}"} \propto N^{-0.5}$).
         </span>
-        <span className={`font-bold ${Math.abs(fit.slope - (-0.5)) <= 0.05 ? "text-emerald-400" : "text-amber-400"}`}>
+        <span className={`font-bold ${Math.abs(fit.slope - (-0.5)) <= 0.05 ? "text-emerald-400" : "text-cyan-400"}`}>
           {Math.abs(fit.slope - (-0.5)) <= 0.05 ? "✓ Validated O(N⁻¹/²) Fit" : "High Sampling Noise"}
         </span>
       </div>

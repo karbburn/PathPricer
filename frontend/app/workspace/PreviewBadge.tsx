@@ -20,7 +20,7 @@ interface PreviewBadgeProps {
  * - Computing: live elapsed time (not indeterminate spinner)
  * - Error: warm red/crimson
  * - Preview: muted/desaturated slate
- * - Validated: full-strength electric amber-gold
+ * - Validated: full-strength electric cyan-teal
  */
 export function PreviewBadge({
   tier,
@@ -90,8 +90,10 @@ export function PreviewBadge({
       <div
         className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/90 border-2 border-cyan-400 text-cyan-200 text-xs font-mono font-extrabold shadow-lg shadow-cyan-950/60 ${className}`}
       >
-        <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-400 text-slate-950 font-bold text-xs">
-          ✓
+        <span className="inline-flex items-center justify-center w-4 h-4">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
         </span>
         <span className="tracking-wider uppercase">
           VALIDATED &bull; N={nSimulations.toLocaleString()}

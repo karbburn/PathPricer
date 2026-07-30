@@ -99,7 +99,7 @@ export function TickerInput({
   }, [activeIndex]);
 
   const focusBorderClass =
-    accentColor === "cyan" ? "focus:border-cyan-500" : "focus:border-amber-500";
+    accentColor === "cyan" ? "focus:border-cyan-500" : "focus:border-cyan-500";
 
   return (
     <div ref={containerRef} className={`relative flex-1 w-full ${className}`}>

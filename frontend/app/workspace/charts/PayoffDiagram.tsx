@@ -54,7 +54,7 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
             Deterministic Option Payoff Diagram at Expiry
           </h3>
           <p className="text-xs text-slate-400 font-mono mt-0.5">
@@ -66,7 +66,7 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
         </span>
       </div>
 
-      <div className="h-[320px] w-full">
+      <div className="h-[380px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <XAxis

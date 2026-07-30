@@ -2,50 +2,65 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useDensity } from "@/lib/contexts/DensityContext";
+import { TickerStrip } from "./components/TickerStrip";
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { density, toggle } = useDensity();
+  const pathname = usePathname();
+
+  const navLink = (href: string, label: string) => {
+    const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+    return (
+      <Link
+        href={href}
+        className={`px-3 py-1.5 rounded transition-colors relative ${
+          active
+            ? "text-cyan-400 bg-slate-800/40"
+            : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+        }`}
+      >
+        {label}
+        {active && (
+          <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-cyan-400 rounded-full" />
+        )}
+      </Link>
+    );
+  };
 
   return (
-    <header className="border-b border-slate-800 bg-[#0c1018] text-white px-6 py-3.5 relative z-50">
+    <header className="border-b border-slate-800 bg-[#0c1018] text-white px-6 py-3 relative z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <img
-            src="/favicon.ico"
-            alt="PathPricer"
-            width={20}
-            height={20}
-            className="group-hover:opacity-80 transition-opacity"
-          />
+          <div className="w-5 h-5 rounded bg-cyan-600 flex items-center justify-center text-[10px] font-bold text-white">
+            P
+          </div>
           <span className="text-lg font-bold tracking-tight text-white">
-            Path<span className="text-amber-400">Pricer</span>
+            Path<span className="text-cyan-400">Pricer</span>
           </span>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-1 text-xs font-medium">
-          <Link href="/" className="px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Market Overview
-          </Link>
-          <Link href="/workspace" className="px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Pricing Workspace
-          </Link>
-          <Link href="/validation" className="px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Validation
-          </Link>
-          <Link href="/docs" className="px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Documentation
-          </Link>
-          <button
-            type="button"
-            onClick={toggle}
-            className="ml-2 px-2 py-1 rounded text-xs font-mono text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors border border-slate-700"
-          >
-            {density === "compact" ? "Compact" : "Comfortable"}
-          </button>
+          {navLink("/", "Markets")}
+          {navLink("/workspace", "Workspace")}
+          {navLink("/validation", "Validate")}
+          {navLink("/docs", "Docs")}
+          <div className="ml-2 flex items-center gap-1.5">
+            <span className="text-[10px] font-mono text-slate-500 bg-slate-800/60 px-1.5 py-0.5 rounded border border-slate-700">
+              ⌘K
+            </span>
+            <button
+              type="button"
+              onClick={toggle}
+              className="px-2 py-1 rounded text-xs font-mono text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors border border-slate-700"
+            >
+              {density === "compact" ? "CMP" : "CMF"}
+            </button>
+          </div>
         </nav>
 
         {/* Mobile hamburger */}
@@ -76,16 +91,16 @@ export function Header() {
       {mobileOpen && (
         <nav className="sm:hidden mt-3 pb-2 border-t border-slate-800 pt-3 space-y-1">
           <Link href="/" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Market Overview
+            Markets
           </Link>
           <Link href="/workspace" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Pricing Workspace
+            Workspace
           </Link>
           <Link href="/validation" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Validation
+            Validate
           </Link>
           <Link href="/docs" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
-            Documentation
+            Docs
           </Link>
           <button
             type="button"
@@ -96,6 +111,9 @@ export function Header() {
           </button>
         </nav>
       )}
+
+      {/* Ticker Strip */}
+      <TickerStrip />
     </header>
   );
 }

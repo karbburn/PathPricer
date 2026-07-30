@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* ── Grid background overlay (Bloomberg-terminal subtle texture) ── */
+body {
+  background-image: radial-gradient(circle, rgba(71, 85, 105, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Selection color (cyan tint) ── */
+::selection {
+  background: rgba(6, 182, 212, 0.3);
+  color: #f1f5f9;
+}
+
 /* ── Custom scrollbar (dark theme) ── */
 ::-webkit-scrollbar {
   width: 8px;
@@ -36,26 +48,26 @@ input[type="range"]::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #f59e0b;
+  background: #06b6d4;
   border: 2px solid #0c1018;
-  box-shadow: 0 0 0 2px #f59e0b33;
+  box-shadow: 0 0 0 2px #06b6d433;
   cursor: grab;
   transition: box-shadow 0.15s ease-in-out;
 }
 input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 4px #f59e0b33;
+  box-shadow: 0 0 0 4px #06b6d433;
 }
 input[type="range"]::-webkit-slider-thumb:active {
   cursor: grabbing;
-  box-shadow: 0 0 0 6px #f59e0b33;
+  box-shadow: 0 0 0 6px #06b6d433;
 }
 input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #f59e0b;
+  background: #06b6d4;
   border: 2px solid #0c1018;
-  box-shadow: 0 0 0 2px #f59e0b33;
+  box-shadow: 0 0 0 2px #06b6d433;
   cursor: grab;
 }
 input[type="range"]::-moz-range-track {
@@ -141,4 +153,47 @@ input[type="date"] {
 }
 .animate-toast-out {
   animation: toast-out 0.2s ease-in forwards;
+}
+
+/* ── Density mode overrides ── */
+[data-density="compact"] .card { padding: 8px !important; }
+[data-density="compact"] .section { gap: 8px !important; }
+[data-density="compact"] .table-cell { padding: 4px 8px !important; }
+[data-density="compact"] .input-field { padding: 4px 8px !important; }
+[data-density="compact"] .btn-default { height: 30px !important; font-size: 11px !important; }
+[data-density="compact"] .chart-container { height: 260px !important; }
+
+/* ── Structured skeleton variants ── */
+.skeleton-text {
+  height: 12px;
+  border-radius: 4px;
+  background: #1e293b/60;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-heading {
+  height: 20px;
+  width: 33%;
+  border-radius: 4px;
+  background: #1e293b/60;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-card {
+  border-radius: 8px;
+  border: 1px solid #1e293b/40;
+  background: #1e293b/40;
+  animation: shimmer 1.5s ease-in-out infinite;
+  padding: 16px;
+}
+.skeleton-chart {
+  border-radius: 8px;
+  background: #1e293b/40;
+  animation: shimmer 1.5s ease-in-out infinite;
+  height: 380px;
+}
+
+/* ── Focus-visible ring utility ── */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.6), 0 0 0 4px #0c1018;
 }

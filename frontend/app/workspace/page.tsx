@@ -6,6 +6,10 @@ import { InputPanel } from "./InputPanel";
 import { ResultsPanel } from "./ResultsPanel";
 import { ExportControls } from "./ExportControls";
 import { ChartTabContainer } from "./charts/ChartTabContainer";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/app/components/ResizablePanel";
+import { ShortcutsHelp } from "@/app/components/ShortcutsHelp";
+import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
+import { useDensity } from "@/lib/contexts/DensityContext";
 import { postPriceFull, postImpliedVol, postPnLExplain, ApiError } from "@/lib/api-client";
 import { getEffectiveInputs, serializeInputs } from "@/lib/url-state";
 import {
@@ -49,6 +53,8 @@ function WorkspaceContent() {
   const [activeTier, setActiveTier] = useState<"preview" | "full">("preview");
   const [isFullSimulating, setIsFullSimulating] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
+  const { toggle: toggleDensity } = useDensity();
 
   const handleWorkspaceModeChange = (mode: "pricing" | "implied_vol" | "pnl_explain") => {
     setWorkspaceMode(mode);
@@ -80,23 +86,22 @@ function WorkspaceContent() {
     []
   );
 
-  // Keyboard shortcut: Ctrl+Enter triggers full simulation / IV solve / PnL explain
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-        e.preventDefault();
-        if (workspaceMode === "pricing" && !isFullSimulating) {
-          handleRunFullSimulation(inputs);
-        } else if (workspaceMode === "implied_vol" && !isSolvingIv) {
-          handleSolveImpliedVol();
-        } else if (workspaceMode === "pnl_explain" && !isCalculatingPnL) {
-          handleCalculatePnLExplain();
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [inputs, isFullSimulating, workspaceMode, isSolvingIv, marketPrice, pnlShift, isCalculatingPnL]);
+  // Keyboard shortcuts via shared hook
+  const handleRunShortcut = useCallback(() => {
+    if (workspaceMode === "pricing" && !isFullSimulating) {
+      handleRunFullSimulation(inputs);
+    } else if (workspaceMode === "implied_vol" && !isSolvingIv) {
+      handleSolveImpliedVol();
+    } else if (workspaceMode === "pnl_explain" && !isCalculatingPnL) {
+      handleCalculatePnLExplain();
+    }
+  }, [workspaceMode, isFullSimulating, isSolvingIv, isCalculatingPnL, inputs, marketPrice, pnlShift]);
+
+  useKeyboardShortcuts({
+    onRunSimulation: handleRunShortcut,
+    onToggleDensity: toggleDensity,
+    onShowHelp: () => setShowHelp(true),
+  });
 
   // Full Simulation Trigger Handler (Doc 7 §6 — Never automatic)
   const handleRunFullSimulation = async (targetInputs: PricingRequest) => {
@@ -201,71 +206,93 @@ function WorkspaceContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="max-w-[1600px] mx-auto px-4 py-4">
       {/* Workspace Header */}
-      <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Option Pricing Workspace
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div className="flex items-center gap-3">
+          <h1 className="text-lg font-bold text-white tracking-tight uppercase font-mono">
+            {workspaceMode === "implied_vol" ? "IV Solver" : workspaceMode === "pnl_explain" ? "P&L Explain" : "Pricing"}
           </h1>
-          <p className="text-sm text-slate-300">
-            {workspaceMode === "implied_vol"
-              ? "Implied Volatility Solver — Solve Black-Scholes Volatility from Option Price"
-              : "Interactive Monte Carlo simulation workspace"}
-          </p>
-        </div>
-      </div>
-
-      {/* Primary Workspace Grid: Input Panel (left) vs Results & Analytics (right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Inputs Panel */}
-        <div className="lg:col-span-5">
-          <InputPanel
-            initialInputs={inputs}
-            onInputsChange={handleInputsChange}
-            onPreviewSuccess={handlePreviewSuccess}
-            onPreviewError={handlePreviewError}
-            onRunFullSimulation={handleRunFullSimulation}
-            isFullSimulating={isFullSimulating}
-            onMicroStateChange={handleMicroStateChange}
-            workspaceMode={workspaceMode}
-            onWorkspaceModeChange={handleWorkspaceModeChange}
-            marketPrice={marketPrice}
-            onMarketPriceChange={setMarketPrice}
-            onSolveImpliedVol={handleSolveImpliedVol}
-            isSolvingIv={isSolvingIv}
-            pnlShift={pnlShift}
-            onPnLShiftChange={setPnLShift}
-            onCalculatePnLExplain={handleCalculatePnLExplain}
-            isCalculatingPnL={isCalculatingPnL}
-          />
-        </div>
-
-        {/* Right Column: Results & Analytics + Export Suite + Tabbed Charts */}
-        <div className="lg:col-span-7 space-y-6">
-          <ResultsPanel
-            microState={microState}
-            previewResult={previewResult}
-            fullResult={fullResult}
-            error={error}
-            activeTier={activeTier}
-            isFullSimulating={isFullSimulating}
-            market={inputs.market}
-            workspaceMode={workspaceMode}
-            impliedVolResult={impliedVolResult}
-            isSolvingIv={isSolvingIv}
-            pnlExplainResult={pnlExplainResult}
-            isCalculatingPnL={isCalculatingPnL}
-          />
-
-          {workspaceMode === "pricing" && (
-            <>
-              <ExportControls fullResult={fullResult} request={inputs} />
-              <ChartTabContainer request={inputs} fullResult={fullResult} />
-            </>
+          {inputs.ticker && (
+            <span className="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded border border-slate-700">
+              {inputs.ticker} · {inputs.market}
+            </span>
           )}
         </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-mono text-slate-500">Ctrl+Enter → Run</span>
+        </div>
       </div>
+
+      {/* 3-Column Resizable Workspace */}
+      <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-180px)]">
+        {/* Left: Inputs */}
+        <ResizablePanel index={0} defaultSize={25} minSize={18} maxSize={40}>
+          <div className="pr-2 h-full overflow-y-auto">
+            <InputPanel
+              initialInputs={inputs}
+              onInputsChange={handleInputsChange}
+              onPreviewSuccess={handlePreviewSuccess}
+              onPreviewError={handlePreviewError}
+              onRunFullSimulation={handleRunFullSimulation}
+              isFullSimulating={isFullSimulating}
+              onMicroStateChange={handleMicroStateChange}
+              workspaceMode={workspaceMode}
+              onWorkspaceModeChange={handleWorkspaceModeChange}
+              marketPrice={marketPrice}
+              onMarketPriceChange={setMarketPrice}
+              onSolveImpliedVol={handleSolveImpliedVol}
+              isSolvingIv={isSolvingIv}
+              pnlShift={pnlShift}
+              onPnLShiftChange={setPnLShift}
+              onCalculatePnLExplain={handleCalculatePnLExplain}
+              isCalculatingPnL={isCalculatingPnL}
+            />
+          </div>
+        </ResizablePanel>
+
+        <ResizableHandle index={0} />
+
+        {/* Center: Results */}
+        <ResizablePanel index={1} defaultSize={45} minSize={30} maxSize={60}>
+          <div className="px-2 h-full overflow-y-auto">
+            <ResultsPanel
+              microState={microState}
+              previewResult={previewResult}
+              fullResult={fullResult}
+              error={error}
+              activeTier={activeTier}
+              isFullSimulating={isFullSimulating}
+              market={inputs.market}
+              workspaceMode={workspaceMode}
+              impliedVolResult={impliedVolResult}
+              isSolvingIv={isSolvingIv}
+              pnlExplainResult={pnlExplainResult}
+              isCalculatingPnL={isCalculatingPnL}
+            />
+            {workspaceMode === "pricing" && (
+              <ExportControls fullResult={fullResult} request={inputs} />
+            )}
+          </div>
+        </ResizablePanel>
+
+        <ResizableHandle index={1} />
+
+        {/* Right: Charts */}
+        <ResizablePanel index={2} defaultSize={30} minSize={20} maxSize={50}>
+          <div className="pl-2 h-full overflow-y-auto">
+            {workspaceMode === "pricing" ? (
+              <ChartTabContainer request={inputs} fullResult={fullResult} />
+            ) : (
+              <div className="flex items-center justify-center h-64 text-sm text-slate-500 font-mono">
+                Charts available in Pricing mode
+              </div>
+            )}
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
+      <ShortcutsHelp isOpen={showHelp} onClose={() => setShowHelp(false)} />
     </div>
   );
 }

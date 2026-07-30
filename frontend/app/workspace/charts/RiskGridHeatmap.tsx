@@ -157,7 +157,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
           <h3 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
-            <span>🌡️ 2D Risk Surface Heatmap</span>
+            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 2D Risk Surface Heatmap</span>
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
             Vectorized Black-Scholes surface evaluation across 2D parameter grid (25×25)
@@ -171,7 +171,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             onClick={() => handlePresetChange("spot_vol")}
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "spot_vol"
-                ? "bg-amber-500 text-slate-950 font-bold shadow"
+                ? "bg-cyan-500 text-slate-950 font-bold shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -182,7 +182,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             onClick={() => handlePresetChange("strike_expiry")}
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "strike_expiry"
-                ? "bg-amber-500 text-slate-950 font-bold shadow"
+                ? "bg-cyan-500 text-slate-950 font-bold shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -267,15 +267,15 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
       {/* Error state */}
       {error && (
         <div className="bg-red-950/40 border border-red-800 text-red-300 text-xs p-3 rounded-lg font-mono">
-          ⚠️ Grid Computation Rejected: {error}
+          <svg className="inline w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Grid Computation Rejected: {error}
         </div>
       )}
 
       {/* Heatmap Area */}
       {isLoading ? (
-        <div className="h-72 flex items-center justify-center bg-slate-950/50 rounded-lg border border-slate-800">
+        <div className="h-[380px] flex items-center justify-center bg-slate-950/50 rounded-lg border border-slate-800">
           <div className="text-xs text-teal-400 font-mono animate-pulse">
-            ⚡ Evaluating vectorized 2D Black-Scholes meshgrid...
+            <svg className="inline w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Evaluating vectorized 2D Black-Scholes meshgrid...
           </div>
         </div>
       ) : gridData ? (
@@ -289,7 +289,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
                   } = ${formatAxisVal(axisY, hoveredCell.y)}]`
                 : "Hover over any grid cell to view exact coordinates & metric value"}
             </span>
-            <span className="text-amber-400 font-bold">
+            <span className="text-cyan-400 font-bold">
               {hoveredCell ? `${METRIC_LABELS[metric]}: ${hoveredCell.val.toFixed(4)}` : ""}
             </span>
           </div>

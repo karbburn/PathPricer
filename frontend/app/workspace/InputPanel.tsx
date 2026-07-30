@@ -191,7 +191,7 @@ export function InputPanel({
             onClick={() => onWorkspaceModeChange("pricing")}
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
               workspaceMode === "pricing"
-                ? "bg-amber-500 text-slate-950 shadow"
+                ? "bg-cyan-500 text-slate-950 shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -202,7 +202,7 @@ export function InputPanel({
             onClick={() => onWorkspaceModeChange("implied_vol")}
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
               workspaceMode === "implied_vol"
-                ? "bg-purple-600 text-white shadow"
+                ? "bg-cyan-600 text-white shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -213,7 +213,7 @@ export function InputPanel({
             onClick={() => onWorkspaceModeChange("pnl_explain")}
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
               workspaceMode === "pnl_explain"
-                ? "bg-teal-600 text-white shadow"
+                ? "bg-cyan-600 text-white shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -238,7 +238,7 @@ export function InputPanel({
 
       {/* 1. Underlying Ticker & Market Selection */}
       <div className="space-y-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
           Underlying Asset
         </label>
 
@@ -267,7 +267,7 @@ export function InputPanel({
               onClick={() => updateField("market", "US")}
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "US"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-cyan-600 text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -278,7 +278,7 @@ export function InputPanel({
               onClick={() => updateField("market", "IN")}
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
                 inputs.market === "IN"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-cyan-600 text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -312,8 +312,8 @@ export function InputPanel({
               className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-1.5 text-sm text-white font-mono"
             />
             {(!inputs.dividend_yield || inputs.dividend_yield === 0) && (
-              <p className="text-[10px] text-amber-400/90 mt-1 font-mono flex items-center gap-1">
-                <span>⚠️</span> Dividend yield 0.0% (defaulted/no payout)
+              <p className="text-[10px] text-cyan-400/90 mt-1 font-mono flex items-center gap-1">
+                <span className="text-amber-400"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Dividend yield 0.0% (defaulted/no payout)
               </p>
             )}
           </div>
@@ -323,7 +323,7 @@ export function InputPanel({
       {/* 2. Option Type & Strike Price */}
       <div className="space-y-3 pt-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-amber-400">
+          <label className="text-xs font-bold uppercase tracking-wider text-cyan-400">
             Contract Terms
           </label>
           <div className="flex bg-slate-950 p-1 rounded border border-slate-700">
@@ -332,7 +332,7 @@ export function InputPanel({
               onClick={() => updateField("option_type", "call")}
               className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
                 inputs.option_type === "call"
-                  ? "bg-green-600 text-white"
+                  ? "bg-slate-700 text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -343,7 +343,7 @@ export function InputPanel({
               onClick={() => updateField("option_type", "put")}
               className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
                 inputs.option_type === "put"
-                  ? "bg-red-600 text-white"
+                  ? "bg-slate-700 text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -371,7 +371,7 @@ export function InputPanel({
             step={strikeStep}
             value={inputs.strike}
             onChange={(e) => updateField("strike", Number(e.target.value))}
-            className="w-full accent-amber-500 cursor-pointer"
+            className="w-full accent-cyan-500 cursor-pointer"
           />
         </div>
 
@@ -389,14 +389,14 @@ export function InputPanel({
 
       {/* 3. Market Risk Parameters */}
       <div className="space-y-3 pt-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
           {workspaceMode === "implied_vol" ? "Target Market Price & Rates" : "Risk & Volatility Parameters"}
         </label>
 
         {workspaceMode === "implied_vol" ? (
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-bold text-purple-300">
+              <label className="text-xs font-bold text-cyan-300">
                 Market Option Price (V_mkt)
               </label>
             </div>
@@ -406,7 +406,7 @@ export function InputPanel({
               min="0.01"
               value={marketPrice}
               onChange={(e) => onMarketPriceChange && onMarketPriceChange(Number(e.target.value))}
-              className="w-full bg-slate-950 border border-purple-500/60 focus:border-purple-400 rounded px-3 py-2 text-sm font-mono text-white font-bold"
+              className="w-full bg-slate-950 border border-cyan-500/60 focus:border-cyan-400 rounded px-3 py-2 text-sm font-mono text-white font-bold"
               placeholder="e.g. 5.25"
             />
           </div>
@@ -431,7 +431,7 @@ export function InputPanel({
               step="0.01"
               value={inputs.volatility}
               onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
-              className="w-full accent-amber-500 cursor-pointer"
+              className="w-full accent-cyan-500 cursor-pointer"
             />
           </div>
         )}
@@ -457,7 +457,7 @@ export function InputPanel({
             step="0.0025"
             value={inputs.risk_free_rate}
             onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
-            className="w-full accent-amber-500 cursor-pointer"
+            className="w-full accent-cyan-500 cursor-pointer"
           />
         </div>
       </div>
@@ -465,7 +465,7 @@ export function InputPanel({
       {/* 4. Simulation Engine Controls (Pricing Mode Only) */}
       {workspaceMode === "pricing" && (
         <div className="space-y-3 pt-3">
-          <label className="block text-xs font-bold uppercase tracking-wider text-amber-400">
+          <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
             Simulation Controls
           </label>
 
@@ -482,7 +482,7 @@ export function InputPanel({
                   onClick={() => updateField("n_simulations", nVal)}
                   className={`py-1 text-xs font-mono rounded transition-colors ${
                     inputs.n_simulations === nVal
-                      ? "bg-blue-600 text-white font-bold"
+                      ? "bg-cyan-600 text-white font-bold"
                       : "bg-slate-950 text-slate-400 hover:text-white border border-slate-800"
                   }`}
                 >
@@ -497,7 +497,7 @@ export function InputPanel({
               step="5000"
               value={inputs.n_simulations}
               onChange={(e) => updateField("n_simulations", Number(e.target.value))}
-              className="w-full accent-amber-500 cursor-pointer"
+              className="w-full accent-cyan-500 cursor-pointer"
             />
           </div>
 
@@ -558,7 +558,7 @@ export function InputPanel({
       {/* 4. Scenario Shift Parameters (P&L Explain Mode Only) */}
       {workspaceMode === "pnl_explain" && (
         <div className="space-y-3 pt-3 border-t border-slate-800">
-          <label className="block text-xs font-bold uppercase tracking-wider text-teal-400">
+          <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
             Hypothetical Scenario Shifts
           </label>
 
@@ -575,7 +575,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
                 }
-                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
               />
             </div>
             <input
@@ -587,7 +587,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
               }
-              className="w-full accent-teal-500 cursor-pointer"
+              className="w-full accent-cyan-500 cursor-pointer"
             />
           </div>
 
@@ -604,7 +604,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
                 }
-                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
               />
             </div>
             <input
@@ -616,7 +616,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
               }
-              className="w-full accent-teal-500 cursor-pointer"
+              className="w-full accent-cyan-500 cursor-pointer"
             />
           </div>
 
@@ -635,7 +635,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.max(0, Number(e.target.value)) })
                 }
-                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
               />
             </div>
             <input
@@ -647,7 +647,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Number(e.target.value) })
               }
-              className="w-full accent-teal-500 cursor-pointer"
+              className="w-full accent-cyan-500 cursor-pointer"
             />
           </div>
 
@@ -664,7 +664,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
                 }
-                className="w-24 bg-slate-950 border border-teal-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
               />
             </div>
             <input
@@ -676,7 +676,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
               }
-              className="w-full accent-teal-500 cursor-pointer"
+              className="w-full accent-cyan-500 cursor-pointer"
             />
           </div>
         </div>
@@ -689,18 +689,18 @@ export function InputPanel({
             type="button"
             disabled={isSolvingIv}
             onClick={onSolveImpliedVol}
-            className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-purple-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-cyan-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
-            <span>{isSolvingIv ? "Solving Volatility..." : "⚡ Solve Implied Volatility"}</span>
+            <span>{isSolvingIv ? "Solving Volatility..." : <><svg className="inline w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Solve Implied Volatility</>}</span>
           </button>
         ) : workspaceMode === "pnl_explain" ? (
           <button
             type="button"
             disabled={isCalculatingPnL}
             onClick={onCalculatePnLExplain}
-            className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-teal-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-cyan-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
-            <span>{isCalculatingPnL ? "Calculating P&L Attribution..." : "📊 Explain P&L Attribution"}</span>
+            <span>{isCalculatingPnL ? "Calculating P&L Attribution..." : <><svg className="inline w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg> Explain P&L Attribution</>}</span>
           </button>
         ) : (
           <>
@@ -708,10 +708,10 @@ export function InputPanel({
               type="button"
               disabled={isFullSimulating}
               onClick={() => onRunFullSimulation(inputs)}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-blue-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-cyan-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
-              <span className="text-xs font-mono text-blue-200">(N={inputs.n_simulations.toLocaleString()})</span>
+              <span className="text-xs font-mono text-cyan-200">(N={inputs.n_simulations.toLocaleString()})</span>
             </button>
             <p className="text-[11px] text-slate-500 text-center mt-1.5 font-mono">
               <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Ctrl</kbd>
