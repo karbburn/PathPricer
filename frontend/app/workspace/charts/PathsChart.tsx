@@ -110,7 +110,7 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
         </span>
       </div>
 
-      <div className="h-[380px] w-full overflow-hidden">
+      <div className="h-[380px] w-full overflow-hidden chart-container">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
             <XAxis

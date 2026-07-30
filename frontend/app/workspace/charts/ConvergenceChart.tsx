@@ -143,7 +143,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         </button>
       )}
 
-      <div className="h-[380px] w-full">
+      <div className="h-[380px] w-full chart-container">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={zoomedData}

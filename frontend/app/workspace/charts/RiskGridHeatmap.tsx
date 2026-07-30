@@ -273,7 +273,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
       {/* Heatmap Area */}
       {isLoading ? (
-        <div className="h-[380px] flex items-center justify-center bg-[#0d1117]/50 rounded-lg border border-[#21262d]">
+        <div className="h-[380px] flex items-center justify-center bg-[#0d1117]/50 rounded-lg border border-[#21262d] chart-container">
           <div className="text-xs text-[#58a6ff] font-mono animate-pulse">
             <svg className="inline w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Evaluating vectorized 2D Black-Scholes meshgrid...
           </div>

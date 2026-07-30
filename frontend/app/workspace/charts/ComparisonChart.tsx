@@ -63,7 +63,7 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
         </span>
       </div>
 
-      <div className="h-[380px] w-full">
+      <div className="h-[380px] w-full chart-container">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 15, right: 20, left: 10, bottom: 25 }}>
             <XAxis

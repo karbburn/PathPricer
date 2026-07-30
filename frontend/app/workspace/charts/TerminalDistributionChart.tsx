@@ -104,7 +104,7 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
         </span>
       </div>
 
-      <div className="h-[380px] w-full">
+      <div className="h-[380px] w-full chart-container">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <XAxis

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDensity } from "@/lib/contexts/DensityContext";
@@ -10,6 +10,12 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { density, toggle } = useDensity();
   const pathname = usePathname();
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      setIsMac(navigator.platform.toLowerCase().includes("mac"));
+    }
+  }, []);
 
   const navLink = (href: string, label: string) => {
     const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -37,7 +43,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
           <img src="/favicon.ico" alt="PathPricer" className="w-5 h-5 rounded" />
           <span className="text-lg font-bold tracking-tight text-white">
-            Path<span className="text-[#58a6ff]">Pricer</span>
+            PathPricer
           </span>
         </Link>
 
@@ -48,15 +54,20 @@ export function Header() {
           {navLink("/validation", "Validate")}
           {navLink("/docs", "Docs")}
           <div className="ml-2 flex items-center gap-1.5">
-              <span className="text-[10px] font-mono text-[#6e7681] bg-[#21262d]/60 px-1.5 py-0.5 rounded border border-[#30363d]">
-              ⌘K
-            </span>
+              <div className="relative group">
+                <span className="text-[10px] font-mono text-[#6e7681] bg-[#21262d]/60 px-1.5 py-0.5 rounded border border-[#30363d] cursor-default select-none">
+                  {isMac ? "⌘K" : "Ctrl+K"}
+                </span>
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs text-[#8b949e] whitespace-nowrap shadow-xl z-50 pointer-events-none">
+                  Search tickers
+                </div>
+              </div>
             <button
               type="button"
               onClick={toggle}
               className="px-2 py-1 rounded text-xs font-mono text-[#6e7681] hover:text-white hover:bg-[#21262d] transition-colors border border-[#30363d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
-              {density === "compact" ? "CMP" : "CMF"}
+              {density === "compact" ? "Cmpct" : "Cmft"}
             </button>
           </div>
         </nav>
