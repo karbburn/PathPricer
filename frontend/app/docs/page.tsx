@@ -42,12 +42,12 @@ export default function DocsPage() {
           </div>
         </div>
 
-        <h3 className="text-sm font-bold text-slate-200 pt-2">Exact Closed-Form Solution</h3>
+        <h3 className="text-sm font-bold text-[#e6edf3] pt-2">Exact Closed-Form Solution</h3>
         <p className="text-sm text-[#8b949e] leading-relaxed">
           Applying Itô&apos;s Lemma to ln(S_t) yields the exact (non-discretized) terminal price solution:
         </p>
 
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-emerald-400 flex justify-center">
+        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#3fb950] flex justify-center">
           S_T = S_0 exp[(r - q - 0.5 σ²) T + σ √T Z], Z ~ N(0, 1)
         </div>
 
@@ -70,13 +70,13 @@ export default function DocsPage() {
           </span>
         </div>
 
-        <p className="text-sm text-slate-200 font-semibold leading-relaxed">
+        <p className="text-sm text-[#e6edf3] font-semibold leading-relaxed">
           This is the single most important conceptual question in PathPricer: why build Monte Carlo simulation for European vanilla options when Black-Scholes is exact and instant?
         </p>
 
         <div className="space-y-3 text-sm text-[#8b949e] leading-relaxed">
           <div className="bg-[#161b22]/90 p-4 rounded border border-[#21262d]">
-            <h4 className="font-bold text-rose-400 mb-1">The Honest Assessment:</h4>
+            <h4 className="font-bold text-[#f85149] mb-1">The Honest Assessment:</h4>
             <p className="text-xs text-[#8b949e]">
               For vanilla European options under GBM, Monte Carlo is <strong>strictly worse</strong> than Black-Scholes on every axis that matters in production: it is slower, introduces sampling noise, and estimates a quantity Black-Scholes computes exactly in closed form.
             </p>
@@ -90,7 +90,7 @@ export default function DocsPage() {
           </div>
 
           <div className="bg-[#161b22]/90 p-4 rounded border border-[#21262d]">
-            <h4 className="font-bold text-emerald-400 mb-1">What PathPricer Demonstrates:</h4>
+            <h4 className="font-bold text-[#3fb950] mb-1">What PathPricer Demonstrates:</h4>
             <p className="text-xs text-[#8b949e]">
               PathPricer builds and validates numerical machinery — variance reduction, empirical convergence rate tracking (O(N⁻¹/²)), confidence interval calibration, and finite-difference Greeks with CRN — against a case where <strong>ground truth is independently known</strong>. Validating simulation infrastructure against known analytical truth is the prerequisite for trusting that same machinery on unsolvable problems.
             </p>
@@ -111,15 +111,15 @@ export default function DocsPage() {
         <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-xs text-[#79c0ff] space-y-2">
           <div>d1 = [ln(S0/K) + (r - q + 0.5 σ²) T] / (σ √T)</div>
           <div>d2 = d1 - σ √T</div>
-          <div className="pt-2 text-emerald-400 font-bold">
+          <div className="pt-2 text-[#3fb950] font-bold">
             Call = S0 e^(-qT) N(d1) - K e^(-rT) N(d2)
           </div>
-          <div className="text-emerald-400 font-bold">
+          <div className="text-[#3fb950] font-bold">
             Put = K e^(-rT) N(-d2) - S0 e^(-qT) N(-d1)
           </div>
         </div>
 
-        <h3 className="text-sm font-bold text-slate-200 pt-2">Analytical Greeks Table</h3>
+        <h3 className="text-sm font-bold text-[#e6edf3] pt-2">Analytical Greeks Table</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono text-left">
             <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
@@ -130,7 +130,7 @@ export default function DocsPage() {
                 <th className="p-2.5">Convention</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-200">
+            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
               <tr>
                 <td className="p-2.5 font-bold text-white">Delta (&Delta;)</td>
                 <td className="p-2.5 text-[#79c0ff]">e^(-qT) N(d1)</td>
@@ -194,8 +194,8 @@ export default function DocsPage() {
           </div>
         </div>
 
-        <div className="bg-[#0d1117]/80 border-l-4 border-emerald-500 p-4 text-xs text-[#8b949e] space-y-1">
-          <div className="font-bold text-emerald-400">Why Normal-Approximation CI and not Bootstrap?</div>
+        <div className="bg-[#0d1117]/80 border-l-4 border-[#3fb950] p-4 text-xs text-[#8b949e] space-y-1">
+          <div className="font-bold text-[#3fb950]">Why Normal-Approximation CI and not Bootstrap?</div>
           <p className="leading-relaxed">
             Discounted payoffs e^(-rT) h(S_T^(i)) are i.i.d. with finite variance, so the Central Limit Theorem applies cleanly for N &ge; 10⁴. Bootstrap CIs would target the same asymptotic result at much higher compute cost without improving accuracy.
           </p>
@@ -256,48 +256,48 @@ export default function DocsPage() {
                 <th className="p-3">Future Fix / Institutional Extension</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-200">
+            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
               <tr>
                 <td className="p-3 font-bold text-white">Constant Volatility</td>
                 <td className="p-3 text-[#8b949e]">Implied vol varies by strike &amp; expiry (smile/skew)</td>
                 <td className="p-3 text-[#79c0ff]">Single &sigma; input (historical or manual)</td>
-                <td className="p-3 text-emerald-400">SABR / Local Volatility (Dupire)</td>
+                <td className="p-3 text-[#3fb950]">SABR / Local Volatility (Dupire)</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">GBM / Log-Normal Returns</td>
                 <td className="p-3 text-[#8b949e]">Real returns exhibit fat tails &amp; negative skew</td>
                 <td className="p-3 text-[#79c0ff]">GBM log-normal exact sampling</td>
-                <td className="p-3 text-emerald-400">Merton Jump-Diffusion / Heston</td>
+                <td className="p-3 text-[#3fb950]">Merton Jump-Diffusion / Heston</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Constant Risk-Free Rate</td>
                 <td className="p-3 text-[#8b949e]">Rates have term structure &amp; evolve stochastically</td>
                 <td className="p-3 text-[#79c0ff]">Flat r rate input</td>
-                <td className="p-3 text-emerald-400">BondFactor Yield Curve Provider Hook</td>
+                <td className="p-3 text-[#3fb950]">BondFactor Yield Curve Provider Hook</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Continuous Dividend Yield</td>
                 <td className="p-3 text-[#8b949e]">Real dividends are discrete cash payments</td>
                 <td className="p-3 text-[#79c0ff]">Continuous q yield approximation</td>
-                <td className="p-3 text-emerald-400">Scheduled Ex-Dividend Escrow Modeling</td>
+                <td className="p-3 text-[#3fb950]">Scheduled Ex-Dividend Escrow Modeling</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">European Exercise Only</td>
                 <td className="p-3 text-[#8b949e]">Most US single-name equity options are American</td>
                 <td className="p-3 text-[#79c0ff]">Explicit scope limitation</td>
-                <td className="p-3 text-emerald-400">Longstaff-Schwartz LSM Monte Carlo</td>
+                <td className="p-3 text-[#3fb950]">Longstaff-Schwartz LSM Monte Carlo</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Frictionless Markets</td>
                 <td className="p-3 text-[#8b949e]">Real trading has bid-ask spreads &amp; market impact</td>
                 <td className="p-3 text-[#79c0ff]">Not modeled in pricing engine</td>
-                <td className="p-3 text-emerald-400">Pricing Model vs Execution System distinction</td>
+                <td className="p-3 text-[#3fb950]">Pricing Model vs Execution System distinction</td>
               </tr>
               <tr>
                 <td className="p-3 font-bold text-white">Risk-Neutral Measure Q</td>
                 <td className="p-3 text-[#8b949e]">Physical measure drift &ne; risk-neutral drift</td>
                 <td className="p-3 text-[#79c0ff]">Priced strictly under risk-neutral measure Q</td>
-                <td className="p-3 text-emerald-400">Appropriate for pricing/hedging, not forecasting</td>
+                <td className="p-3 text-[#3fb950]">Appropriate for pricing/hedging, not forecasting</td>
               </tr>
             </tbody>
           </table>
@@ -319,7 +319,7 @@ export default function DocsPage() {
                 <th className="p-3">Mathematical Reasoning</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-200">
+            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
               <tr>
                 <td className="p-3 font-bold text-white">Why MC for a problem BS solves?</td>
                 <td className="p-3 text-[#79c0ff]">Validation infrastructure for machinery meant to generalize to unsolvable cases</td>

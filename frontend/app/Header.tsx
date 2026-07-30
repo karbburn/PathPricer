@@ -31,7 +31,7 @@ export function Header() {
   };
 
   return (
-    <header className="border-b border-slate-800 bg-[#0d1117] text-white px-6 py-3 relative z-50">
+    <header className="border-b border-[#21262d] bg-[#0d1117] text-white px-6 py-3 relative z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
@@ -87,7 +87,7 @@ export function Header() {
 
       {/* Mobile dropdown */}
       {mobileOpen && (
-        <nav className="sm:hidden mt-3 pb-2 border-t border-slate-800 pt-3 space-y-1">
+        <nav className="sm:hidden mt-3 pb-2 border-t border-[#21262d] pt-3 space-y-1">
           <Link href="/" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-[#6e7681] hover:text-white hover:bg-[#21262d] transition-colors">
             Markets
           </Link>

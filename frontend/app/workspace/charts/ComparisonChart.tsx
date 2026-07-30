@@ -113,7 +113,7 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
         <span>
           Blue Reference Line = BS Benchmark. Blue Caps = 95% Confidence Intervals.
         </span>
-        <span className="text-emerald-400 font-semibold">
+        <span className="text-[#3fb950] font-semibold">
           Variance Reduction Narrows Error Bar Width
         </span>
       </div>

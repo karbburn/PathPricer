@@ -192,7 +192,7 @@ export function InputPanel({
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pricing"
                 ? "bg-[#238636] text-[#0d1117] shadow"
-                : "text-slate-400 hover:text-white"
+                : "text-[#6e7681] hover:text-white"
             }`}
           >
             Option Pricing
@@ -203,7 +203,7 @@ export function InputPanel({
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "implied_vol"
                 ? "bg-[#238636] text-white shadow"
-                : "text-slate-400 hover:text-white"
+                : "text-[#6e7681] hover:text-white"
             }`}
           >
             Implied Volatility
@@ -214,7 +214,7 @@ export function InputPanel({
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pnl_explain"
                 ? "bg-[#238636] text-white shadow"
-                : "text-slate-400 hover:text-white"
+                : "text-[#6e7681] hover:text-white"
             }`}
           >
             P&amp;L Explain
@@ -230,7 +230,7 @@ export function InputPanel({
             ? "P&L Explain Base & Shift"
             : "Pricing Inputs"}
         </h2>
-        <span className="text-xs text-slate-300 font-mono">
+        <span className="text-xs text-[#8b949e] font-mono">
           {workspaceMode === "pricing" ? "Preview Auto-Debounced (~200ms)" : "Scenario Simulation"}
         </span>
       </div>
@@ -255,7 +255,7 @@ export function InputPanel({
               type="button"
               onClick={handleMarketFetch}
               disabled={fetchingMarket}
-              className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className="bg-[#30363d] hover:bg-[#3a424b] text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               {fetchingMarket ? "Syncing..." : "Sync Market"}
             </button>
@@ -268,7 +268,7 @@ export function InputPanel({
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "US"
                   ? "bg-[#238636] text-white"
-                  : "text-slate-400 hover:text-white"
+                  : "text-[#6e7681] hover:text-white"
               }`}
             >
               US
@@ -279,7 +279,7 @@ export function InputPanel({
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "IN"
                   ? "bg-[#238636] text-white"
-                  : "text-slate-400 hover:text-white"
+                  : "text-[#6e7681] hover:text-white"
               }`}
             >
               IN (.NS)
@@ -290,7 +290,7 @@ export function InputPanel({
         {/* Spot Price Override */}
         <div className="grid grid-cols-2 gap-3 pt-1">
           <div>
-            <label className="block text-xs text-slate-300 mb-1">Spot Price (S₀)</label>
+            <label className="block text-xs text-[#8b949e] mb-1">Spot Price (S₀)</label>
             <input
               type="number"
               step="0.01"
@@ -303,7 +303,7 @@ export function InputPanel({
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-300 mb-1">Dividend Yield (q)</label>
+            <label className="block text-xs text-[#8b949e] mb-1">Dividend Yield (q)</label>
             <input
               type="number"
               step="0.001"
@@ -332,8 +332,8 @@ export function InputPanel({
               onClick={() => updateField("option_type", "call")}
               className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "call"
-                  ? "bg-slate-700 text-white"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-[#30363d] text-white"
+                  : "text-[#6e7681] hover:text-white"
               }`}
             >
               CALL
@@ -343,8 +343,8 @@ export function InputPanel({
               onClick={() => updateField("option_type", "put")}
               className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "put"
-                  ? "bg-slate-700 text-white"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-[#30363d] text-white"
+                  : "text-[#6e7681] hover:text-white"
               }`}
             >
               PUT
@@ -355,7 +355,7 @@ export function InputPanel({
         {/* Strike Price Dual Input (Slider + Box) */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-xs text-slate-300">Strike Price (K)</label>
+            <label className="text-xs text-[#8b949e]">Strike Price (K)</label>
             <input
               type="number"
               step={strikeStep}
@@ -377,7 +377,7 @@ export function InputPanel({
 
         {/* Expiry Date */}
         <div>
-          <label className="block text-xs text-slate-300 mb-1">Expiration Date</label>
+          <label className="block text-xs text-[#8b949e] mb-1">Expiration Date</label>
           <input
             type="date"
             value={inputs.expiry_date}
@@ -413,7 +413,7 @@ export function InputPanel({
         ) : (
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs text-slate-300">
+              <label className="text-xs text-[#8b949e]">
                 Volatility (σ): {(inputs.volatility * 100).toFixed(1)}%
               </label>
               <input
@@ -439,7 +439,7 @@ export function InputPanel({
         {/* Risk-Free Rate Dual Input */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-xs text-slate-300">
+            <label className="text-xs text-[#8b949e]">
               Risk-Free Rate (r): {(inputs.risk_free_rate * 100).toFixed(1)}%
             </label>
             <input
@@ -471,7 +471,7 @@ export function InputPanel({
 
           {/* N Simulations Presets */}
           <div>
-            <label className="block text-xs text-slate-300 mb-1">
+            <label className="block text-xs text-[#8b949e] mb-1">
               Simulations (N): {inputs.n_simulations.toLocaleString()}
             </label>
             <div className="grid grid-cols-5 gap-1 mb-2">
@@ -483,7 +483,7 @@ export function InputPanel({
                   className={`py-1 text-xs font-mono rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                     inputs.n_simulations === nVal
                       ? "bg-[#238636] text-white font-bold"
-                      : "bg-[#0d1117] text-slate-400 hover:text-white border border-[#21262d]"
+                      : "bg-[#0d1117] text-[#6e7681] hover:text-white border border-[#21262d]"
                   }`}
                 >
                   {nVal >= 1000000 ? `${nVal / 1000000}M` : `${nVal / 1000}k`}
@@ -503,7 +503,7 @@ export function InputPanel({
 
           {/* Variance Reduction Selector */}
           <div>
-            <label className="block text-xs text-slate-300 mb-1">Variance Reduction Method</label>
+            <label className="block text-xs text-[#8b949e] mb-1">Variance Reduction Method</label>
             <select
               value={inputs.variance_reduction}
               onChange={(e) =>
@@ -522,7 +522,7 @@ export function InputPanel({
 
           {/* Seed Control (Randomize + Lock Button) */}
           <div>
-            <label className="block text-xs text-slate-300 mb-1">RNG Seed</label>
+            <label className="block text-xs text-[#8b949e] mb-1">RNG Seed</label>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -535,7 +535,7 @@ export function InputPanel({
                 type="button"
                 onClick={handleRandomizeSeed}
                 disabled={seedLocked}
-                className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="bg-[#30363d] hover:bg-[#3a424b] text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               >
                 Randomize
               </button>
@@ -545,7 +545,7 @@ export function InputPanel({
                 className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                   seedLocked
                     ? "bg-[#161b22] border-[#30363d] text-[#d29922]"
-                    : "bg-[#161b22] border-[#30363d] text-slate-400 hover:text-white"
+                    : "bg-[#161b22] border-[#30363d] text-[#6e7681] hover:text-white"
                 }`}
               >
                 {seedLocked ? "Locked" : "Unlocked"}
@@ -565,7 +565,7 @@ export function InputPanel({
           {/* Spot Shift (dS) */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs text-slate-300">
+              <label className="text-xs text-[#8b949e]">
                 Spot Shift (ΔS): {pnlShift.d_spot >= 0 ? `+${pnlShift.d_spot}` : pnlShift.d_spot}
               </label>
               <input
@@ -594,7 +594,7 @@ export function InputPanel({
           {/* Volatility Shift (d_vol) */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs text-slate-300">
+              <label className="text-xs text-[#8b949e]">
                 Volatility Shift (Δσ): {(pnlShift.d_vol * 100).toFixed(1)}%
               </label>
               <input
@@ -623,7 +623,7 @@ export function InputPanel({
           {/* Elapsed Days (d_days) */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs text-slate-300">
+              <label className="text-xs text-[#8b949e]">
                 Time Elapsed (Δt): {pnlShift.d_days} days
               </label>
               <input
@@ -654,7 +654,7 @@ export function InputPanel({
           {/* Rate Shift (d_rate) */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs text-slate-300">
+              <label className="text-xs text-[#8b949e]">
                 Rate Shift (Δr): {(pnlShift.d_rate * 10000).toFixed(0)} bps
               </label>
               <input
@@ -713,7 +713,7 @@ export function InputPanel({
               <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
               <span className="text-xs font-mono text-[#79c0ff]">(N={inputs.n_simulations.toLocaleString()})</span>
             </button>
-            <p className="text-[11px] text-slate-500 text-center mt-1.5 font-mono">
+            <p className="text-[11px] text-[#6e7681] text-center mt-1.5 font-mono">
               <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#6e7681] text-[10px]">Ctrl</kbd>
               {" + "}
               <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#6e7681] text-[10px]">Enter</kbd>

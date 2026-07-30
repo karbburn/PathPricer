@@ -61,7 +61,7 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
             Hockey-stick payoff &bull; Strike: {currencySymbol}{K.toFixed(2)} &bull; Spot: {currencySymbol}{S0.toFixed(2)} &bull; Breakeven: {currencySymbol}{breakeven.toFixed(2)}
           </p>
         </div>
-        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-emerald-400 px-2 py-1 rounded font-mono font-bold uppercase">
+        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-[#3fb950] px-2 py-1 rounded font-mono font-bold uppercase">
           {opt} Option Payoff
         </span>
       </div>

@@ -94,9 +94,9 @@ export function ResultsPanel({
       return (
         <div className="bg-[#161b22] border border-[#58a6ff]/60 rounded-xl p-8 text-center space-y-4">
           <div className="flex justify-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-            <div className="h-3 w-3 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-            <div className="h-3 w-3 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+            <div className="h-3 w-3 rounded-full bg-[#bc8cff] animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="h-3 w-3 rounded-full bg-[#bc8cff] animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="h-3 w-3 rounded-full bg-[#bc8cff] animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
           <p className="text-sm text-[#79c0ff] font-semibold">
             Solving Implied Volatility via Black-Scholes inversion...
@@ -130,13 +130,13 @@ export function ResultsPanel({
               Closed-form BSM Newton-Raphson / Brent Fallback root finder
             </p>
           </div>
-          <span className="px-3 py-1 bg-purple-950 border border-purple-700 text-[#79c0ff] text-xs font-mono font-bold rounded-full">
+          <span className="px-3 py-1 bg-[#0d1117] border border-[#30363d] text-[#79c0ff] text-xs font-mono font-bold rounded-full">
             Discrete Solve
           </span>
         </div>
 
         {/* Hero Display */}
-        <div className="bg-[#0d1117] border border-purple-900/50 rounded-xl p-6 text-center space-y-2">
+        <div className="bg-[#0d1117] border border-[#30363d]/50 rounded-xl p-6 text-center space-y-2">
           <span className="text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             Solved Implied Volatility (&sigma;)
           </span>
@@ -156,7 +156,7 @@ export function ResultsPanel({
             </span>
             <span className={`inline-block px-2 py-0.5 text-xs font-mono font-bold rounded ${
               impliedVolResult.method_used === "newton"
-                ? "bg-purple-950 text-[#79c0ff] border border-[#21262d]"
+                ? "bg-[#0d1117] text-[#79c0ff] border border-[#21262d]"
                 : "bg-[#161b22] text-[#79c0ff] border border-[#30363d]"
             }`}>
               {impliedVolResult.method_used === "newton" ? "Newton-Raphson" : "Brent Fallback"}
@@ -169,7 +169,7 @@ export function ResultsPanel({
             </span>
             <span className={`inline-block px-2 py-0.5 text-xs font-mono font-bold rounded ${
               impliedVolResult.converged
-                ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                ? "bg-[#0d1117] text-[#3fb950] border border-[#30363d]"
                 : "bg-red-950 text-red-300 border border-red-800"
             }`}>
               {impliedVolResult.converged ? "Converged" : "Failed"}
@@ -198,7 +198,7 @@ export function ResultsPanel({
         {/* Residual diagnostic line */}
         <div className="bg-[#0d1117]/50 border border-[#21262d] px-4 py-2.5 rounded-lg flex items-center justify-between text-xs font-mono text-[#6e7681]">
           <span>Final Price Residual:</span>
-          <span className="text-slate-200">
+          <span className="text-[#e6edf3]">
             {impliedVolResult.final_residual >= 0 ? "+" : ""}
             {impliedVolResult.final_residual.toExponential(3)}
           </span>
@@ -213,9 +213,9 @@ export function ResultsPanel({
       return (
         <div className="bg-[#161b22] border border-[#58a6ff]/60 rounded-xl p-8 text-center space-y-4">
           <div className="flex justify-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-            <div className="h-3 w-3 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-            <div className="h-3 w-3 rounded-full bg-teal-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+            <div className="h-3 w-3 rounded-full bg-[#58a6ff] animate-bounce" style={{ animationDelay: "0ms" }} />
+            <div className="h-3 w-3 rounded-full bg-[#58a6ff] animate-bounce" style={{ animationDelay: "150ms" }} />
+            <div className="h-3 w-3 rounded-full bg-[#58a6ff] animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
           <p className="text-sm text-[#79c0ff] font-semibold">
             Recomputing Black-Scholes scenario P&amp;L &amp; Taylor series Greek attribution...
@@ -253,11 +253,11 @@ export function ResultsPanel({
 
     const terms = [
       { name: "Delta P&L (Δ · ΔS)", val: delta_pnl, color: "bg-[#58a6ff]", text: "text-[#58a6ff]", border: "border-[#21262d]/40" },
-      { name: "Gamma P&L (½Γ · ΔS²)", val: gamma_pnl, color: "bg-indigo-500", text: "text-indigo-400", border: "border-indigo-800/40" },
+      { name: "Gamma P&L (½Γ · ΔS²)", val: gamma_pnl, color: "bg-[#bc8cff]", text: "text-[#bc8cff]", border: "border-[#30363d]/40" },
       { name: "Vega P&L (ν · Δσ)", val: vega_pnl, color: "bg-[#58a6ff]", text: "text-[#58a6ff]", border: "border-[#21262d]/40" },
       { name: "Theta P&L (θ · Δt)", val: theta_pnl, color: "bg-[#d29922]", text: "text-[#58a6ff]", border: "border-[#30363d]/40" },
       { name: "Rho P&L (ρ · Δr)", val: rho_pnl, color: "bg-[#58a6ff]", text: "text-[#58a6ff]", border: "border-[#21262d]/40" },
-      { name: "Higher-Order Residual", val: unexplained_pnl, color: "bg-rose-500", text: "text-rose-400", border: "border-rose-800/80 bg-rose-950/40" },
+      { name: "Higher-Order Residual", val: unexplained_pnl, color: "bg-[#f85149]", text: "text-[#f85149]", border: "border-[#f85149]/40 bg-[#f85149]/10" },
     ];
 
     return (
@@ -271,7 +271,7 @@ export function ResultsPanel({
               1st &amp; 2nd order Taylor Series decomposition vs actual BSM repriced P&amp;L
             </p>
           </div>
-          <span className="px-3 py-1 bg-teal-950 border border-teal-700 text-[#79c0ff] text-xs font-mono font-bold rounded-full">
+          <span className="px-3 py-1 bg-[#0d1117] border border-[#30363d] text-[#79c0ff] text-xs font-mono font-bold rounded-full">
             Exact BSM
           </span>
         </div>
@@ -320,7 +320,7 @@ export function ResultsPanel({
           <h3 className="text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             P&amp;L Term Breakdown &amp; Attribution
           </h3>
-          <div className="divide-y divide-slate-800/60 border border-[#21262d] rounded-lg overflow-hidden bg-[#0d1117]/60">
+          <div className="divide-y divide-[#21262d]/60 border border-[#21262d] rounded-lg overflow-hidden bg-[#0d1117]/60">
             {terms.map((t) => (
               <div
                 key={t.name}
@@ -339,12 +339,12 @@ export function ResultsPanel({
         </div>
 
         {/* Unexplained Residual Explanation Banner */}
-        <div className="bg-rose-950/30 border border-rose-800/40 rounded-lg p-3.5 space-y-1">
+        <div className="bg-[#f85149]/10 border border-[#f85149]/40 rounded-lg p-3.5 space-y-1">
           <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+              <span className="text-xs font-bold text-[#f85149] flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Unexplained Higher-Order Residual:
               </span>
-            <span className="text-xs font-mono font-bold text-rose-300">
+            <span className="text-xs font-mono font-bold text-[#f85149]">
               {unexplained_pnl >= 0 ? "+" : ""}{currencySymbol}{formatPrice(unexplained_pnl, 4)}
             </span>
           </div>
@@ -443,11 +443,11 @@ export function ResultsPanel({
             </p>
           </div>
 
-          <div className="bg-[#161b22] border border-emerald-500/60 rounded-lg p-6 shadow-md">
+          <div className="bg-[#161b22] border border-[#3fb950]/60 rounded-lg p-6 shadow-md">
             <span className="text-xs font-extrabold text-[#3fb950] uppercase tracking-wider block mb-1">
               Monte Carlo (Standard)
             </span>
-            <div className="text-4xl font-black text-emerald-300 font-[family-name:var(--font-display)] tracking-tight">
+            <div className="text-4xl font-black text-[#3fb950] font-[family-name:var(--font-display)] tracking-tight">
               {currencySymbol}{stdMc ? stdMc.price.toFixed(4) : "N/A"}
             </div>
             <p className="text-xs text-[#8b949e] mt-2 font-mono">
@@ -519,7 +519,7 @@ export function ResultsPanel({
                   <th className="p-2.5 text-center">Relative Efficiency</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-200">
+              <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
                 {mcWithEfficiency.map((mc) => {
                   const barPercent = Math.min(100, (mc.relative_efficiency / maxEfficiency) * 100);
                   const isFocalPoint = mc.relative_efficiency > 1.05;
@@ -604,7 +604,7 @@ export function ResultsPanel({
                   <th className="p-2.5 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-200">
+              <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
                 {Object.entries(GREEK_TOLERANCES).map(([key, meta]) => {
                   const bsVal = bs.greeks[key as keyof BSGreeks] ?? 0;
                   const fdVal = fd[key as keyof BSGreeks] ?? 0;
@@ -630,7 +630,7 @@ export function ResultsPanel({
                       {/* Delta column — explicit difference display */}
                       <td
                         className={`p-2.5 text-right font-bold ${
-                          diff >= 0 ? "text-[#3fb950]" : "text-rose-400"
+                          diff >= 0 ? "text-[#3fb950]" : "text-[#f85149]"
                         }`}
                       >
                         {diff >= 0 ? "+" : ""}
@@ -641,7 +641,7 @@ export function ResultsPanel({
                       </td>
                       <td className="p-2.5 text-center">
                         {isWithinTolerance ? (
-                          <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs font-bold">
+                          <span className="px-2 py-0.5 rounded bg-[#0d1117] text-[#3fb950] border border-[#30363d] text-xs font-bold">
                             ✓ Pass ({isNearZero ? "< 0.01" : `&le; ${(meta.tolerance * 100).toFixed(0)}%`})
                           </span>
                         ) : (

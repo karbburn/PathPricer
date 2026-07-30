@@ -38,16 +38,16 @@ function CustomTooltip({ active, payload, label, currencySymbol }: { active?: bo
   const shown = payload.slice(0, 5);
   const remaining = payload.length - shown.length;
   return (
-    <div className="bg-[#090d16] border border-slate-700 rounded px-3 py-2 font-mono text-xs max-w-[200px]">
-      <div className="text-slate-400 mb-1">t = {label}y</div>
+    <div className="bg-[#090d16] border border-[#30363d] rounded px-3 py-2 font-mono text-xs max-w-[200px]">
+      <div className="text-[#6e7681] mb-1">t = {label}y</div>
       {shown.map((p) => (
         <div key={p.dataKey} className="flex justify-between gap-3">
-          <span className="text-slate-500">{p.dataKey}</span>
-          <span className="text-slate-200">{currencySymbol}{p.value.toFixed(2)}</span>
+          <span className="text-[#6e7681]">{p.dataKey}</span>
+          <span className="text-[#e6edf3]">{currencySymbol}{p.value.toFixed(2)}</span>
         </div>
       ))}
       {remaining > 0 && (
-        <div className="text-slate-500 mt-1">+{remaining} more paths</div>
+        <div className="text-[#6e7681] mt-1">+{remaining} more paths</div>
       )}
     </div>
   );

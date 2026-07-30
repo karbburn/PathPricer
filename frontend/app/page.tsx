@@ -268,7 +268,7 @@ export default function MarketOverviewPage() {
               <div
                 className={`text-sm font-bold font-mono px-2.5 py-1 rounded ${
                   quote.daily_return >= 0
-                    ? "bg-emerald-950 text-emerald-400 border border-emerald-800"
+                    ? "bg-[#0d1117] text-[#3fb950] border border-[#30363d]"
                     : "bg-red-950 text-red-400 border border-red-800"
                 }`}
               >

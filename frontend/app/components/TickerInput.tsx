@@ -120,7 +120,7 @@ export function TickerInput({
       />
 
       {market === "IN" && (
-        <span className="absolute right-3 top-2.5 text-xs text-slate-400 font-mono pointer-events-none">
+        <span className="absolute right-3 top-2.5 text-xs text-[#6e7681] font-mono pointer-events-none">
           Auto-appends .NS
         </span>
       )}
@@ -148,11 +148,11 @@ export function TickerInput({
                 <span className="font-bold text-white font-mono bg-[#161b22] px-1.5 py-0.5 rounded border border-[#21262d]">
                   {item.ticker}
                 </span>
-                <span className="text-slate-400 truncate max-w-[200px] sm:max-w-[280px]">
+                <span className="text-[#6e7681] truncate max-w-[200px] sm:max-w-[280px]">
                   {item.name}
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 uppercase">{item.market}</span>
+              <span className="text-[10px] text-[#6e7681] uppercase">{item.market}</span>
             </button>
           ))}
         </div>

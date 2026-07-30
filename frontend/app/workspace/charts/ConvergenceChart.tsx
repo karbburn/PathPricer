@@ -217,7 +217,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         <span>
           Theoretical Central Limit Theorem bound dictates slope = -0.500 ($\widehat{"{"}SE{"}"} \propto N^{-0.5}$).
         </span>
-        <span className={`font-bold ${Math.abs(fit.slope - (-0.5)) <= 0.05 ? "text-emerald-400" : "text-[#58a6ff]"}`}>
+        <span className={`font-bold ${Math.abs(fit.slope - (-0.5)) <= 0.05 ? "text-[#3fb950]" : "text-[#58a6ff]"}`}>
           {Math.abs(fit.slope - (-0.5)) <= 0.05 ? "✓ Validated O(N⁻¹/²) Fit" : "High Sampling Noise"}
         </span>
       </div>
