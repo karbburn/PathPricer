@@ -42,12 +42,12 @@ export function formatCurrency(val: number | null | undefined, currency: string 
   return `${currency}${formatted}`;
 }
 
-export function formatMarketCap(val: number | null | undefined): string {
+export function formatMarketCap(val: number | null | undefined, currency: string = "$"): string {
   if (val === null || val === undefined || isNaN(val)) return "—";
-  if (val >= 1e12) return `$${(val / 1e12).toFixed(2)}T`;
-  if (val >= 1e9) return `$${(val / 1e9).toFixed(2)}B`;
-  if (val >= 1e6) return `$${(val / 1e6).toFixed(2)}M`;
-  return `$${val.toLocaleString()}`;
+  if (val >= 1e12) return `${currency}${(val / 1e12).toFixed(2)}T`;
+  if (val >= 1e9) return `${currency}${(val / 1e9).toFixed(2)}B`;
+  if (val >= 1e6) return `${currency}${(val / 1e6).toFixed(2)}M`;
+  return `${currency}${val.toLocaleString()}`;
 }
 
 export function formatDateTime(isoString: string | null | undefined): string {

@@ -352,7 +352,7 @@ export default function MarketOverviewPage() {
                 Market Capitalization
               </span>
               <span className="text-2xl font-bold font-mono text-white">
-                {formatMarketCap(quote.market_cap)}
+                {formatMarketCap(quote.market_cap, quote.currency === "INR" ? "\u20B9" : "$")}
               </span>
             </div>
 
