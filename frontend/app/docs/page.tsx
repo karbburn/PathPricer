@@ -98,9 +98,13 @@ export default function DocsPage() {
       </div>
 
       {/* ── Mobile TOC (horizontal scroll) ── */}
-      <nav className="md:hidden flex flex-nowrap gap-x-5 mb-8 text-sm overflow-x-auto pb-2">
+      <nav className="md:hidden flex flex-nowrap gap-2 mb-8 text-xs overflow-x-auto pb-3 -mx-6 px-6 border-b border-[#21262d]/60">
         {toc.map((x) => (
-          <a key={x.id} href={`#${x.id}`} className="whitespace-nowrap text-[#58a6ff] hover:text-[#79c0ff] transition-colors border-b border-transparent hover:border-[#58a6ff]">
+          <a
+            key={x.id}
+            href={`#${x.id}`}
+            className="shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full bg-[#161b22] border border-[#21262d] text-[#c9d1d9] hover:text-[#58a6ff] hover:border-[#58a6ff]/50 transition-all font-medium active:scale-95"
+          >
             {x.label}
           </a>
         ))}
