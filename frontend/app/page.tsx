@@ -226,7 +226,7 @@ export default function MarketOverviewPage() {
                 <Link
                   href={`/workspace?ticker=${encodeURIComponent(
                     tickerInput
-                  )}&market=${marketInput}&spot_override=${roundClean(manualSpot, 2)}&strike=${computeAtmStrike(manualSpot)}&volatility=${roundClean(manualVol, 4)}&dividend_yield=${roundClean(manualDiv, 4)}`}
+                  )}&market=${marketInput}&spot_override=${roundClean(Number(manualSpot), 2)}&strike=${computeAtmStrike(Number(manualSpot))}&volatility=${roundClean(Number(manualVol), 4)}&dividend_yield=${roundClean(Number(manualDiv), 4)}`}
                   className="inline-flex items-center gap-2 bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                 >
                   <span>Proceed to Workspace</span>
