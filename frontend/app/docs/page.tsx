@@ -27,10 +27,11 @@ function SectionCard({ id, title, children, className }: { id: string; title: st
 }
 
 function Callout({ title, children, accent = "blue" }: { title: string; children: React.ReactNode; accent?: "blue" | "green" | "red" }) {
-  const accentColors = { blue: "border-[#58a6ff] text-[#79c0ff]", green: "border-[#3fb950] text-[#3fb950]", red: "border-[#f85149] text-[#f85149]" };
+  const borderClass = accent === "blue" ? "border-[#58a6ff]" : accent === "green" ? "border-[#3fb950]" : "border-[#f85149]";
+  const titleClass = accent === "blue" ? "text-[#79c0ff]" : accent === "green" ? "text-[#3fb950]" : "text-[#f85149]";
   return (
-    <div className={`border-l-4 ${accent === "blue" ? "border-[#58a6ff]" : accent === "green" ? "border-[#3fb950]" : "border-[#f85149]"} bg-[#0d1117]/50 pl-4 pr-3 py-3 space-y-1.5`}>
-      <div className={`font-semibold text-xs uppercase tracking-wider ${accentColors[accent]}`}>{title}</div>
+    <div className={`border-l-4 ${borderClass} bg-[#161b22] pl-4 pr-3 py-3 space-y-1.5`}>
+      <div className={`font-semibold text-xs uppercase tracking-wider ${titleClass}`}>{title}</div>
       <div className="text-sm text-[#8b949e] leading-relaxed">{children}</div>
     </div>
   );
@@ -40,7 +41,7 @@ function ParamGrid({ items }: { items: { sym: string; desc: string }[] }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs">
       {items.map((x) => (
-        <div key={x.sym} className="bg-[#0d1117]/60 px-3 py-2 rounded border border-[#21262d]">
+        <div key={x.sym} className="bg-[#0d1117] px-3 py-2 rounded border border-[#21262d]">
           <span className="font-mono text-[#79c0ff] block">{x.sym}</span>
           <span className="text-[#8b949e]">{x.desc}</span>
         </div>
@@ -51,7 +52,7 @@ function ParamGrid({ items }: { items: { sym: string; desc: string }[] }) {
 
 export default function DocsPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       {/* ── Header ── */}
       <div className="mb-8 pb-6 border-b border-[#21262d]">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
@@ -62,14 +63,32 @@ export default function DocsPage() {
         </p>
       </div>
 
-      {/* ── TOC ── */}
-      <nav className="flex flex-wrap gap-x-5 gap-y-1.5 mb-10 text-sm">
+      {/* ── Mobile TOC (horizontal scroll) ── */}
+      <nav className="md:hidden flex flex-nowrap gap-x-5 mb-8 text-sm overflow-x-auto pb-2">
         {toc.map((x) => (
-          <a key={x.id} href={`#${x.id}`} className="text-[#58a6ff] hover:text-[#79c0ff] transition-colors border-b border-transparent hover:border-[#58a6ff]">
+          <a key={x.id} href={`#${x.id}`} className="whitespace-nowrap text-[#58a6ff] hover:text-[#79c0ff] transition-colors border-b border-transparent hover:border-[#58a6ff]">
             {x.label}
           </a>
         ))}
       </nav>
+
+      {/* ── Layout: sidebar TOC + content ── */}
+      <div className="flex gap-8">
+        {/* Desktop TOC — sticky left sidebar */}
+        <nav className="hidden md:block sticky top-24 self-start shrink-0 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto">
+          <ul className="space-y-1.5 text-sm border-l border-[#21262d] pl-3">
+            {toc.map((x) => (
+              <li key={x.id}>
+                <a href={`#${x.id}`} className="block py-0.5 text-[#8b949e] hover:text-[#58a6ff] transition-colors">
+                  {x.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0 max-w-4xl">
 
       {/* ════════════════════════════════════════════════════════════ 1. GBM */}
       <SectionCard id="gbm" title="1. The Model: Geometric Brownian Motion (GBM)">
@@ -150,19 +169,19 @@ export default function DocsPage() {
       {/* ════════════════════════════════════════════════════════════ 3. Why MC */}
       <SectionCard id="why-mc" title="3. Why Monte Carlo for a Problem Black-Scholes Already Solves?">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-bold text-[#f85149] mb-1">Honest Assessment</div>
             <p className="text-xs text-[#8b949e] leading-relaxed">
               For European vanillas under GBM, Monte Carlo is <strong>strictly worse</strong> than Black-Scholes: slower, noisier, estimates what BS computes exactly.
             </p>
           </div>
-          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-bold text-[#79c0ff] mb-1">Why Institutions Use MC</div>
             <p className="text-xs text-[#8b949e] leading-relaxed">
               MC generalises where no closed form exists: path-dependent payoffs, baskets, American exercise (LSM), stochastic volatility. BS is the exception, not the rule.
             </p>
           </div>
-          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-bold text-[#3fb950] mb-1">What PathPricer Demonstrates</div>
             <p className="text-xs text-[#8b949e] leading-relaxed">
               Numerical machinery validated against known truth before applying it where truth is unknown. This is the intellectual foundation of the project.
@@ -178,12 +197,12 @@ export default function DocsPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Standard Error</div>
             <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\widehat{SE} = s/\sqrt{N}" /></div>
             <div className="text-xs text-[#8b949e] mt-1">Sample std dev of i.i.d. discounted payoffs</div>
           </div>
-          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">95% Confidence Interval</div>
             <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\hat{V} \pm 1.96\cdot\widehat{SE}" /></div>
             <div className="text-xs text-[#8b949e] mt-1">Normal approx justified by CLT for N ≥ 10⁴</div>
@@ -203,23 +222,23 @@ export default function DocsPage() {
       {/* ════════════════════════════════════════════════════════════ 5. Variance Reduction */}
       <SectionCard id="var-red" title="5. Variance Reduction Techniques">
         <div className="space-y-3 text-sm">
-          <div className="bg-[#0d1117]/40 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <h3 className="font-semibold text-white mb-1">5.1 Antithetic Variates</h3>
             <p className="text-xs text-[#8b949e] leading-relaxed mb-2">
               For each draw <InlineMath math="Z_i" />, also evaluate payoff at <InlineMath math="-Z_i" />. Monotonic payoffs guarantee negatively correlated pairs.
             </p>
-            <div className="bg-[#0d1117]/80 px-3 py-2 rounded text-xs font-mono text-[#79c0ff] overflow-x-auto">
+            <div className="bg-[#161b22] px-3 py-2 rounded text-xs font-mono text-[#79c0ff] overflow-x-auto">
               <BlockMath math="\hat{V}_{AV} = e^{-rT}\cdot\frac{1}{N}\sum_{i=1}^{N}\frac{h(S_T^{(i,+)}) + h(S_T^{(i,-)})}{2}" />
             </div>
           </div>
 
-          <div className="bg-[#0d1117]/40 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <h3 className="font-semibold text-white mb-1">5.2 Control Variates (S_T)</h3>
             <p className="text-xs text-[#8b949e] leading-relaxed mb-2">
               Uses <InlineMath math="S_T" /> as control with known expectation{" "}
               <InlineMath math="\mathbb{E}^{\mathbb{Q}}[S_T] = S_0 e^{(r-q)T}" /> (Boyle 1977).
             </p>
-            <div className="bg-[#0d1117]/80 px-3 py-2 rounded text-xs font-mono text-[#79c0ff] overflow-x-auto">
+            <div className="bg-[#161b22] px-3 py-2 rounded text-xs font-mono text-[#79c0ff] overflow-x-auto">
               <BlockMath math="\hat{V}_{CV} = e^{-rT}\cdot\frac{1}{N}\sum_{i=1}^{N}\left[h(S_T^{(i)}) - \beta^*\left(S_T^{(i)} - \mathbb{E}^{\mathbb{Q}}[S_T]\right)\right]" />
             </div>
             <Callout title="Why S_T and not BS price?" accent="red">
@@ -227,7 +246,7 @@ export default function DocsPage() {
             </Callout>
           </div>
 
-          <div className="bg-[#0d1117]/40 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <h3 className="font-semibold text-white mb-1">5.3 Combined Antithetic + CV</h3>
             <p className="text-xs text-[#8b949e] leading-relaxed">
               Apply antithetic pairing first, then CV correction to paired averages. The techniques target different variance components and stack without redundancy.
@@ -317,11 +336,11 @@ export default function DocsPage() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Newton-Raphson (Primary)</div>
             <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\sigma_{n+1} = \sigma_n - \frac{\text{BS}_{\text{price}}(\sigma_n) - P_{\text{market}}}{\text{Vega}(\sigma_n)}" /></div>
           </div>
-          <div className="bg-[#0d1117]/60 p-4 rounded border border-[#21262d]">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Brenner-Subrahmanyam Init</div>
             <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\sigma_0 \approx \sqrt{2\pi/T} \cdot P_{\text{market}} / S_0" /></div>
           </div>
@@ -481,6 +500,9 @@ export default function DocsPage() {
       <div className="text-xs text-[#484f58] text-center pt-6 border-t border-[#21262d]">
         Full mathematical specification available in the project&rsquo;s Quantitative Methodology document.
       </div>
+
+        </div>{/* end content */}
+      </div>{/* end flex */}
     </div>
   );
 }
