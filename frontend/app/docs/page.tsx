@@ -52,7 +52,7 @@ function ParamGrid({ items }: { items: { sym: string; desc: string }[] }) {
 
 export default function DocsPage() {
   return (
-    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div className="relative max-w-7xl mx-auto px-6 md:pl-10 md:pr-6 py-8 sm:py-12">
       {/* ── Header ── */}
       <div className="mb-8 pb-6 border-b border-[#21262d]">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
@@ -75,7 +75,7 @@ export default function DocsPage() {
       {/* ── Layout: sidebar TOC + content ── */}
       <div className="flex gap-8">
         {/* Desktop TOC — sticky left sidebar */}
-        <nav className="hidden md:block sticky top-24 self-start shrink-0 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto">
+        <nav className="hidden md:block sticky top-24 self-start shrink-0 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto pl-2">
           <ul className="space-y-1.5 text-sm border-l border-[#21262d] pl-3">
             {toc.map((x) => (
               <li key={x.id}>
