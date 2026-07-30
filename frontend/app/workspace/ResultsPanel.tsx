@@ -569,7 +569,7 @@ export function ResultsPanel({
                                 : "text-[#6e7681]"
                             }`}
                           >
-                            {mc.relative_efficiency.toFixed(2)}x
+                            {mc.relative_efficiency > 9999 ? ">9999" : mc.relative_efficiency.toFixed(2)}x
                           </span>
                         </div>
                       </td>
