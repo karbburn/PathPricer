@@ -301,17 +301,19 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="text-[10px] font-mono text-[#6e7681] flex flex-col justify-between h-64 text-right">
-                <span>{formatAxisVal(axisY, gridData.y_values[gridData.y_values.length - 1])}</span>
-                <span>{formatAxisVal(axisY, gridData.y_values[Math.floor(gridData.y_values.length / 2)])}</span>
-                <span>{formatAxisVal(axisY, gridData.y_values[0])}</span>
-              </div>
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px]">
+                  <div className="text-[10px] font-mono text-[#6e7681] flex flex-col justify-between h-64 text-right">
+                    <span>{formatAxisVal(axisY, gridData.y_values[gridData.y_values.length - 1])}</span>
+                    <span>{formatAxisVal(axisY, gridData.y_values[Math.floor(gridData.y_values.length / 2)])}</span>
+                    <span>{formatAxisVal(axisY, gridData.y_values[0])}</span>
+                  </div>
 
-              {/* Grid Cells matrix */}
-              <div
-                className="grid gap-[1px] bg-[#0d1117] p-1 rounded-lg border border-[#21262d] w-full max-w-xl h-64"
-                style={{ gridTemplateColumns: "repeat(25, minmax(0, 1fr))" }}
-              >
+                  {/* Grid Cells matrix */}
+                  <div
+                    className="grid gap-[1px] bg-[#0d1117] p-1 rounded-lg border border-[#21262d] w-full max-w-xl h-64 min-w-[600px]"
+                    style={{ gridTemplateColumns: "repeat(25, minmax(0, 1fr))" }}
+                  >
                 {gridData.grid
                   .slice()
                   .reverse()
@@ -333,6 +335,8 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
                       );
                     });
                   })}
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ShortcutsHelpProps {
   isOpen: boolean;
@@ -20,6 +20,13 @@ const shortcuts = [
 ];
 
 export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -30,6 +37,7 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
     >
       <div
         className="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl shadow-black/40 p-6 w-full max-w-md mx-4"
+        style={{ overscrollBehavior: "contain" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -38,7 +46,7 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
           </h2>
           <button
             onClick={onClose}
-            className="text-[#6e7681] hover:text-white transition-colors p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+            className="text-[#6e7681] hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" />

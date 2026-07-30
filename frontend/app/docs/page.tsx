@@ -23,8 +23,8 @@ export default function DocsPage() {
           The underlying stock price S_t follows the risk-neutral Stochastic Differential Equation (SDE):
         </p>
 
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#79c0ff] flex justify-center">
-          dS_t = (r - q) S_t dt + σ S_t dW_t
+        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#79c0ff] overflow-x-auto py-2">
+          <div className="min-w-max">dS_t = (r - q) S_t dt + σ S_t dW_t</div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono text-[#8b949e] py-2">
@@ -47,8 +47,8 @@ export default function DocsPage() {
           Applying Itô&apos;s Lemma to ln(S_t) yields the exact (non-discretized) terminal price solution:
         </p>
 
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#3fb950] flex justify-center">
-          S_T = S_0 exp[(r - q - 0.5 σ²) T + σ √T Z], Z ~ N(0, 1)
+        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#3fb950] overflow-x-auto py-2">
+          <div className="min-w-max">S_T = S_0 exp[(r - q - 0.5 σ²) T + σ √T Z], Z ~ N(0, 1)</div>
         </div>
 
         <div className="bg-[#0d1117]/80 border-l-4 border-[#58a6ff] p-4 text-xs text-[#8b949e] space-y-2">
@@ -172,8 +172,8 @@ export default function DocsPage() {
           4. Monte Carlo Estimator &amp; O(N⁻¹/²) Convergence
         </h2>
 
-        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#79c0ff] flex justify-center">
-          V̂ = e^(-rT) &bull; (1/N) &sum; h(S_T^(i)), h(S_T) = max(S_T - K, 0)
+        <div className="bg-[#0d1117] p-4 rounded-md border border-[#21262d] font-mono text-sm text-[#79c0ff] overflow-x-auto py-2">
+          <div className="min-w-max">V̂ = e^(-rT) &bull; (1/N) &sum; h(S_T^(i)), h(S_T) = max(S_T - K, 0)</div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">

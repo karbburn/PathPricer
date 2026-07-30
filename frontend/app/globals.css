@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Mobile touch improvements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (pointer: coarse) {
+  input, select, textarea, button, a {
+    min-height: 44px;
+  }
+}
+
 /* ── Grid background overlay (Bloomberg-terminal subtle texture) ── */
 body {
   background-image: radial-gradient(circle, rgba(71, 85, 105, 0.12) 1px, transparent 1px);

@@ -27,6 +27,7 @@ export function TickerInput({
 }: TickerInputProps) {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const [touchActiveIndex, setTouchActiveIndex] = useState<number>(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -80,14 +81,18 @@ export function TickerInput({
 
   // Close dropdown on click outside
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
         setActiveIndex(-1);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
 
   // Scroll active item into view
@@ -137,9 +142,12 @@ export function TickerInput({
               type="button"
               data-ticker-item
               onClick={() => selectItem(item)}
+              onTouchEnd={() => selectItem(item)}
+              onTouchStart={() => setTouchActiveIndex(idx)}
+              onTouchCancel={() => setTouchActiveIndex(-1)}
               onMouseEnter={() => setActiveIndex(idx)}
               className={`w-full text-left px-4 py-2.5 flex items-center justify-between transition-colors text-xs font-mono ${
-                idx === activeIndex
+                idx === activeIndex || idx === touchActiveIndex
                   ? "bg-[#21262d] text-white"
                   : "text-[#8b949e] hover:bg-[#161b22]"
               }`}

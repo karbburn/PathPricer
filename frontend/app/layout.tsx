@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className={`antialiased ${spaceGrotesk.variable} ${dmSerifDisplay.variable} ${jetbrainsMono.variable}`}>
         <DensityProvider>
           <Header />
-          <main className="min-h-[calc(100vh-93px)] bg-[#0d1117] text-[#e6edf3] pb-16 md:pb-0">{children}</main>
+          <main className="min-h-[calc(100dvh-93px)] bg-[#0d1117] text-[#e6edf3] pb-16 md:pb-0">{children}</main>
           <MobileNav />
           <ToastContainer />
         </DensityProvider>

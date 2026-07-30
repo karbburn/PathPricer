@@ -108,6 +108,18 @@ export function ResizableHandle({
     [direction, panelSizes, index]
   );
 
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault();
+      setIsDragging(true);
+      startPos.current = direction === "horizontal"
+        ? e.touches[0].clientX
+        : e.touches[0].clientY;
+      startSize.current = panelSizes[index] ?? 50;
+    },
+    [direction, panelSizes, index]
+  );
+
   useEffect(() => {
     if (!isDragging) return;
 
@@ -125,13 +137,35 @@ export function ResizableHandle({
       setPanelSize(index + 1, 100 - newSize + (panelSizes[index + 1] ?? 50));
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const currentPos = direction === "horizontal"
+        ? e.touches[0].clientX
+        : e.touches[0].clientY;
+      const delta = currentPos - startPos.current;
+      const container = containerRef.current?.parentElement;
+      if (!container) return;
+      const containerSize = direction === "horizontal"
+        ? container.getBoundingClientRect().width
+        : container.getBoundingClientRect().height;
+      const deltaPercent = (delta / containerSize) * 100;
+      const newSize = Math.max(20, Math.min(80, startSize.current + deltaPercent));
+      setPanelSize(index, newSize);
+      setPanelSize(index + 1, 100 - newSize + (panelSizes[index + 1] ?? 50));
+    };
+
     const handleMouseUp = () => setIsDragging(false);
+    const handleTouchEnd = () => setIsDragging(false);
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd);
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [isDragging, direction, index, setPanelSize, panelSizes]);
 
@@ -142,7 +176,18 @@ export function ResizableHandle({
         direction === "horizontal" ? "w-1 cursor-col-resize" : "h-1 cursor-row-resize"
       } ${className}`}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
+      style={{ touchAction: isDragging ? "none" : "auto" }}
     >
+      {/* Invisible wider touch target */}
+      <div
+        className={`absolute ${
+          direction === "horizontal"
+            ? "left-1/2 -translate-x-1/2 w-3 h-full"
+            : "top-1/2 -translate-y-1/2 h-3 w-full"
+        }`}
+      />
+      {/* Visible thin handle */}
       <div
         className={`absolute inset-0 transition-colors ${
           isDragging ? "bg-[#58a6ff]/30" : "bg-[#30363d]/40 group-hover:bg-[#58a6ff]/20"

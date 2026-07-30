@@ -54,6 +54,7 @@ function WorkspaceContent() {
   const [isFullSimulating, setIsFullSimulating] = useState<boolean>(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"inputs" | "results" | "charts">("inputs");
   const { toggle: toggleDensity } = useDensity();
 
   const handleWorkspaceModeChange = (mode: "pricing" | "implied_vol" | "pnl_explain") => {
@@ -224,73 +225,154 @@ function WorkspaceContent() {
         </div>
       </div>
 
-      {/* 3-Column Resizable Workspace */}
-      <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-180px)]">
-        {/* Left: Inputs */}
-        <ResizablePanel index={0} defaultSize={25} minSize={18} maxSize={40}>
-          <div className="pr-2 h-full overflow-y-auto">
-            <InputPanel
-              initialInputs={inputs}
-              onInputsChange={handleInputsChange}
-              onPreviewSuccess={handlePreviewSuccess}
-              onPreviewError={handlePreviewError}
-              onRunFullSimulation={handleRunFullSimulation}
-              isFullSimulating={isFullSimulating}
-              onMicroStateChange={handleMicroStateChange}
-              workspaceMode={workspaceMode}
-              onWorkspaceModeChange={handleWorkspaceModeChange}
-              marketPrice={marketPrice}
-              onMarketPriceChange={setMarketPrice}
-              onSolveImpliedVol={handleSolveImpliedVol}
-              isSolvingIv={isSolvingIv}
-              pnlShift={pnlShift}
-              onPnLShiftChange={setPnLShift}
-              onCalculatePnLExplain={handleCalculatePnLExplain}
-              isCalculatingPnL={isCalculatingPnL}
-            />
-          </div>
-        </ResizablePanel>
+      {/* Mobile: Tabbed layout */}
+      <div className="block md:hidden">
+        {/* Tab bar */}
+        <div className="flex border-b border-[#21262d] mb-2">
+          {(["inputs", "results", "charts"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setMobileTab(tab)}
+              className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider text-center transition-colors ${
+                mobileTab === tab
+                  ? "text-white border-b-2 border-[#58a6ff]"
+                  : "text-[#6e7681] hover:text-[#8b949e]"
+              }`}
+            >
+              {tab === "inputs" ? "Inputs" : tab === "results" ? "Results" : "Charts"}
+            </button>
+          ))}
+        </div>
 
-        <ResizableHandle index={0} />
+        {/* Tab panels */}
+        <div className="h-[calc(100vh-180px)] h-[calc(100dvh-180px)] overflow-y-auto">
+          {mobileTab === "inputs" && (
+            <div className="h-full overflow-y-auto">
+              <InputPanel
+                initialInputs={inputs}
+                onInputsChange={handleInputsChange}
+                onPreviewSuccess={handlePreviewSuccess}
+                onPreviewError={handlePreviewError}
+                onRunFullSimulation={handleRunFullSimulation}
+                isFullSimulating={isFullSimulating}
+                onMicroStateChange={handleMicroStateChange}
+                workspaceMode={workspaceMode}
+                onWorkspaceModeChange={handleWorkspaceModeChange}
+                marketPrice={marketPrice}
+                onMarketPriceChange={setMarketPrice}
+                onSolveImpliedVol={handleSolveImpliedVol}
+                isSolvingIv={isSolvingIv}
+                pnlShift={pnlShift}
+                onPnLShiftChange={setPnLShift}
+                onCalculatePnLExplain={handleCalculatePnLExplain}
+                isCalculatingPnL={isCalculatingPnL}
+              />
+            </div>
+          )}
+          {mobileTab === "results" && (
+            <div className="h-full overflow-y-auto">
+              <ResultsPanel
+                microState={microState}
+                previewResult={previewResult}
+                fullResult={fullResult}
+                error={error}
+                activeTier={activeTier}
+                isFullSimulating={isFullSimulating}
+                market={inputs.market}
+                workspaceMode={workspaceMode}
+                impliedVolResult={impliedVolResult}
+                isSolvingIv={isSolvingIv}
+                pnlExplainResult={pnlExplainResult}
+                isCalculatingPnL={isCalculatingPnL}
+              />
+              {workspaceMode === "pricing" && (
+                <ExportControls fullResult={fullResult} request={inputs} />
+              )}
+            </div>
+          )}
+          {mobileTab === "charts" && (
+            <div className="h-full overflow-y-auto">
+              {workspaceMode === "pricing" ? (
+                <ChartTabContainer request={inputs} fullResult={fullResult} />
+              ) : (
+                <div className="flex items-center justify-center h-64 text-sm text-[#6e7681] font-mono">
+                  Charts available in Pricing mode
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
-        {/* Center: Results */}
-        <ResizablePanel index={1} defaultSize={45} minSize={30} maxSize={60}>
-          <div className="px-2 h-full overflow-y-auto">
-            <ResultsPanel
-              microState={microState}
-              previewResult={previewResult}
-              fullResult={fullResult}
-              error={error}
-              activeTier={activeTier}
-              isFullSimulating={isFullSimulating}
-              market={inputs.market}
-              workspaceMode={workspaceMode}
-              impliedVolResult={impliedVolResult}
-              isSolvingIv={isSolvingIv}
-              pnlExplainResult={pnlExplainResult}
-              isCalculatingPnL={isCalculatingPnL}
-            />
-            {workspaceMode === "pricing" && (
-              <ExportControls fullResult={fullResult} request={inputs} />
-            )}
-          </div>
-        </ResizablePanel>
+      {/* Desktop: 3-Column Resizable Workspace */}
+      <div className="hidden md:block h-[calc(100vh-180px)]">
+        <ResizablePanelGroup direction="horizontal">
+          {/* Left: Inputs */}
+          <ResizablePanel index={0} defaultSize={25} minSize={18} maxSize={40}>
+            <div className="pr-2 h-full overflow-y-auto">
+              <InputPanel
+                initialInputs={inputs}
+                onInputsChange={handleInputsChange}
+                onPreviewSuccess={handlePreviewSuccess}
+                onPreviewError={handlePreviewError}
+                onRunFullSimulation={handleRunFullSimulation}
+                isFullSimulating={isFullSimulating}
+                onMicroStateChange={handleMicroStateChange}
+                workspaceMode={workspaceMode}
+                onWorkspaceModeChange={handleWorkspaceModeChange}
+                marketPrice={marketPrice}
+                onMarketPriceChange={setMarketPrice}
+                onSolveImpliedVol={handleSolveImpliedVol}
+                isSolvingIv={isSolvingIv}
+                pnlShift={pnlShift}
+                onPnLShiftChange={setPnLShift}
+                onCalculatePnLExplain={handleCalculatePnLExplain}
+                isCalculatingPnL={isCalculatingPnL}
+              />
+            </div>
+          </ResizablePanel>
 
-        <ResizableHandle index={1} />
+          <ResizableHandle index={0} />
 
-        {/* Right: Charts */}
-        <ResizablePanel index={2} defaultSize={30} minSize={20} maxSize={50}>
-          <div className="pl-2 h-full overflow-y-auto">
-            {workspaceMode === "pricing" ? (
-              <ChartTabContainer request={inputs} fullResult={fullResult} />
-            ) : (
-              <div className="flex items-center justify-center h-64 text-sm text-[#6e7681] font-mono">
-                Charts available in Pricing mode
-              </div>
-            )}
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          {/* Center: Results */}
+          <ResizablePanel index={1} defaultSize={45} minSize={30} maxSize={60}>
+            <div className="px-2 h-full overflow-y-auto">
+              <ResultsPanel
+                microState={microState}
+                previewResult={previewResult}
+                fullResult={fullResult}
+                error={error}
+                activeTier={activeTier}
+                isFullSimulating={isFullSimulating}
+                market={inputs.market}
+                workspaceMode={workspaceMode}
+                impliedVolResult={impliedVolResult}
+                isSolvingIv={isSolvingIv}
+                pnlExplainResult={pnlExplainResult}
+                isCalculatingPnL={isCalculatingPnL}
+              />
+              {workspaceMode === "pricing" && (
+                <ExportControls fullResult={fullResult} request={inputs} />
+              )}
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle index={1} />
+
+          {/* Right: Charts */}
+          <ResizablePanel index={2} defaultSize={30} minSize={20} maxSize={50}>
+            <div className="pl-2 h-full overflow-y-auto">
+              {workspaceMode === "pricing" ? (
+                <ChartTabContainer request={inputs} fullResult={fullResult} />
+              ) : (
+                <div className="flex items-center justify-center h-64 text-sm text-[#6e7681] font-mono">
+                  Charts available in Pricing mode
+                </div>
+              )}
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
 
       <ShortcutsHelp isOpen={showHelp} onClose={() => setShowHelp(false)} />
     </div>
