@@ -14,7 +14,7 @@ const toc = [
   { id: "pnl", label: "9. P&L Explain" },
   { id: "risk-grid", label: "10. Risk Grid" },
   { id: "assumptions", label: "11. Assumptions" },
-  { id: "design", label: "12. Design Decisions" },
+  { id: "design", label: "12. Design FAQ" },
 ];
 
 function SectionCard({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) {
@@ -446,11 +446,11 @@ export default function DocsPage() {
       </SectionCard>
 
       {/* ════════════════════════════════════════════════════════════ 12. Cheat Sheet */}
-      <SectionCard id="design" title="12. Defensible Design Decisions (Interview Cheat Sheet)">
+      <SectionCard id="design" title="12. Design Decisions FAQ">
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono text-left">
             <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
-              <tr><th className="p-2.5">Question</th><th className="p-2.5">One-Line Answer</th></tr>
+              <tr><th className="p-2.5">Question</th>            <th className="p-2.5">Rationale</th></tr>
             </thead>
             <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
               {[
