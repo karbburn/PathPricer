@@ -20,16 +20,16 @@ const presetTickers: TickerItem[] = [
 
 export function TickerStrip() {
   return (
-    <div className="h-10 bg-[#0a0f1a] border-b border-slate-800 flex items-center overflow-x-auto scrollbar-thin">
+    <div className="h-10 bg-[#0d1117] border-b border-[#21262d] flex items-center overflow-x-auto scrollbar-thin">
       <div className="flex items-center gap-6 px-4 whitespace-nowrap">
         {presetTickers.map((ticker) => (
           <button
             key={ticker.symbol}
-            className="flex items-center gap-2 text-[10px] font-mono hover:bg-slate-800/40 px-2 py-1 rounded transition-colors"
+            className="flex items-center gap-2 text-[10px] font-mono hover:bg-[#21262d]/40 px-2 py-1 rounded transition-colors"
           >
-            <span className="text-slate-400 font-semibold">{ticker.symbol}</span>
-            <span className="text-slate-200">{ticker.price}</span>
-            <span className={ticker.positive ? "text-emerald-400" : "text-red-400"}>
+            <span className="text-[#6e7681] font-semibold">{ticker.symbol}</span>
+            <span className="text-[#e6edf3]">{ticker.price}</span>
+            <span className={ticker.positive ? "text-[#3fb950]" : "text-[#f85149]"}>
               {ticker.positive ? "▲" : "▼"} {ticker.changePercent}
             </span>
           </button>

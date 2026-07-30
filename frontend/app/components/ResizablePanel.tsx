@@ -145,7 +145,7 @@ export function ResizableHandle({
     >
       <div
         className={`absolute inset-0 transition-colors ${
-          isDragging ? "bg-cyan-500/30" : "bg-slate-700/40 group-hover:bg-cyan-500/20"
+          isDragging ? "bg-[#58a6ff]/30" : "bg-[#30363d]/40 group-hover:bg-[#58a6ff]/20"
         }`}
       />
     </div>

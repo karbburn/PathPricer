@@ -153,26 +153,26 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6 shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-6 space-y-6 shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#21262d] pb-4">
         <div>
           <h3 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
-            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 2D Risk Surface Heatmap</span>
+            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-[#58a6ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 2D Risk Surface Heatmap</span>
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[#6e7681] mt-0.5">
             Vectorized Black-Scholes surface evaluation across 2D parameter grid (25×25)
           </p>
         </div>
 
         {/* Preset Selector */}
-        <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 gap-1">
+        <div className="flex bg-[#0d1117] p-1 rounded-lg border border-[#21262d] gap-1">
           <button
             type="button"
             onClick={() => handlePresetChange("spot_vol")}
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "spot_vol"
-                ? "bg-cyan-500 text-slate-950 font-bold shadow"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
+                : "text-[#6e7681] hover:text-white"
             }`}
           >
             Spot × Vol (Classic)
@@ -182,8 +182,8 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             onClick={() => handlePresetChange("strike_expiry")}
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "strike_expiry"
-                ? "bg-cyan-500 text-slate-950 font-bold shadow"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
+                : "text-[#6e7681] hover:text-white"
             }`}
           >
             Strike × Expiry
@@ -193,8 +193,8 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             onClick={() => setPreset("custom")}
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "custom"
-                ? "bg-teal-600 text-white font-bold shadow"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
+                : "text-[#6e7681] hover:text-white"
             }`}
           >
             Custom Grid
@@ -203,15 +203,15 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
       </div>
 
       {/* Metric Selector & Axis Configurator */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950/60 p-4 rounded-lg border border-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#0d1117]/60 p-4 rounded-lg border border-[#21262d]">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#6e7681] mb-1">
             Target Metric
           </label>
           <select
             value={metric}
             onChange={(e) => setMetric(e.target.value as RiskGridMetric)}
-            className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-white"
+            className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
           >
             {Object.entries(METRIC_LABELS).map(([k, label]) => (
               <option key={k} value={k}>
@@ -224,13 +224,13 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
         {preset === "custom" && (
           <>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#6e7681] mb-1">
                 X-Axis Parameter
               </label>
               <select
                 value={axisX}
                 onChange={(e) => setAxisX(e.target.value as RiskGridAxis)}
-                className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-white"
+                className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
               >
                 {Object.entries(PARAM_LABELS)
                   .filter(([k]) => k !== axisY)
@@ -243,13 +243,13 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#6e7681] mb-1">
                 Y-Axis Parameter
               </label>
               <select
                 value={axisY}
                 onChange={(e) => setAxisY(e.target.value as RiskGridAxis)}
-                className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-white"
+                className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
               >
                 {Object.entries(PARAM_LABELS)
                   .filter(([k]) => k !== axisX)
@@ -273,7 +273,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
       {/* Heatmap Area */}
       {isLoading ? (
-        <div className="h-[380px] flex items-center justify-center bg-slate-950/50 rounded-lg border border-slate-800">
+        <div className="h-[380px] flex items-center justify-center bg-[#0d1117]/50 rounded-lg border border-[#21262d]">
           <div className="text-xs text-teal-400 font-mono animate-pulse">
             <svg className="inline w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Evaluating vectorized 2D Black-Scholes meshgrid...
           </div>
@@ -281,27 +281,27 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
       ) : gridData ? (
         <div className="space-y-3">
           {/* Active Hover Tooltip Diagnostic Bar */}
-          <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded-lg flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400">
+          <div className="bg-[#0d1117] border border-[#21262d] px-4 py-2 rounded-lg flex items-center justify-between text-xs font-mono">
+            <span className="text-[#6e7681]">
               {hoveredCell
                 ? `Cell Details: [${PARAM_LABELS[axisX]} = ${formatAxisVal(axisX, hoveredCell.x)}, ${
                     PARAM_LABELS[axisY]
                   } = ${formatAxisVal(axisY, hoveredCell.y)}]`
                 : "Hover over any grid cell to view exact coordinates & metric value"}
             </span>
-            <span className="text-cyan-400 font-bold">
+            <span className="text-[#58a6ff] font-bold">
               {hoveredCell ? `${METRIC_LABELS[metric]}: ${hoveredCell.val.toFixed(4)}` : ""}
             </span>
           </div>
 
           {/* 2D Heatmap Grid Container */}
           <div className="flex flex-col items-center">
-            <div className="text-xs font-mono font-bold text-slate-400 mb-1">
+            <div className="text-xs font-mono font-bold text-[#6e7681] mb-1">
               Y-Axis ↑ {PARAM_LABELS[axisY]}
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="text-[10px] font-mono text-slate-500 flex flex-col justify-between h-64 text-right">
+              <div className="text-[10px] font-mono text-[#6e7681] flex flex-col justify-between h-64 text-right">
                 <span>{formatAxisVal(axisY, gridData.y_values[gridData.y_values.length - 1])}</span>
                 <span>{formatAxisVal(axisY, gridData.y_values[Math.floor(gridData.y_values.length / 2)])}</span>
                 <span>{formatAxisVal(axisY, gridData.y_values[0])}</span>
@@ -309,7 +309,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
               {/* Grid Cells matrix */}
               <div
-                className="grid gap-[1px] bg-slate-950 p-1 rounded-lg border border-slate-800 w-full max-w-xl h-64"
+                className="grid gap-[1px] bg-[#0d1117] p-1 rounded-lg border border-[#21262d] w-full max-w-xl h-64"
                 style={{ gridTemplateColumns: "repeat(25, minmax(0, 1fr))" }}
               >
                 {gridData.grid
@@ -336,7 +336,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
               </div>
             </div>
 
-            <div className="text-xs font-mono font-bold text-slate-400 mt-1">
+            <div className="text-xs font-mono font-bold text-[#6e7681] mt-1">
               X-Axis → {PARAM_LABELS[axisX]} ({formatAxisVal(axisX, gridData.x_values[0])} to{" "}
               {formatAxisVal(axisX, gridData.x_values[gridData.x_values.length - 1])})
             </div>
@@ -344,11 +344,11 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
           {/* Color Legend Bar */}
           <div className="flex items-center justify-between pt-2">
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-xs font-mono text-[#6e7681]">
               Min: {minVal.toFixed(4)}
             </span>
-            <div className="flex-1 max-w-md mx-4 h-3 rounded-full bg-gradient-to-r from-[hsl(240,80%,25%)] via-[hsl(120,80%,45%)] to-[hsl(0,80%,60%)] border border-slate-800" />
-            <span className="text-xs font-mono text-slate-400">
+            <div className="flex-1 max-w-md mx-4 h-3 rounded-full bg-gradient-to-r from-[hsl(240,80%,25%)] via-[hsl(120,80%,45%)] to-[hsl(0,80%,60%)] border border-[#21262d]" />
+            <span className="text-xs font-mono text-[#6e7681]">
               Max: {maxVal.toFixed(4)}
             </span>
           </div>

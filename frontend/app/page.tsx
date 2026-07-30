@@ -77,23 +77,23 @@ export default function MarketOverviewPage() {
         <h1 className="text-lg font-bold text-white tracking-tight uppercase font-mono">
           Market Overview
         </h1>
-        <p className="text-xs text-slate-400 font-mono mt-1">
+        <p className="text-xs text-[#6e7681] font-mono mt-1">
           Underlying asset data, historical volatility, and dividend yields
         </p>
       </div>
 
       {/* Search Bar & Market Selector */}
-      <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 mb-6">
+      <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-4 mb-6">
         <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-4">
           {/* Market Toggle */}
-          <div className="flex bg-slate-950 p-1 rounded border border-slate-800 w-full sm:w-auto">
+          <div className="flex bg-[#0d1117] p-1 rounded border border-[#21262d] w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setMarketInput("US")}
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
                 marketInput === "US"
-                  ? "bg-cyan-600 text-white"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-[#238636] text-white"
+                  : "text-[#6e7681] hover:text-white"
               }`}
             >
               US Market
@@ -103,8 +103,8 @@ export default function MarketOverviewPage() {
               onClick={() => setMarketInput("IN")}
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
                 marketInput === "IN"
-                  ? "bg-cyan-600 text-white"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-[#238636] text-white"
+                  : "text-[#6e7681] hover:text-white"
               }`}
             >
               IN Market (.NS)
@@ -117,27 +117,27 @@ export default function MarketOverviewPage() {
             onChange={(val) => setTickerInput(val)}
             market={marketInput}
             onSelectTicker={(selectedTicker) => fetchQuote(selectedTicker, marketInput)}
-            accentColor="cyan"
+            accentColor="#58a6ff"
           />
 
           {/* Fetch Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50"
+            className="w-full sm:w-auto bg-[#238636] hover:bg-[#2ea043] text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50"
           >
             {loading ? "Fetching..." : "Fetch Quote"}
           </button>
         </form>
 
         {/* Preset Quick Tickers */}
-        <div className="mt-4 pt-4 border-t border-slate-800/60 flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-slate-300 mr-2 font-medium">Quick Presets:</span>
+        <div className="mt-4 pt-4 border-t border-[#21262d]/60 flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-[#8b949e] mr-2 font-medium">Quick Presets:</span>
           {PRESET_TICKERS.map((item) => (
             <button
               key={item.ticker}
               onClick={() => handlePresetClick(item.ticker, item.market)}
-              className="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-1 rounded transition-colors font-mono"
+              className="text-xs bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[#8b949e] px-3 py-1 rounded transition-colors font-mono"
             >
               {item.ticker} ({item.market})
             </button>
@@ -147,21 +147,21 @@ export default function MarketOverviewPage() {
 
       {/* Loading Skeleton */}
       {loading && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-8 text-center animate-pulse">
-          <div className="h-6 bg-slate-800 rounded w-1/4 mx-auto mb-4"></div>
-          <div className="h-12 bg-slate-800 rounded w-1/2 mx-auto mb-6"></div>
+        <div className="bg-[#161b22]/50 border border-[#21262d] rounded-lg p-8 text-center animate-pulse">
+          <div className="h-6 bg-[#21262d] rounded w-1/4 mx-auto mb-4"></div>
+          <div className="h-12 bg-[#21262d] rounded w-1/2 mx-auto mb-6"></div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="h-20 bg-slate-800 rounded"></div>
-            <div className="h-20 bg-slate-800 rounded"></div>
-            <div className="h-20 bg-slate-800 rounded"></div>
-            <div className="h-20 bg-slate-800 rounded"></div>
+            <div className="h-20 bg-[#21262d] rounded"></div>
+            <div className="h-20 bg-[#21262d] rounded"></div>
+            <div className="h-20 bg-[#21262d] rounded"></div>
+            <div className="h-20 bg-[#21262d] rounded"></div>
           </div>
         </div>
       )}
 
       {/* 404 Error State & Manual Fallback Form */}
       {!loading && error && (
-        <div className="bg-slate-900 border border-red-500/40 rounded-lg overflow-hidden mb-8">
+        <div className="bg-[#161b22] border border-red-500/40 rounded-lg overflow-hidden mb-8">
           <div className="bg-red-950/50 px-6 py-4 border-b border-red-900/60 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-red-900/80 border border-red-700 flex items-center justify-center">
@@ -177,46 +177,46 @@ export default function MarketOverviewPage() {
           </div>
 
           <div className="px-6 py-5 space-y-4">
-            <p className="text-sm text-slate-300 leading-relaxed">{error.message}</p>
+            <p className="text-sm text-[#8b949e] leading-relaxed">{error.message}</p>
 
             {error.fallback_available && (
-              <div className="bg-slate-950 border border-slate-800 rounded-lg p-5 mt-4">
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+              <div className="bg-[#0d1117] border border-[#21262d] rounded-lg p-5 mt-4">
+                <h4 className="text-xs font-bold text-[#8b949e] uppercase tracking-wider mb-2">
                   Manual Entry Available
                 </h4>
-                <p className="text-xs text-slate-300 mb-4">
-                  Enter parameters manually to proceed to the Pricing Workspace for <span className="text-slate-300 font-mono font-bold">{error.field || tickerInput}</span>.
+                <p className="text-xs text-[#8b949e] mb-4">
+                  Enter parameters manually to proceed to the Pricing Workspace for <span className="text-[#8b949e] font-mono font-bold">{error.field || tickerInput}</span>.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                   <div>
-                    <label className="block text-xs text-slate-300 mb-1">Spot Price</label>
+                    <label className="block text-xs text-[#8b949e] mb-1">Spot Price</label>
                     <input
                       type="number"
                       step="0.01"
                       value={manualSpot}
                       onChange={(e) => setManualSpot(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-300 mb-1">Volatility</label>
+                    <label className="block text-xs text-[#8b949e] mb-1">Volatility</label>
                     <input
                       type="number"
                       step="0.01"
                       value={manualVol}
                       onChange={(e) => setManualVol(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-300 mb-1">Dividend Yield</label>
+                    <label className="block text-xs text-[#8b949e] mb-1">Dividend Yield</label>
                     <input
                       type="number"
                       step="0.001"
                       value={manualDiv}
                       onChange={(e) => setManualDiv(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff]"
                     />
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export default function MarketOverviewPage() {
                   href={`/workspace?ticker=${encodeURIComponent(
                     tickerInput
                   )}&market=${marketInput}&spot_override=${manualSpot}&volatility=${manualVol}&dividend_yield=${manualDiv}`}
-                  className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
                 >
                   <span>Proceed to Workspace</span>
                   <span>&rarr;</span>
@@ -240,22 +240,22 @@ export default function MarketOverviewPage() {
       {!loading && quote && (
         <div className="space-y-6">
           {/* Top Metric Header */}
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-3 mb-1">
                 <h2 className="text-2xl font-bold text-white tracking-tight">
                   {quote.ticker}
                 </h2>
-                <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
+                <span className="text-xs px-2 py-0.5 rounded bg-[#21262d] text-[#8b949e] font-mono">
                   {quote.market} &bull; {quote.resolved_symbol}
                 </span>
                 {quote.currency && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">
+                  <span className="text-xs px-2 py-0.5 rounded bg-[#0d1117] text-[#79c0ff] border border-[#21262d] font-mono">
                     {quote.currency}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-300 font-mono">
+              <p className="text-xs text-[#8b949e] font-mono">
                 Delayed Data (yfinance) &bull; Last Updated: {formatDateTime(quote.last_updated)}
               </p>
             </div>
@@ -284,7 +284,7 @@ export default function MarketOverviewPage() {
               )}&market=${quote.market}&spot_override=${quote.spot_price}&volatility=${
                 quote.historical_volatility["252d"] || 0.25
               }&dividend_yield=${quote.dividend_yield}`}
-              className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-cyan-950/40 flex items-center gap-2"
+              className="bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-[#0d1117]/40 flex items-center gap-2"
             >
               <span>Open in Pricing Workspace</span>
               <span>&rarr;</span>
@@ -293,8 +293,8 @@ export default function MarketOverviewPage() {
 
           {/* Data Warnings if present */}
           {quote.data_warnings && quote.data_warnings.length > 0 && (
-            <div className="bg-amber-950/40 border border-amber-800/80 rounded-lg p-4 text-xs text-amber-300 space-y-1 font-mono">
-              <div className="font-bold text-amber-200">Data Quality Warning:</div>
+            <div className="bg-[#161b22]/40 border border-[#30363d]/80 rounded-lg p-4 text-xs text-[#d29922] space-y-1 font-mono">
+              <div className="font-bold text-[#d29922]">Data Quality Warning:</div>
               {quote.data_warnings.map((warn, i) => (
                 <div key={i}>&bull; {warn}</div>
               ))}
@@ -302,33 +302,33 @@ export default function MarketOverviewPage() {
           )}
 
           {/* Historical Volatility Grid */}
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-            <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-4">
+          <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6">
+            <h3 className="text-xs font-bold text-[#58a6ff] uppercase tracking-wider mb-4">
               Realized Historical Volatility (Close-to-Close Log Returns)
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-300 font-mono block mb-1">20-Day Vol</span>
+              <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+                <span className="text-xs text-[#8b949e] font-mono block mb-1">20-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["20d"] || 0)}
                 </span>
               </div>
-              <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-300 font-mono block mb-1">60-Day Vol</span>
+              <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+                <span className="text-xs text-[#8b949e] font-mono block mb-1">60-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["60d"] || 0)}
                 </span>
               </div>
-              <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-300 font-mono block mb-1">126-Day Vol</span>
+              <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+                <span className="text-xs text-[#8b949e] font-mono block mb-1">126-Day Vol</span>
                 <span className="text-xl font-bold font-mono text-white">
                   {formatPercent(quote.historical_volatility["126d"] || 0)}
                 </span>
               </div>
-              <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                <span className="text-xs text-slate-300 font-mono block mb-1">252-Day Vol (1 Year)</span>
-                <span className="text-xl font-bold font-mono text-cyan-400">
+              <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+                <span className="text-xs text-[#8b949e] font-mono block mb-1">252-Day Vol (1 Year)</span>
+                <span className="text-xl font-bold font-mono text-[#58a6ff]">
                   {formatPercent(quote.historical_volatility["252d"] || 0)}
                 </span>
               </div>
@@ -337,8 +337,8 @@ export default function MarketOverviewPage() {
 
           {/* Secondary Financial Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
+            <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6">
+              <span className="text-xs font-bold text-[#8b949e] uppercase tracking-wider block mb-2">
                 Dividend Yield (q)
               </span>
               <span className="text-2xl font-bold font-mono text-white">
@@ -346,8 +346,8 @@ export default function MarketOverviewPage() {
               </span>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
+            <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6">
+              <span className="text-xs font-bold text-[#8b949e] uppercase tracking-wider block mb-2">
                 Market Capitalization
               </span>
               <span className="text-2xl font-bold font-mono text-white">
@@ -355,8 +355,8 @@ export default function MarketOverviewPage() {
               </span>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
+            <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6">
+              <span className="text-xs font-bold text-[#8b949e] uppercase tracking-wider block mb-2">
                 Quote Currency
               </span>
               <span className="text-2xl font-bold font-mono text-white">

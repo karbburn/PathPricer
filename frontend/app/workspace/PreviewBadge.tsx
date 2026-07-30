@@ -50,9 +50,9 @@ export function PreviewBadge({
   if (tier === "pending") {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-slate-300 text-xs font-mono animate-pulse ${className}`}
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/90 border border-[#30363d] text-[#8b949e] text-xs font-mono animate-pulse ${className}`}
       >
-        <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+        <span className="w-2 h-2 rounded-full bg-[#6e7681]"></span>
         <span className="tracking-wide">PENDING &bull; DEBOUNCING...</span>
       </div>
     );
@@ -62,9 +62,9 @@ export function PreviewBadge({
   if (tier === "computing") {
     return (
       <div
-        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/80 text-amber-300 text-xs font-mono font-bold shadow-md shadow-amber-950/50 ${className}`}
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/80 border border-[#d29922]/80 text-[#d29922] text-xs font-mono font-bold shadow-md shadow-[#0d1117]/50 ${className}`}
       >
-        <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span className="w-2 h-2 rounded-full bg-[#d29922]"></span>
         <span className="tracking-wide">
           COMPUTING &bull; {elapsedMs}ms
         </span>
@@ -88,10 +88,10 @@ export function PreviewBadge({
   if (tier === "full") {
     return (
       <div
-        className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/90 border-2 border-cyan-400 text-cyan-200 text-xs font-mono font-extrabold shadow-lg shadow-cyan-950/60 ${className}`}
+        className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0d1117]/90 border-2 border-[#58a6ff] text-[#79c0ff] text-xs font-mono font-extrabold shadow-lg shadow-[#0d1117]/60 ${className}`}
       >
         <span className="inline-flex items-center justify-center w-4 h-4">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-[#58a6ff]">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </span>
@@ -99,12 +99,12 @@ export function PreviewBadge({
           VALIDATED &bull; N={nSimulations.toLocaleString()}
         </span>
         {computeMs !== undefined && (
-          <span className="text-cyan-300/80 font-normal border-l border-cyan-800 pl-2">
+          <span className="text-[#79c0ff]/80 font-normal border-l border-[#21262d] pl-2">
             {computeMs.toFixed(1)}ms
           </span>
         )}
         {timestamp && (
-          <span className="text-cyan-400/60 text-xs hidden sm:inline">
+          <span className="text-[#58a6ff]/60 text-xs hidden sm:inline">
             [{timestamp}]
           </span>
         )}
@@ -115,14 +115,14 @@ export function PreviewBadge({
   // 5. Preview State (Muted / Desaturated Slate Neutral)
   return (
     <div
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-800 text-slate-400 text-xs font-mono opacity-80 hover:opacity-100 transition-opacity ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/90 border border-[#21262d] text-[#6e7681] text-xs font-mono opacity-80 hover:opacity-100 transition-opacity ${className}`}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+      <span className="w-1.5 h-1.5 rounded-full bg-[#6e7681]"></span>
       <span className="tracking-wide">
         PREVIEW &bull; ~N={nSimulations.toLocaleString()}
       </span>
       {computeMs !== undefined && (
-        <span className="text-slate-400 text-xs">
+        <span className="text-[#6e7681] text-xs">
           ({computeMs.toFixed(1)}ms)
         </span>
       )}

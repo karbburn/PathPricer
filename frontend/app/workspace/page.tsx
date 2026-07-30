@@ -208,19 +208,19 @@ function WorkspaceContent() {
   return (
     <div className="max-w-[1600px] mx-auto px-4 py-4">
       {/* Workspace Header */}
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#21262d]">
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-bold text-white tracking-tight uppercase font-mono">
             {workspaceMode === "implied_vol" ? "IV Solver" : workspaceMode === "pnl_explain" ? "P&L Explain" : "Pricing"}
           </h1>
           {inputs.ticker && (
-            <span className="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded border border-slate-700">
+            <span className="text-[10px] font-mono text-[#6e7681] bg-[#21262d]/60 px-2 py-0.5 rounded border border-[#30363d]">
               {inputs.ticker} · {inputs.market}
             </span>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono text-slate-500">Ctrl+Enter → Run</span>
+          <span className="text-[10px] font-mono text-[#6e7681]">Ctrl+Enter → Run</span>
         </div>
       </div>
 
@@ -284,7 +284,7 @@ function WorkspaceContent() {
             {workspaceMode === "pricing" ? (
               <ChartTabContainer request={inputs} fullResult={fullResult} />
             ) : (
-              <div className="flex items-center justify-center h-64 text-sm text-slate-500 font-mono">
+              <div className="flex items-center justify-center h-64 text-sm text-[#6e7681] font-mono">
                 Charts available in Pricing mode
               </div>
             )}

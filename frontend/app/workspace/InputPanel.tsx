@@ -179,19 +179,19 @@ export function InputPanel({
 
   return (
     <div
-      className={`bg-slate-900 border border-slate-800 rounded-xl shadow-xl space-y-6 ${
+      className={`bg-[#161b22] border border-[#21262d] rounded-xl shadow-xl space-y-6 ${
         density === "compact" ? "p-4" : "p-6"
       }`}
     >
       {/* Mode Selector Tabs */}
       {onWorkspaceModeChange && (
-        <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 gap-1 overflow-x-auto">
+        <div className="flex bg-[#0d1117] p-1 rounded-lg border border-[#21262d] gap-1 overflow-x-auto">
           <button
             type="button"
             onClick={() => onWorkspaceModeChange("pricing")}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
+            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pricing"
-                ? "bg-cyan-500 text-slate-950 shadow"
+                ? "bg-[#238636] text-[#0d1117] shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -200,9 +200,9 @@ export function InputPanel({
           <button
             type="button"
             onClick={() => onWorkspaceModeChange("implied_vol")}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
+            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "implied_vol"
-                ? "bg-cyan-600 text-white shadow"
+                ? "bg-[#238636] text-white shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -211,9 +211,9 @@ export function InputPanel({
           <button
             type="button"
             onClick={() => onWorkspaceModeChange("pnl_explain")}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 ${
+            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pnl_explain"
-                ? "bg-cyan-600 text-white shadow"
+                ? "bg-[#238636] text-white shadow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -222,7 +222,7 @@ export function InputPanel({
         </div>
       )}
 
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="flex items-center justify-between border-b border-[#21262d] pb-3">
         <h2 className="text-lg font-bold text-white tracking-wide">
           {workspaceMode === "implied_vol"
             ? "IV Solver Inputs"
@@ -238,7 +238,7 @@ export function InputPanel({
 
       {/* 1. Underlying Ticker & Market Selection */}
       <div className="space-y-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
           Underlying Asset
         </label>
 
@@ -255,19 +255,19 @@ export function InputPanel({
               type="button"
               onClick={handleMarketFetch}
               disabled={fetchingMarket}
-              className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap"
+              className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               {fetchingMarket ? "Syncing..." : "Sync Market"}
             </button>
           </div>
 
-          <div className="flex bg-slate-950 p-1 rounded border border-slate-700">
+          <div className="flex bg-[#0d1117] p-1 rounded border border-[#30363d]">
             <button
               type="button"
               onClick={() => updateField("market", "US")}
-              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
+              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "US"
-                  ? "bg-cyan-600 text-white"
+                  ? "bg-[#238636] text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -276,9 +276,9 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => updateField("market", "IN")}
-              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors ${
+              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "IN"
-                  ? "bg-cyan-600 text-white"
+                  ? "bg-[#238636] text-white"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -299,7 +299,7 @@ export function InputPanel({
                 updateField("spot_override", e.target.value ? roundClean(Number(e.target.value), 2) : null)
               }
               placeholder="Market default"
-              className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-1.5 text-sm text-white font-mono"
+              className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
           <div>
@@ -309,11 +309,11 @@ export function InputPanel({
               step="0.001"
               value={inputs.dividend_yield ?? 0}
               onChange={(e) => updateField("dividend_yield", roundClean(Number(e.target.value), 4))}
-              className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-1.5 text-sm text-white font-mono"
+              className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
             {(!inputs.dividend_yield || inputs.dividend_yield === 0) && (
-              <p className="text-[10px] text-cyan-400/90 mt-1 font-mono flex items-center gap-1">
-                <span className="text-amber-400"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Dividend yield 0.0% (defaulted/no payout)
+              <p className="text-[10px] text-[#58a6ff]/90 mt-1 font-mono flex items-center gap-1">
+                <span className="text-[#d29922]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Dividend yield 0.0% (defaulted/no payout)
               </p>
             )}
           </div>
@@ -323,14 +323,14 @@ export function InputPanel({
       {/* 2. Option Type & Strike Price */}
       <div className="space-y-3 pt-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-cyan-400">
+          <label className="text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             Contract Terms
           </label>
-          <div className="flex bg-slate-950 p-1 rounded border border-slate-700">
+          <div className="flex bg-[#0d1117] p-1 rounded border border-[#30363d]">
             <button
               type="button"
               onClick={() => updateField("option_type", "call")}
-              className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
+              className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "call"
                   ? "bg-slate-700 text-white"
                   : "text-slate-400 hover:text-white"
@@ -341,7 +341,7 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => updateField("option_type", "put")}
-              className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
+              className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "put"
                   ? "bg-slate-700 text-white"
                   : "text-slate-400 hover:text-white"
@@ -361,7 +361,7 @@ export function InputPanel({
               step={strikeStep}
               value={inputs.strike}
               onChange={(e) => updateField("strike", Number(e.target.value))}
-              className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
           <input
@@ -371,7 +371,7 @@ export function InputPanel({
             step={strikeStep}
             value={inputs.strike}
             onChange={(e) => updateField("strike", Number(e.target.value))}
-            className="w-full accent-cyan-500 cursor-pointer"
+            className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           />
         </div>
 
@@ -382,21 +382,21 @@ export function InputPanel({
             type="date"
             value={inputs.expiry_date}
             onChange={(e) => updateField("expiry_date", e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-sm text-white font-mono"
+            className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           />
         </div>
       </div>
 
       {/* 3. Market Risk Parameters */}
       <div className="space-y-3 pt-3">
-        <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
           {workspaceMode === "implied_vol" ? "Target Market Price & Rates" : "Risk & Volatility Parameters"}
         </label>
 
         {workspaceMode === "implied_vol" ? (
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-bold text-cyan-300">
+              <label className="text-xs font-bold text-[#79c0ff]">
                 Market Option Price (V_mkt)
               </label>
             </div>
@@ -406,7 +406,7 @@ export function InputPanel({
               min="0.01"
               value={marketPrice}
               onChange={(e) => onMarketPriceChange && onMarketPriceChange(Number(e.target.value))}
-              className="w-full bg-slate-950 border border-cyan-500/60 focus:border-cyan-400 rounded px-3 py-2 text-sm font-mono text-white font-bold"
+              className="w-full bg-[#0d1117] border border-[#58a6ff]/60 focus:border-[#58a6ff] rounded px-3 py-2 text-sm font-mono text-white font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               placeholder="e.g. 5.25"
             />
           </div>
@@ -421,7 +421,7 @@ export function InputPanel({
                 step="0.01"
                 value={inputs.volatility}
                 onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
-                className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -431,7 +431,7 @@ export function InputPanel({
               step="0.01"
               value={inputs.volatility}
               onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
-              className="w-full accent-cyan-500 cursor-pointer"
+              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
         )}
@@ -447,7 +447,7 @@ export function InputPanel({
               step="0.005"
               value={inputs.risk_free_rate}
               onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
-              className="w-24 bg-slate-950 border border-slate-700/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+              className="w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
           <input
@@ -457,7 +457,7 @@ export function InputPanel({
             step="0.0025"
             value={inputs.risk_free_rate}
             onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
-            className="w-full accent-cyan-500 cursor-pointer"
+            className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           />
         </div>
       </div>
@@ -465,7 +465,7 @@ export function InputPanel({
       {/* 4. Simulation Engine Controls (Pricing Mode Only) */}
       {workspaceMode === "pricing" && (
         <div className="space-y-3 pt-3">
-          <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             Simulation Controls
           </label>
 
@@ -480,10 +480,10 @@ export function InputPanel({
                   key={nVal}
                   type="button"
                   onClick={() => updateField("n_simulations", nVal)}
-                  className={`py-1 text-xs font-mono rounded transition-colors ${
+                  className={`py-1 text-xs font-mono rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                     inputs.n_simulations === nVal
-                      ? "bg-cyan-600 text-white font-bold"
-                      : "bg-slate-950 text-slate-400 hover:text-white border border-slate-800"
+                      ? "bg-[#238636] text-white font-bold"
+                      : "bg-[#0d1117] text-slate-400 hover:text-white border border-[#21262d]"
                   }`}
                 >
                   {nVal >= 1000000 ? `${nVal / 1000000}M` : `${nVal / 1000}k`}
@@ -497,7 +497,7 @@ export function InputPanel({
               step="5000"
               value={inputs.n_simulations}
               onChange={(e) => updateField("n_simulations", Number(e.target.value))}
-              className="w-full accent-cyan-500 cursor-pointer"
+              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
 
@@ -509,7 +509,7 @@ export function InputPanel({
               onChange={(e) =>
                 updateField("variance_reduction", e.target.value as VarianceReductionMethod)
               }
-              className="w-full bg-slate-950 border border-slate-700/50 rounded px-3 py-2 text-xs font-mono text-white"
+              className="w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-xs font-mono text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               <option value="all">All 5 Estimators (Standard / Anti / CV / Combined / RQMC)</option>
               <option value="standard">Standard Monte Carlo</option>
@@ -529,23 +529,23 @@ export function InputPanel({
                 value={inputs.seed}
                 disabled={seedLocked}
                 onChange={(e) => updateField("seed", Number(e.target.value))}
-                className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50"
+                className="flex-1 bg-[#0d1117] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
               <button
                 type="button"
                 onClick={handleRandomizeSeed}
                 disabled={seedLocked}
-                className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50"
+                className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               >
                 Randomize
               </button>
               <button
                 type="button"
                 onClick={() => setSeedLocked(!seedLocked)}
-                className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors ${
+                className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                   seedLocked
-                    ? "bg-amber-950 border-amber-700 text-amber-300"
-                    : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
+                    ? "bg-[#161b22] border-[#30363d] text-[#d29922]"
+                    : "bg-[#161b22] border-[#30363d] text-slate-400 hover:text-white"
                 }`}
               >
                 {seedLocked ? "Locked" : "Unlocked"}
@@ -557,8 +557,8 @@ export function InputPanel({
 
       {/* 4. Scenario Shift Parameters (P&L Explain Mode Only) */}
       {workspaceMode === "pnl_explain" && (
-        <div className="space-y-3 pt-3 border-t border-slate-800">
-          <label className="block text-xs font-bold uppercase tracking-wider text-cyan-400">
+        <div className="space-y-3 pt-3 border-t border-[#21262d]">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
             Hypothetical Scenario Shifts
           </label>
 
@@ -575,7 +575,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
                 }
-                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -587,7 +587,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
               }
-              className="w-full accent-cyan-500 cursor-pointer"
+              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
 
@@ -604,7 +604,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
                 }
-                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -616,7 +616,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
               }
-              className="w-full accent-cyan-500 cursor-pointer"
+              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
 
@@ -635,7 +635,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.max(0, Number(e.target.value)) })
                 }
-                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -647,7 +647,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Number(e.target.value) })
               }
-              className="w-full accent-cyan-500 cursor-pointer"
+              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
 
@@ -664,7 +664,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
                 }
-                className="w-24 bg-slate-950 border border-cyan-500/50 rounded px-2 py-1 text-xs font-mono text-right text-white"
+                className="w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -676,7 +676,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
               }
-              className="w-full accent-cyan-500 cursor-pointer"
+              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
         </div>
@@ -689,7 +689,7 @@ export function InputPanel({
             type="button"
             disabled={isSolvingIv}
             onClick={onSolveImpliedVol}
-            className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-cyan-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-[#0d1117]/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
             <span>{isSolvingIv ? "Solving Volatility..." : <><svg className="inline w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Solve Implied Volatility</>}</span>
           </button>
@@ -698,7 +698,7 @@ export function InputPanel({
             type="button"
             disabled={isCalculatingPnL}
             onClick={onCalculatePnLExplain}
-            className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-cyan-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-[#0d1117]/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
             <span>{isCalculatingPnL ? "Calculating P&L Attribution..." : <><svg className="inline w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg> Explain P&L Attribution</>}</span>
           </button>
@@ -708,15 +708,15 @@ export function InputPanel({
               type="button"
               disabled={isFullSimulating}
               onClick={() => onRunFullSimulation(inputs)}
-              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-cyan-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-[#0d1117]/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
-              <span className="text-xs font-mono text-cyan-200">(N={inputs.n_simulations.toLocaleString()})</span>
+              <span className="text-xs font-mono text-[#79c0ff]">(N={inputs.n_simulations.toLocaleString()})</span>
             </button>
             <p className="text-[11px] text-slate-500 text-center mt-1.5 font-mono">
-              <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Ctrl</kbd>
+              <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#6e7681] text-[10px]">Ctrl</kbd>
               {" + "}
-              <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 text-[10px]">Enter</kbd>
+              <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#6e7681] text-[10px]">Enter</kbd>
             </p>
           </>
         )}

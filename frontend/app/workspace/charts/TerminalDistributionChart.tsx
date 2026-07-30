@@ -89,17 +89,17 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
   }, [sample, req]);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5 space-y-4">
+      <div className="flex items-center justify-between border-b border-[#21262d] pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             Terminal Price Distribution ($S_T$) &amp; Log-Normal Density Overlay
           </h3>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
             Empirical histogram vs Black-Scholes theoretical $p(S_T)$ curve (Validation Visual)
           </p>
         </div>
-        <span className="text-xs bg-slate-950 border border-slate-800 text-slate-400 px-2 py-1 rounded font-mono">
+        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-[#6e7681] px-2 py-1 rounded font-mono">
           Sample: {sample.length.toLocaleString()} paths (Downsampled)
         </span>
       </div>
@@ -109,21 +109,21 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <XAxis
               dataKey="price"
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <YAxis
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => v.toFixed(3)}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#090d16",
-                borderColor: "#1e293b",
+                backgroundColor: "#0d1117",
+                borderColor: "#21262d",
                 fontSize: "12px",
                 fontFamily: "monospace",
                 color: "#e2e8f0",
@@ -137,17 +137,17 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
             />
             <ReferenceLine
               x={req.strike}
-              stroke="#e11d48"
+              stroke="#f85149"
               strokeDasharray="4 4"
-              label={{ value: `Strike ${currencySymbol}${req.strike}`, fill: "#e11d48", fontSize: 10, position: "top" }}
+              label={{ value: `Strike ${currencySymbol}${req.strike}`, fill: "#f85149", fontSize: 10, position: "top" }}
             />
             {/* Histogram Bars */}
-            <Bar dataKey="empiricalDensity" fill="#1e293b" stroke="#334155" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="empiricalDensity" fill="#21262d" stroke="#30363d" radius={[2, 2, 0, 0]} />
             {/* Theoretical Log-Normal Density Overlay Curve */}
             <Line
               type="monotone"
               dataKey="theoreticalDensity"
-              stroke="#f59e0b"
+              stroke="#58a6ff"
               strokeWidth={2.5}
               dot={false}
               isAnimationActive={false}
@@ -156,11 +156,11 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
         </ResponsiveContainer>
       </div>
 
-      <div className="text-xs text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
+      <div className="text-xs text-[#6e7681] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
         <span>
           Note: Downsampled sample capped at 5,000 terminal prices for API performance.
         </span>
-        <span className="text-cyan-400 font-semibold">Amber Curve = Theoretical BS PDF</span>
+        <span className="text-[#58a6ff] font-semibold">Blue Curve = Theoretical BS PDF</span>
       </div>
     </div>
   );

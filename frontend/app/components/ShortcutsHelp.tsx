@@ -29,7 +29,7 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
       onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
       <div
-        className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl shadow-black/40 p-6 w-full max-w-md mx-4"
+        className="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl shadow-black/40 p-6 w-full max-w-md mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -38,7 +38,7 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors p-1"
+            className="text-[#6e7681] hover:text-white transition-colors p-1"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -51,14 +51,14 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
           {shortcuts.map((s, i) => (
             <div
               key={i}
-              className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-slate-800/40 transition-colors"
+              className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-[#21262d]/40 transition-colors"
             >
-              <span className="text-xs text-slate-300 font-mono">{s.action}</span>
+              <span className="text-xs text-[#8b949e] font-mono">{s.action}</span>
               <div className="flex items-center gap-1">
                 {s.keys.map((k, j) => (
                   <kbd
                     key={j}
-                    className="px-1.5 py-0.5 text-[10px] font-mono font-bold text-cyan-300 bg-slate-800 border border-slate-700 rounded"
+                    className="px-1.5 py-0.5 text-[10px] font-mono font-bold text-[#79c0ff] bg-[#21262d] border border-[#30363d] rounded"
                   >
                     {k}
                   </kbd>
@@ -68,8 +68,8 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
           ))}
         </div>
 
-        <p className="text-[10px] text-slate-500 mt-4 text-center font-mono">
-          Press <kbd className="px-1 py-0.5 bg-slate-800 border border-slate-700 rounded text-cyan-300">?</kbd> or <kbd className="px-1 py-0.5 bg-slate-800 border border-slate-700 rounded text-cyan-300">Esc</kbd> to close
+        <p className="text-[10px] text-[#6e7681] mt-4 text-center font-mono">
+          Press <kbd className="px-1 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#79c0ff]">?</kbd> or <kbd className="px-1 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#79c0ff]">Esc</kbd> to close
         </p>
       </div>
     </div>

@@ -8,14 +8,14 @@ import { ToastContainer } from "@/lib/components/Toast";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-sans",
   display: "swap",
 });
 
 const dmSerifDisplay = DM_Serif_Display({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-serif",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className={`antialiased ${spaceGrotesk.variable} ${dmSerifDisplay.variable} ${jetbrainsMono.variable}`}>
         <DensityProvider>
           <Header />
-          <main className="min-h-[calc(100vh-93px)] bg-[#0c1018] text-slate-200 pb-16 md:pb-0">{children}</main>
+          <main className="min-h-[calc(100vh-93px)] bg-[#0d1117] text-[#e6edf3] pb-16 md:pb-0">{children}</main>
           <MobileNav />
           <ToastContainer />
         </DensityProvider>

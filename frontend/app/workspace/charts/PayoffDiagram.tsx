@@ -51,17 +51,17 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
   }, [K, optionPrice, opt]);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5 space-y-4">
+      <div className="flex items-center justify-between border-b border-[#21262d] pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             Deterministic Option Payoff Diagram at Expiry
           </h3>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
             Hockey-stick payoff &bull; Strike: {currencySymbol}{K.toFixed(2)} &bull; Spot: {currencySymbol}{S0.toFixed(2)} &bull; Breakeven: {currencySymbol}{breakeven.toFixed(2)}
           </p>
         </div>
-        <span className="text-xs bg-slate-950 border border-slate-800 text-emerald-400 px-2 py-1 rounded font-mono font-bold uppercase">
+        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-emerald-400 px-2 py-1 rounded font-mono font-bold uppercase">
           {opt} Option Payoff
         </span>
       </div>
@@ -71,21 +71,21 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
           <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <XAxis
               dataKey="spot"
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <YAxis
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#090d16",
-                borderColor: "#1e293b",
+                backgroundColor: "#0d1117",
+                borderColor: "#21262d",
                 fontSize: "12px",
                 fontFamily: "monospace",
                 color: "#e2e8f0",
@@ -94,15 +94,15 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
             <ReferenceLine y={0} stroke="#475569" strokeWidth={1} />
             <ReferenceLine
               x={K}
-              stroke="#e11d48"
+              stroke="#f85149"
               strokeDasharray="4 4"
-              label={{ value: `Strike ${currencySymbol}${K}`, fill: "#e11d48", fontSize: 10, position: "top" }}
+              label={{ value: `Strike ${currencySymbol}${K}`, fill: "#f85149", fontSize: 10, position: "top" }}
             />
             <ReferenceLine
               x={S0}
-              stroke="#f59e0b"
+              stroke="#58a6ff"
               strokeDasharray="4 4"
-              label={{ value: `Spot ${currencySymbol}${S0}`, fill: "#f59e0b", fontSize: 10, position: "left" }}
+              label={{ value: `Spot ${currencySymbol}${S0}`, fill: "#58a6ff", fontSize: 10, position: "left" }}
             />
             <ReferenceLine
               x={breakeven}
@@ -124,7 +124,7 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
             <Line
               type="monotone"
               dataKey="netProfit"
-              stroke="#38bdf8"
+              stroke="#58a6ff"
               strokeWidth={2}
               strokeDasharray="3 3"
               dot={false}

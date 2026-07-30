@@ -95,17 +95,17 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
   }, [request]);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4 overflow-hidden">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5 space-y-4 overflow-hidden">
+      <div className="flex items-center justify-between border-b border-[#21262d] pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             Simulated Asset Price Paths (Stepwise GBM)
           </h3>
-          <p className="text-xs text-slate-300 font-mono mt-0.5">
+          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
             Sample of {numPaths} log-normal paths &bull; Spot: {currencySymbol}{spotPrice.toFixed(2)} &bull; Strike: {currencySymbol}{strikePrice.toFixed(2)}
           </p>
         </div>
-        <span className="text-xs bg-slate-950 border border-slate-800 text-slate-300 px-2 py-1 rounded font-mono">
+        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-[#6e7681] px-2 py-1 rounded font-mono">
           Seed: {request.seed}
         </span>
       </div>
@@ -115,13 +115,13 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
             <XAxis
               dataKey="time"
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${v}y`}
             />
             <YAxis
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={11}
               fontFamily="monospace"
               domain={["auto", "auto"]}
@@ -130,28 +130,28 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
             <Tooltip content={<CustomTooltip currencySymbol={currencySymbol} />} />
             <ReferenceLine
               y={spotPrice}
-              stroke="#f59e0b"
+              stroke="#58a6ff"
               strokeDasharray="4 4"
-              label={{ value: `Spot ${currencySymbol}${spotPrice}`, fill: "#f59e0b", fontSize: 10, position: "left" }}
+              label={{ value: `Spot ${currencySymbol}${spotPrice}`, fill: "#58a6ff", fontSize: 10, position: "left" }}
             />
             <ReferenceLine
               y={strikePrice}
-              stroke="#e11d48"
+              stroke="#f85149"
               strokeDasharray="4 4"
-              label={{ value: `Strike ${currencySymbol}${strikePrice}`, fill: "#e11d48", fontSize: 10, position: "right" }}
+              label={{ value: `Strike ${currencySymbol}${strikePrice}`, fill: "#f85149", fontSize: 10, position: "right" }}
             />
             <ReferenceLine
               x={T}
-              stroke="#f59e0b"
+              stroke="#58a6ff"
               strokeDasharray="2 2"
-              label={{ value: `Expiry (${T}y)`, fill: "#f59e0b", fontSize: 10, position: "top" }}
+              label={{ value: `Expiry (${T}y)`, fill: "#58a6ff", fontSize: 10, position: "top" }}
             />
             {Array.from({ length: numPaths }).map((_, i) => (
               <Line
                 key={i}
                 type="monotone"
                 dataKey={`path${i}`}
-                stroke={i === 0 ? "#38bdf8" : i % 2 === 0 ? "#1e293b" : "#334155"}
+                stroke={i === 0 ? "#58a6ff" : i % 2 === 0 ? "#21262d" : "#30363d"}
                 strokeWidth={i === 0 ? 1.5 : 0.8}
                 dot={false}
                 isAnimationActive={false}

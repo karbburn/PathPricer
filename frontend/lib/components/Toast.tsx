@@ -30,9 +30,9 @@ function ToastItem({ msg, onDismiss }: { msg: ToastMessage; onDismiss: () => voi
   }, [onDismiss]);
 
   const bgMap = {
-    success: "bg-emerald-950/90 border-emerald-700 text-emerald-200",
-    error: "bg-red-950/90 border-red-700 text-red-200",
-    info: "bg-slate-800/90 border-slate-600 text-slate-200",
+    success: "bg-[#0d1117]/90 border-[#3fb950] text-[#3fb950]",
+    error: "bg-[#0d1117]/90 border-[#f85149] text-[#f85149]",
+    info: "bg-[#21262d]/90 border-[#30363d] text-[#e6edf3]",
   };
 
   return (

@@ -48,17 +48,17 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
   const yMax = Number((maxP + padding).toFixed(2));
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+    <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-5 space-y-4">
+      <div className="flex items-center justify-between border-b border-[#21262d] pb-3">
         <div>
-          <h3 className="text-sm font-extrabold text-cyan-400 uppercase tracking-wider">
+          <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             MC Estimator Prices &amp; 95% Confidence Intervals vs BS Benchmark
           </h3>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
             Error bars reflect [&plusmn;1.96 SE] confidence width &bull; Reference line = BS analytical benchmark
           </p>
         </div>
-        <span className="text-xs font-mono font-bold text-cyan-300 bg-slate-950 px-2.5 py-1 rounded border border-slate-800">
+        <span className="text-xs font-mono font-bold text-[#79c0ff] bg-[#0d1117] px-2.5 py-1 rounded border border-[#21262d]">
           BS: {currencySymbol}{bsPrice.toFixed(4)}
         </span>
       </div>
@@ -68,12 +68,12 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
           <BarChart data={chartData} margin={{ top: 15, right: 20, left: 10, bottom: 25 }}>
             <XAxis
               dataKey="name"
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={10}
               fontFamily="monospace"
             />
             <YAxis
-              stroke="#64748b"
+              stroke="#6e7681"
               fontSize={11}
               fontFamily="monospace"
               domain={[yMin, yMax]}
@@ -81,8 +81,8 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#090d16",
-                borderColor: "#1e293b",
+                backgroundColor: "#0d1117",
+                borderColor: "#21262d",
                 fontSize: "12px",
                 fontFamily: "monospace",
                 color: "#e2e8f0",
@@ -96,22 +96,22 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
             {/* Black-Scholes Benchmark Line */}
             <ReferenceLine
               y={bsPrice}
-              stroke="#f59e0b"
+              stroke="#58a6ff"
               strokeWidth={2}
-              label={{ value: `BS Benchmark ${currencySymbol}${bsPrice.toFixed(4)}`, fill: "#f59e0b", fontSize: 11, position: "top" }}
+              label={{ value: `BS Benchmark ${currencySymbol}${bsPrice.toFixed(4)}`, fill: "#58a6ff", fontSize: 11, position: "top" }}
             />
 
             {/* MC Estimator Price Bars with 95% CI Error Bars */}
-            <Bar dataKey="price" fill="#1e293b" stroke="#38bdf8" radius={[4, 4, 0, 0]} barSize={40}>
-              <ErrorBar dataKey="errorRange" width={6} strokeWidth={2} stroke="#f59e0b" />
+            <Bar dataKey="price" fill="#21262d" stroke="#58a6ff" radius={[4, 4, 0, 0]} barSize={40}>
+              <ErrorBar dataKey="errorRange" width={6} strokeWidth={2} stroke="#58a6ff" />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="text-xs text-slate-400 font-mono bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
+      <div className="text-xs text-[#6e7681] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
         <span>
-          Cyan Reference Line = BS Benchmark. Yellow Caps = 95% Confidence Intervals.
+          Blue Reference Line = BS Benchmark. Blue Caps = 95% Confidence Intervals.
         </span>
         <span className="text-emerald-400 font-semibold">
           Variance Reduction Narrows Error Bar Width
