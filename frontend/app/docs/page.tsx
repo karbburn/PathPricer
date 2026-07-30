@@ -1,6 +1,7 @@
 import React from "react";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
+import { Lightbulb, CheckCircle2, AlertTriangle } from "lucide-react";
 
 const toc = [
   { id: "gbm", label: "1. GBM" },
@@ -27,12 +28,45 @@ function SectionCard({ id, title, children, className }: { id: string; title: st
 }
 
 function Callout({ title, children, accent = "blue" }: { title: string; children: React.ReactNode; accent?: "blue" | "green" | "red" }) {
-  const borderClass = accent === "blue" ? "border-[#58a6ff]" : accent === "green" ? "border-[#3fb950]" : "border-[#f85149]";
-  const titleClass = accent === "blue" ? "text-[#79c0ff]" : accent === "green" ? "text-[#3fb950]" : "text-[#f85149]";
+  const config = {
+    blue: {
+      border: "border-[#388bfd]/30 hover:border-[#388bfd]/50",
+      bg: "bg-gradient-to-r from-[#388bfd]/10 via-[#161b22]/90 to-[#161b22]",
+      badgeBg: "bg-[#388bfd]/15 border-[#388bfd]/30 text-[#79c0ff]",
+      titleColor: "text-[#79c0ff]",
+      Icon: Lightbulb,
+    },
+    green: {
+      border: "border-[#3fb950]/30 hover:border-[#3fb950]/50",
+      bg: "bg-gradient-to-r from-[#238636]/10 via-[#161b22]/90 to-[#161b22]",
+      badgeBg: "bg-[#238636]/15 border-[#3fb950]/30 text-[#56d364]",
+      titleColor: "text-[#56d364]",
+      Icon: CheckCircle2,
+    },
+    red: {
+      border: "border-[#f85149]/30 hover:border-[#f85149]/50",
+      bg: "bg-gradient-to-r from-[#da3633]/10 via-[#161b22]/90 to-[#161b22]",
+      badgeBg: "bg-[#da3633]/15 border-[#f85149]/30 text-[#ff7b72]",
+      titleColor: "text-[#ff7b72]",
+      Icon: AlertTriangle,
+    },
+  }[accent];
+
+  const IconComponent = config.Icon;
+
   return (
-    <div className={`border-l-4 ${borderClass} bg-[#161b22] pl-4 pr-3 py-3 space-y-1.5`}>
-      <div className={`font-semibold text-xs uppercase tracking-wider ${titleClass}`}>{title}</div>
-      <div className="text-sm text-[#8b949e] leading-relaxed">{children}</div>
+    <div className={`my-4 rounded-xl border ${config.border} ${config.bg} p-4 transition-all duration-200 shadow-sm relative overflow-hidden group`}>
+      <div className="flex items-center gap-2.5 mb-2">
+        <div className={`p-1.5 rounded-lg border ${config.badgeBg} flex items-center justify-center shrink-0`}>
+          <IconComponent className="w-3.5 h-3.5" />
+        </div>
+        <span className={`font-semibold text-xs uppercase tracking-wider ${config.titleColor}`}>
+          {title}
+        </span>
+      </div>
+      <div className="text-sm text-[#8b949e] leading-relaxed pl-8">
+        {children}
+      </div>
     </div>
   );
 }
