@@ -423,18 +423,21 @@ Antithetic variates reuse the same base draws — this is *not* implemented as t
 
 ---
 
-## Interview Reference
+## 16. Design Decisions FAQ
 
-| Question | One-Line Answer |
+A quick-reference summary of architectural and numerical choices made in this project — for anyone reading the code or evaluating its design.
+
+| Question | Rationale |
 |---|---|
-| Why Monte Carlo for something Black-Scholes already solves? | Validation infrastructure for machinery meant to generalize to unsolvable cases. |
-| Why $S_T$ and not Black-Scholes price as control variate? | Black-Scholes is the benchmark, not a valid control — using it would be circular. |
-| Why exact GBM sampling, not Euler-Maruyama? | No discretization error needed or wanted for terminal-only payoffs. |
-| Why normal-approximation CI, not bootstrap? | CLT applies cleanly; bootstrap adds cost with no benefit here. |
-| Why finite-difference Greeks need common random numbers? | Without CRN, Greeks are dominated by MC noise, not true sensitivity. |
-| Why continuous dividend yield, not discrete? | Free data does not reliably support forward ex-div schedules. |
-| Why close-to-close vol, not range-based? | Data quality consistency across US/Indian tickers matters more than marginal efficiency gain. |
-| Why `default_rng`, not legacy RandomState? | Statistically better and avoids shared-global-state bugs in a stateless backend. |
-| Why Newton-Raphson with Brent fallback for IV? | Newton-Raphson is fast near the root; Brent handles near-zero-Vega cases without a derivative. |
-| Why does P&L attribution include a residual term? | Taylor expansion is exact only for infinitesimal moves; residual captures cross-Greeks and higher-order terms. |
-| Why vectorize the risk grid instead of looping? | 625 cell-level loops would dominate runtime; a single broadcast array operation evaluates all points at NumPy speed. |
+| Why Monte Carlo for something Black-Scholes already solves? | Validation infrastructure for machinery meant to generalize to unsolvable cases (path-dependent, American, multi-asset). |
+| Why $S_T$ as control variate and not the Black-Scholes price? | Black-Scholes is the benchmark being validated; using it as a control would be circular. $S_T$ has a known expectation independent of the option price. |
+| Why exact GBM sampling instead of Euler-Maruyama? | The closed-form log-normal transition density eliminates discretisation bias. Euler is needed only for path-dependent payoffs or models without closed-form densities. |
+| Why a normal-approximation confidence interval and not bootstrap? | The CLT applies cleanly to i.i.d. discounted payoffs with finite variance. Bootstrap targets the same result at higher computational cost. |
+| Why do finite-difference Greeks need common random numbers? | Without CRN, the parameter bump is swamped by Monte Carlo noise. Reusing the same seed across the bump pair isolates the sensitivity from sampling variance. |
+| Why a continuous dividend yield approximation instead of discrete? | Free market data does not reliably provide ex-dividend schedules. The continuous approximation (Merton) is standard for equity indices and trailing yields. |
+| Why close-to-close volatility instead of a range-based estimator? | yfinance guarantees close prices across all US and Indian tickers, but intraday range data quality is inconsistent. Data reliability matters more than marginal statistical efficiency. |
+| Why `default_rng(seed)` instead of legacy `RandomState`? | PCG64 has better statistical properties and avoids shared global state — a correctness hazard in a concurrent API backend. Each request gets an isolated generator. |
+| Why Newton-Raphson with a Brent fallback for implied volatility? | Newton-Raphson converges quadratically near the root; Brent's method handles near-zero-Vega cases (deep ITM/OTM, near-expiry) without requiring a derivative. |
+| Why does P&L attribution include a residual term? | The Taylor expansion is exact only for infinitesimal moves. The residual captures cross-Greeks (Vanna, Volga), higher-order terms, and other unmodeled effects. |
+| Why vectorise the risk grid instead of looping over grid cells? | 625 cell-level Python loops would dominate runtime. A single NumPy broadcast operation evaluates all points at C speed. |
+| Why RQMC (Sobol) instead of standard Monte Carlo? | For smooth integrands, RQMC converges at $\mathcal{O}(N^{-1})$ vs standard MC's $\mathcal{O}(N^{-1/2})$ — halving error requires 2× paths instead of 4×. The confidence interval is a heuristic, not a strict 95% statement. |
