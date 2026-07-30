@@ -38,7 +38,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           <button
             type="button"
             onClick={() => setActiveTab("paths")}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               activeTab === "paths"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
                 : "text-[#6e7681] hover:text-white hover:bg-[#161b22]"
@@ -51,7 +51,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           <button
             type="button"
             onClick={() => setActiveTab("risk_grid")}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               activeTab === "risk_grid"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
                 : "text-[#6e7681] hover:text-white hover:bg-[#161b22]"
@@ -64,7 +64,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           <button
             type="button"
             onClick={() => setActiveTab("distribution")}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               activeTab === "distribution"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
                 : "text-[#6e7681] hover:text-white hover:bg-[#161b22]"
@@ -77,7 +77,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           <button
             type="button"
             onClick={() => setActiveTab("payoff")}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               activeTab === "payoff"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
                 : "text-[#6e7681] hover:text-white hover:bg-[#161b22]"
@@ -90,7 +90,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           <button
             type="button"
             onClick={() => setActiveTab("convergence")}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               activeTab === "convergence"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
                 : "text-[#6e7681] hover:text-white hover:bg-[#161b22]"
@@ -103,7 +103,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           <button
             type="button"
             onClick={() => setActiveTab("comparison")}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               activeTab === "comparison"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
                 : "text-[#6e7681] hover:text-white hover:bg-[#161b22]"
@@ -118,7 +118,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
         <button
           type="button"
           onClick={handleExportPng}
-          className="px-3 py-1.5 text-xs font-mono font-semibold rounded bg-[#161b22] border border-[#21262d] text-[#6e7681] hover:text-white hover:border-[#58a6ff] transition-colors flex items-center justify-center gap-1.5 self-end sm:self-auto"
+          className="px-3 py-1.5 text-xs font-mono font-semibold rounded bg-[#161b22] border border-[#21262d] text-[#6e7681] hover:text-white hover:border-[#58a6ff] transition-colors flex items-center justify-center gap-1.5 self-end sm:self-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span>Export PNG</span>

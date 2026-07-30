@@ -90,7 +90,7 @@ export default function MarketOverviewPage() {
             <button
               type="button"
               onClick={() => setMarketInput("US")}
-              className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
+              className={`px-4 py-2 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 marketInput === "US"
                   ? "bg-[#238636] text-white"
                   : "text-[#6e7681] hover:text-white"
@@ -101,7 +101,7 @@ export default function MarketOverviewPage() {
             <button
               type="button"
               onClick={() => setMarketInput("IN")}
-              className={`px-4 py-2 text-xs font-semibold rounded transition-colors ${
+              className={`px-4 py-2 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 marketInput === "IN"
                   ? "bg-[#238636] text-white"
                   : "text-[#6e7681] hover:text-white"
@@ -124,7 +124,7 @@ export default function MarketOverviewPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto bg-[#238636] hover:bg-[#2ea043] text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50"
+            className="w-full sm:w-auto bg-[#238636] hover:bg-[#2ea043] text-white font-semibold text-sm px-6 py-2.5 rounded transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
             {loading ? "Fetching..." : "Fetch Quote"}
           </button>
@@ -137,7 +137,7 @@ export default function MarketOverviewPage() {
             <button
               key={item.ticker}
               onClick={() => handlePresetClick(item.ticker, item.market)}
-              className="text-xs bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[#8b949e] px-3 py-1 rounded transition-colors font-mono"
+              className="text-xs bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[#8b949e] px-3 py-1 rounded transition-colors font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               {item.ticker} ({item.market})
             </button>
@@ -196,7 +196,7 @@ export default function MarketOverviewPage() {
                       step="0.01"
                       value={manualSpot}
                       onChange={(e) => setManualSpot(e.target.value)}
-                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff]"
+                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                     />
                   </div>
                   <div>
@@ -206,7 +206,7 @@ export default function MarketOverviewPage() {
                       step="0.01"
                       value={manualVol}
                       onChange={(e) => setManualVol(e.target.value)}
-                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff]"
+                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                     />
                   </div>
                   <div>
@@ -216,7 +216,7 @@ export default function MarketOverviewPage() {
                       step="0.001"
                       value={manualDiv}
                       onChange={(e) => setManualDiv(e.target.value)}
-                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff]"
+                      className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-[#58a6ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                     />
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export default function MarketOverviewPage() {
                   href={`/workspace?ticker=${encodeURIComponent(
                     tickerInput
                   )}&market=${marketInput}&spot_override=${manualSpot}&volatility=${manualVol}&dividend_yield=${manualDiv}`}
-                  className="inline-flex items-center gap-2 bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                 >
                   <span>Proceed to Workspace</span>
                   <span>&rarr;</span>
@@ -284,7 +284,7 @@ export default function MarketOverviewPage() {
               )}&market=${quote.market}&spot_override=${quote.spot_price}&volatility=${
                 quote.historical_volatility["252d"] || 0.25
               }&dividend_yield=${quote.dividend_yield}`}
-              className="bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-[#0d1117]/40 flex items-center gap-2"
+              className="bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-[#0d1117]/40 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               <span>Open in Pricing Workspace</span>
               <span>&rarr;</span>
