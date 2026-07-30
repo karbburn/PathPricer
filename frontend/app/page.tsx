@@ -10,6 +10,7 @@ import {
   formatMarketCap,
   formatDateTime,
   roundClean,
+  computeAtmStrike,
 } from "@/lib/formatters";
 import { TickerInput } from "@/app/components/TickerInput";
 
@@ -225,7 +226,7 @@ export default function MarketOverviewPage() {
                 <Link
                   href={`/workspace?ticker=${encodeURIComponent(
                     tickerInput
-                  )}&market=${marketInput}&spot_override=${roundClean(manualSpot, 2)}&volatility=${roundClean(manualVol, 4)}&dividend_yield=${roundClean(manualDiv, 4)}`}
+                  )}&market=${marketInput}&spot_override=${roundClean(manualSpot, 2)}&strike=${computeAtmStrike(manualSpot)}&volatility=${roundClean(manualVol, 4)}&dividend_yield=${roundClean(manualDiv, 4)}`}
                   className="inline-flex items-center gap-2 bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                 >
                   <span>Proceed to Workspace</span>
@@ -282,7 +283,7 @@ export default function MarketOverviewPage() {
             <Link
               href={`/workspace?ticker=${encodeURIComponent(
                 quote.ticker
-              )}&market=${quote.market}&spot_override=${roundClean(quote.spot_price, 2)}&volatility=${roundClean(
+              )}&market=${quote.market}&spot_override=${roundClean(quote.spot_price, 2)}&strike=${computeAtmStrike(quote.spot_price)}&volatility=${roundClean(
                 quote.historical_volatility["252d"] || 0.25, 4
               )}&dividend_yield=${roundClean(quote.dividend_yield, 4)}`}
               className="bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors shadow-lg shadow-[#0d1117]/40 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
