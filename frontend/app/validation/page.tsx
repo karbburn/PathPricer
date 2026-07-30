@@ -265,10 +265,10 @@ export default function ValidationPage() {
           {/* Empirical Convergence Proof Card */}
           <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6">
             <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider mb-2">
-              Empirical Monte Carlo Convergence Proof ($\mathcal{"{"}O{"}"}(N^{-1/2})$)
+              Empirical Monte Carlo Convergence Proof (O(N⁻⁰·⁵))
             </h3>
             <p className="text-xs text-[#8b949e] font-mono mb-4">
-              Theoretical regression proof fitted over grid $N \in [1k, 5k, 25k, 100k, 500k]$
+              Theoretical regression proof fitted over grid N ∈ [1k, 5k, 25k, 100k, 500k]
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono">
@@ -279,7 +279,7 @@ export default function ValidationPage() {
               </div>
 
               <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
-                <span className="text-xs text-[#8b949e] block mb-1">Goodness of Fit ($R^2$)</span>
+                <span className="text-xs text-[#8b949e] block mb-1">Goodness of Fit (R²)</span>
                 <div className="text-2xl font-extrabold text-[#3fb950]">0.998</div>
                 <span className="text-xs text-[#8b949e] mt-1 block">Target: &gt; 0.990 (Strong Log-Log Linearity)</span>
               </div>
