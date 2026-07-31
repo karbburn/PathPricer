@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     iv_initial_sigma_max: float = 5.0
     default_risk_grid_points: int = 25
     max_risk_grid_points: int = 100
+    market_data_cache_ttl: int = 300
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -79,5 +80,6 @@ IV_INITIAL_SIGMA_MIN: float = settings.iv_initial_sigma_min
 IV_INITIAL_SIGMA_MAX: float = settings.iv_initial_sigma_max
 DEFAULT_RISK_GRID_POINTS: int = settings.default_risk_grid_points
 MAX_RISK_GRID_POINTS: int = settings.max_risk_grid_points
+MARKET_DATA_CACHE_TTL: int = settings.market_data_cache_ttl
 
 

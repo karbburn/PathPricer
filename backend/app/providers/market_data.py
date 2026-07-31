@@ -7,9 +7,28 @@ historical quote extraction, and dividend yield handling.
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import math
+import time
 import yfinance as yf
 
 from ..engine.volatility import all_windows_volatility
+
+# In-memory TTL cache for market quotes. Key: (symbol, market).
+# ponytail: global dict, fine for single-process Render free tier.
+_CACHE_TTL: float = 300.0  # 5 minutes
+_quote_cache: dict[tuple[str, str], tuple[float, "MarketQuote"]] = {}
+
+
+def _cache_get(key: tuple[str, str]) -> "MarketQuote | None":
+    entry = _quote_cache.get(key)
+    if entry and (time.time() - entry[0]) < _CACHE_TTL:
+        return entry[1]
+    if entry:
+        del _quote_cache[key]
+    return None
+
+
+def _cache_set(key: tuple[str, str], quote: "MarketQuote") -> None:
+    _quote_cache[key] = (time.time(), quote)
 
 
 class MarketDataError(Exception):
@@ -93,6 +112,12 @@ class MarketDataService:
             MarketDataError: If ticker is invalid, not found, or yfinance returns no data.
         """
         symbol = self.resolve_symbol(ticker, market)
+        cache_key = (symbol, market.strip().upper())
+
+        cached = _cache_get(cache_key)
+        if cached is not None:
+            return cached
+
         data_warnings: list[str] = []
 
         ticker_obj = yf.Ticker(symbol)
@@ -171,7 +196,7 @@ class MarketDataService:
 
         last_updated = datetime.now(timezone.utc).isoformat()
 
-        return MarketQuote(
+        quote = MarketQuote(
             ticker=ticker,
             market=market.strip().upper(),
             resolved_symbol=symbol,
@@ -184,3 +209,5 @@ class MarketDataService:
             last_updated=last_updated,
             data_warnings=data_warnings,
         )
+        _cache_set(cache_key, quote)
+        return quote
