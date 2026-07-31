@@ -115,9 +115,9 @@ export function PreviewBadge({
   // 5. Preview State (Muted / Desaturated Slate Neutral)
   return (
     <div
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/90 border border-[#21262d] text-[#8b949e] text-xs font-mono opacity-80 hover:opacity-100 transition-opacity ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/90 border border-[#21262d] text-[#9aa5b1] text-xs font-mono opacity-80 hover:opacity-100 transition-opacity ${className}`}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#8b949e]"></span>
+      <span className="w-1.5 h-1.5 rounded-full bg-[#9aa5b1]"></span>
       <span className="tracking-wide">
         PREVIEW &bull; ~N={nSimulations.toLocaleString()}
       </span>
