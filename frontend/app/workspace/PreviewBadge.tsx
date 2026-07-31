@@ -122,7 +122,7 @@ export function PreviewBadge({
         PREVIEW &bull; ~N={nSimulations.toLocaleString()}
       </span>
       {computeMs !== undefined && (
-        <span className="text-[#8b949e] text-xs">
+        <span className="text-[#9aa5b1] text-xs">
           ({computeMs.toFixed(1)}ms)
         </span>
       )}
