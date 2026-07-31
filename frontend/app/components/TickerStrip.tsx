@@ -10,7 +10,7 @@ interface TickerConfig {
   currency: string;
 }
 
-const TICKERS: TickerConfig[] = [
+const DEFAULT_TICKERS: TickerConfig[] = [
   { symbol: "AAPL", market: "US", currency: "$" },
   { symbol: "SPY", market: "US", currency: "$" },
   { symbol: "MSFT", market: "US", currency: "$" },
@@ -33,18 +33,26 @@ function formatReturn(ret: number): string {
 }
 
 export function TickerStrip() {
-  const [quotes, setQuotes] = useState<(MarketQuoteResponse | null)[]>(
-    () => TICKERS.map(() => null)
-  );
+  const [watchlist, setWatchlist] = useState<TickerConfig[]>(() => {
+    if (typeof window === "undefined") return DEFAULT_TICKERS;
+    try {
+      const saved = localStorage.getItem("ticker_watchlist");
+      return saved ? JSON.parse(saved) : DEFAULT_TICKERS;
+    } catch {
+      return DEFAULT_TICKERS;
+    }
+  });
+
+  const [quotes, setQuotes] = useState<(MarketQuoteResponse | null)[]>(() => watchlist.map(() => null));
   const mountedRef = useRef(true);
 
   const fetchAll = useCallback(async () => {
     const results = await Promise.allSettled(
-      TICKERS.map((t) => getMarketQuote(t.symbol, t.market))
+      watchlist.map((t) => getMarketQuote(t.symbol, t.market))
     );
     if (!mountedRef.current) return;
     setQuotes(results.map((r) => (r.status === "fulfilled" ? r.value : null)));
-  }, []);
+  }, [watchlist]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -56,10 +64,19 @@ export function TickerStrip() {
     };
   }, [fetchAll]);
 
+  useEffect(() => {
+    fetchAll();
+    try {
+      localStorage.setItem("ticker_watchlist", JSON.stringify(watchlist));
+    } catch {
+      // localStorage unavailable
+    }
+  }, [watchlist]);
+
   return (
     <div className="h-10 bg-[#0d1117] border-b border-[#21262d] flex items-center overflow-x-auto relative" style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain" }}>
       <div className="flex items-center gap-6 px-4 whitespace-nowrap">
-        {TICKERS.map((ticker, i) => {
+        {watchlist.map((ticker, i) => {
           const q = quotes[i];
           const positive = q ? q.daily_return >= 0 : true;
           return (
