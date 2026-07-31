@@ -1,6 +1,6 @@
 # PathPricer
 
-Institutional-grade European option pricing platform using Monte Carlo simulation with variance reduction techniques and Black-Scholes analytical benchmarks.
+Monte Carlo option pricing platform with variance reduction techniques and Black-Scholes analytical benchmarks.
 
 ## What It Does
 
