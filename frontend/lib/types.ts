@@ -252,5 +252,56 @@ export interface RiskGridResponse {
   axis_y: RiskGridAxis;
 }
 
+// ---------------------------------------------------------------------------
+// Options Chain types
+// ---------------------------------------------------------------------------
+
+export type MarketRegionExtended = "US" | "IN" | "FX" | "CRYPTO";
+
+export interface OptionContract {
+  contractSymbol?: string;
+  strike: number;
+  lastPrice?: number;
+  bid?: number;
+  ask?: number;
+  change?: number;
+  percentChange?: number;
+  volume?: number;
+  openInterest?: number;
+  impliedVolatility?: number;
+}
+
+export interface OptionsChainResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  underlying_price: number | null;
+  expiries: string[];
+  selected_expiry: string;
+  calls: OptionContract[];
+  puts: OptionContract[];
+}
+
+// ---------------------------------------------------------------------------
+// Historical OHLCV types
+// ---------------------------------------------------------------------------
+
+export interface OhlcvBar {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export interface HistoryResponse {
+  ticker: string;
+  market: string;
+  currency: string;
+  interval: string;
+  bars: OhlcvBar[];
+}
+
 
 

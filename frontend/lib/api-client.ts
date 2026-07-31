@@ -18,6 +18,8 @@ import {
   ErrorResponse,
   MarketQuoteResponse,
   MarketRegion,
+  OptionsChainResponse,
+  HistoryResponse,
 } from "./types";
 
 const BASE_URL =
@@ -171,6 +173,32 @@ export async function postRiskGrid(
     signal,
   });
   return handleResponse<RiskGridResponse>(response);
+}
+
+export async function getOptionsChain(
+  ticker: string,
+  market: MarketRegion,
+  expiry?: string,
+  signal?: AbortSignal
+): Promise<OptionsChainResponse> {
+  const params = new URLSearchParams({ ticker, market });
+  if (expiry) params.set("expiry", expiry);
+  const url = `${BASE_URL}/market/options?${params}`;
+  const response = await fetch(url, { method: "GET", signal });
+  return handleResponse<OptionsChainResponse>(response);
+}
+
+export async function getMarketHistory(
+  ticker: string,
+  market: MarketRegion,
+  period: string = "1y",
+  interval: string = "1d",
+  signal?: AbortSignal
+): Promise<HistoryResponse> {
+  const params = new URLSearchParams({ ticker, market, period, interval });
+  const url = `${BASE_URL}/market/history?${params}`;
+  const response = await fetch(url, { method: "GET", signal });
+  return handleResponse<HistoryResponse>(response);
 }
 
 
