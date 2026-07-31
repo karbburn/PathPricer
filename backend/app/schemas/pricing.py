@@ -349,4 +349,63 @@ class RiskGridResponse(BaseModel):
     axis_y: str
 
 
+# ---------------------------------------------------------------------------
+# Options Chain schemas
+# ---------------------------------------------------------------------------
+
+
+class OptionContract(BaseModel):
+    """Single option contract in an options chain."""
+
+    contractSymbol: str | None = None
+    strike: float
+    lastPrice: float | None = None
+    bid: float | None = None
+    ask: float | None = None
+    change: float | None = None
+    percentChange: float | None = None
+    volume: int | None = None
+    openInterest: int | None = None
+    impliedVolatility: float | None = None
+
+
+class OptionsChainResponse(BaseModel):
+    """Response schema for options chain endpoint."""
+
+    ticker: str
+    market: str
+    resolved_symbol: str
+    underlying_price: float | None = None
+    expiries: list[str]
+    selected_expiry: str
+    calls: list[OptionContract]
+    puts: list[OptionContract]
+
+
+# ---------------------------------------------------------------------------
+# Historical OHLCV schemas
+# ---------------------------------------------------------------------------
+
+
+class OhlcvBar(BaseModel):
+    """Single OHLCV bar."""
+
+    date: str
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: int
+
+
+class HistoryResponse(BaseModel):
+    """Response schema for historical OHLCV endpoint."""
+
+    ticker: str
+    market: str
+    currency: str
+    interval: str
+    bars: list[OhlcvBar]
+
+
 

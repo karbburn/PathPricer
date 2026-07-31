@@ -211,3 +211,122 @@ class MarketDataService:
         )
         _cache_set(cache_key, quote)
         return quote
+
+    def get_options_chain(self, ticker: str, market: str, expiry: str | None = None) -> dict:
+        """Fetch options chain for a ticker. US equities only.
+
+        Args:
+            ticker: Stock ticker string.
+            market: Must be 'US'.
+            expiry: Optional expiry date string (YYYY-MM-DD). If None, returns available expiries.
+
+        Returns:
+            dict with 'expiries' list and 'chain' (calls/puts DataFrames as dicts).
+
+        Raises:
+            MarketDataError: If market is not US or ticker has no options.
+        """
+        if market.strip().upper() != "US":
+            raise MarketDataError(
+                message="Options chains are only available for US-listed equities.",
+                ticker=ticker,
+                fallback_available=False,
+            )
+
+        symbol = self.resolve_symbol(ticker, market)
+        ticker_obj = yf.Ticker(symbol)
+
+        try:
+            expiries = list(ticker_obj.options)
+        except Exception:
+            expiries = []
+
+        if not expiries:
+            raise MarketDataError(
+                message=f"No options data available for '{symbol}'.",
+                ticker=symbol,
+                fallback_available=False,
+            )
+
+        if expiry is None:
+            expiry = expiries[0]
+
+        if expiry not in expiries:
+            raise MarketDataError(
+                message=f"Expiry '{expiry}' not found. Available: {expiries[:5]}...",
+                ticker=symbol,
+                fallback_available=False,
+            )
+
+        chain = ticker_obj.option_chain(expiry)
+        calls = chain.calls.to_dict(orient="records")
+        puts = chain.puts.to_dict(orient="records")
+
+        # Clean NaN values from serialisation
+        for row in calls + puts:
+            for k, v in row.items():
+                if isinstance(v, float) and math.isnan(v):
+                    row[k] = None
+
+        return {
+            "ticker": ticker,
+            "market": market.strip().upper(),
+            "resolved_symbol": symbol,
+            "underlying_price": float(yf.Ticker(symbol).history(period="1d")["Close"].iloc[-1]) if not yf.Ticker(symbol).history(period="1d").empty else None,
+            "expiries": expiries,
+            "selected_expiry": expiry,
+            "calls": calls,
+            "puts": puts,
+        }
+
+    def get_history(
+        self, ticker: str, market: str, period: str = "1y", interval: str = "1d"
+    ) -> dict:
+        """Fetch historical OHLCV data for a ticker.
+
+        Args:
+            ticker: Stock ticker string.
+            market: Market region ('US', 'IN', 'FX', 'CRYPTO').
+            period: yfinance period string (1d/5d/1mo/3mo/6mo/1y/2y/5y/ytd/max).
+            interval: yfinance interval string (1d/1wk/1mo).
+
+        Returns:
+            dict with metadata and list of OHLCV bars.
+        """
+        symbol = self.resolve_symbol(ticker, market)
+        ticker_obj = yf.Ticker(symbol)
+
+        hist = ticker_obj.history(period=period, interval=interval)
+        if hist is None or hist.empty:
+            raise MarketDataError(
+                message=f"No historical data found for '{symbol}'.",
+                ticker=symbol,
+                fallback_available=True,
+            )
+
+        try:
+            info = ticker_obj.info or {}
+        except Exception:
+            info = {}
+
+        currency = str(info.get("currency", "USD"))
+
+        bars = []
+        for idx, row in hist.iterrows():
+            bar = {
+                "date": idx.strftime("%Y-%m-%d"),
+                "open": round(float(row.get("Open", 0)), 4),
+                "high": round(float(row.get("High", 0)), 4),
+                "low": round(float(row.get("Low", 0)), 4),
+                "close": round(float(row.get("Close", 0)), 4),
+                "volume": int(row.get("Volume", 0)),
+            }
+            bars.append(bar)
+
+        return {
+            "ticker": ticker,
+            "market": market.strip().upper(),
+            "currency": currency,
+            "interval": interval,
+            "bars": bars,
+        }
