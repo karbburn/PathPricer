@@ -52,7 +52,7 @@ export function PreviewBadge({
       <div
         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/90 border border-[#30363d] text-[#8b949e] text-xs font-mono animate-pulse ${className}`}
       >
-        <span className="w-2 h-2 rounded-full bg-[#6e7681]"></span>
+        <span className="w-2 h-2 rounded-full bg-[#8b949e]"></span>
         <span className="tracking-wide">PENDING &bull; DEBOUNCING...</span>
       </div>
     );
@@ -115,14 +115,14 @@ export function PreviewBadge({
   // 5. Preview State (Muted / Desaturated Slate Neutral)
   return (
     <div
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/90 border border-[#21262d] text-[#6e7681] text-xs font-mono opacity-80 hover:opacity-100 transition-opacity ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161b22]/90 border border-[#21262d] text-[#8b949e] text-xs font-mono opacity-80 hover:opacity-100 transition-opacity ${className}`}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#6e7681]"></span>
+      <span className="w-1.5 h-1.5 rounded-full bg-[#8b949e]"></span>
       <span className="tracking-wide">
         PREVIEW &bull; ~N={nSimulations.toLocaleString()}
       </span>
       {computeMs !== undefined && (
-        <span className="text-[#6e7681] text-xs">
+        <span className="text-[#8b949e] text-xs">
           ({computeMs.toFixed(1)}ms)
         </span>
       )}

@@ -119,7 +119,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
           <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             Monte Carlo Empirical Convergence Rate ($\log \widehat{"{"}SE{"}"}$ vs $\log N$)
           </h3>
-          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
+          <p className="text-xs text-[#8b949e] font-mono mt-0.5">
             Log-log regression fit verifying theoretical $\mathcal{"{"}O{"}"}(N^{-1/2})$ error reduction rate
           </p>
         </div>
@@ -127,7 +127,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
           <span className="text-sm font-extrabold font-mono text-[#79c0ff] block">
             Slope = {fit.slope.toFixed(3)}
           </span>
-          <span className="text-xs text-[#6e7681] font-mono">
+          <span className="text-xs text-[#8b949e] font-mono">
             R&sup2; = {fit.r_squared.toFixed(3)} &bull; Target: -0.500
           </span>
         </div>
@@ -157,21 +157,21 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
               dataKey="logN"
               type="number"
               domain={zoom ? [zoom.x1, zoom.x2] : [minLogN, maxLogN]}
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `10^${v}`}
-              label={{ value: "log10(N)", position: "bottom", fill: "#6e7681", fontSize: 10 }}
+              label={{ value: "log10(N)", position: "bottom", fill: "#8b949e", fontSize: 10 }}
             />
             <YAxis
               dataKey="logSe"
               type="number"
               domain={zoom ? [zoom.y1, zoom.y2] : ["auto", "auto"]}
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `10^${v.toFixed(1)}`}
-              label={{ value: "log10(SE)", angle: -90, position: "left", fill: "#6e7681", fontSize: 10 }}
+              label={{ value: "log10(SE)", angle: -90, position: "left", fill: "#8b949e", fontSize: 10 }}
             />
             <Tooltip
               contentStyle={{
@@ -213,7 +213,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="text-xs text-[#6e7681] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
+      <div className="text-xs text-[#8b949e] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
         <span>
           Theoretical Central Limit Theorem bound dictates slope = -0.500 ($\widehat{"{"}SE{"}"} \propto N^{-0.5}$).
         </span>

@@ -39,15 +39,15 @@ function CustomTooltip({ active, payload, label, currencySymbol }: { active?: bo
   const remaining = payload.length - shown.length;
   return (
     <div className="bg-[#090d16] border border-[#30363d] rounded px-3 py-2 font-mono text-xs max-w-[200px]">
-      <div className="text-[#6e7681] mb-1">t = {label}y</div>
+      <div className="text-[#8b949e] mb-1">t = {label}y</div>
       {shown.map((p) => (
         <div key={p.dataKey} className="flex justify-between gap-3">
-          <span className="text-[#6e7681]">{p.dataKey}</span>
+          <span className="text-[#8b949e]">{p.dataKey}</span>
           <span className="text-[#e6edf3]">{currencySymbol}{p.value.toFixed(2)}</span>
         </div>
       ))}
       {remaining > 0 && (
-        <div className="text-[#6e7681] mt-1">+{remaining} more paths</div>
+        <div className="text-[#8b949e] mt-1">+{remaining} more paths</div>
       )}
     </div>
   );
@@ -101,11 +101,11 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
           <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             Simulated Asset Price Paths (Stepwise GBM)
           </h3>
-          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
+          <p className="text-xs text-[#8b949e] font-mono mt-0.5">
             Sample of {numPaths} log-normal paths &bull; Spot: {currencySymbol}{spotPrice.toFixed(2)} &bull; Strike: {currencySymbol}{strikePrice.toFixed(2)}
           </p>
         </div>
-        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-[#6e7681] px-2 py-1 rounded font-mono">
+        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-[#8b949e] px-2 py-1 rounded font-mono">
           Seed: {request.seed}
         </span>
       </div>
@@ -115,13 +115,13 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
             <XAxis
               dataKey="time"
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${v}y`}
             />
             <YAxis
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               domain={["auto", "auto"]}

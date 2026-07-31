@@ -95,11 +95,11 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
           <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             Terminal Price Distribution ($S_T$) &amp; Log-Normal Density Overlay
           </h3>
-          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
+          <p className="text-xs text-[#8b949e] font-mono mt-0.5">
             Empirical histogram vs Black-Scholes theoretical $p(S_T)$ curve (Validation Visual)
           </p>
         </div>
-        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-[#6e7681] px-2 py-1 rounded font-mono">
+        <span className="text-xs bg-[#0d1117] border border-[#21262d] text-[#8b949e] px-2 py-1 rounded font-mono">
           Sample: {sample.length.toLocaleString()} paths (Downsampled)
         </span>
       </div>
@@ -109,13 +109,13 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <XAxis
               dataKey="price"
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <YAxis
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => v.toFixed(3)}
@@ -156,7 +156,7 @@ export function TerminalDistributionChart({ fullResult, currencySymbol }: Termin
         </ResponsiveContainer>
       </div>
 
-      <div className="text-xs text-[#6e7681] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
+      <div className="text-xs text-[#8b949e] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
         <span>
           Note: Downsampled sample capped at 5,000 terminal prices for API performance.
         </span>

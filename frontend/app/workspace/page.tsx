@@ -215,13 +215,13 @@ function WorkspaceContent() {
             {workspaceMode === "implied_vol" ? "IV Solver" : workspaceMode === "pnl_explain" ? "P&L Explain" : "Pricing"}
           </h1>
           {inputs.ticker && (
-            <span className="text-[10px] font-mono text-[#6e7681] bg-[#21262d]/60 px-2 py-0.5 rounded border border-[#30363d]">
+            <span className="text-[10px] font-mono text-[#8b949e] bg-[#21262d]/60 px-2 py-0.5 rounded border border-[#30363d]">
               {inputs.ticker} · {inputs.market}
             </span>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono text-[#6e7681]">Ctrl+Enter → Run</span>
+          <span className="text-[10px] font-mono text-[#8b949e]">Ctrl+Enter → Run</span>
         </div>
       </div>
 
@@ -236,7 +236,7 @@ function WorkspaceContent() {
               className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider text-center transition-colors ${
                 mobileTab === tab
                   ? "text-white border-b-2 border-[#58a6ff]"
-                  : "text-[#6e7681] hover:text-[#8b949e]"
+                  : "text-[#8b949e] hover:text-[#8b949e]"
               }`}
             >
               {tab === "inputs" ? "Inputs" : tab === "results" ? "Results" : "Charts"}
@@ -295,7 +295,7 @@ function WorkspaceContent() {
               {workspaceMode === "pricing" ? (
                 <ChartTabContainer request={inputs} fullResult={fullResult} />
               ) : (
-                <div className="flex items-center justify-center h-64 text-sm text-[#6e7681] font-mono">
+                <div className="flex items-center justify-center h-64 text-sm text-[#8b949e] font-mono">
                   Charts available in Pricing mode
                 </div>
               )}
@@ -365,7 +365,7 @@ function WorkspaceContent() {
               {workspaceMode === "pricing" ? (
                 <ChartTabContainer request={inputs} fullResult={fullResult} />
               ) : (
-                <div className="flex items-center justify-center h-64 text-sm text-[#6e7681] font-mono">
+                <div className="flex items-center justify-center h-64 text-sm text-[#8b949e] font-mono">
                   Charts available in Pricing mode
                 </div>
               )}

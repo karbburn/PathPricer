@@ -191,8 +191,8 @@ export function InputPanel({
             onClick={() => onWorkspaceModeChange("pricing")}
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pricing"
-                ? "bg-[#238636] text-[#0d1117] shadow"
-                : "text-[#6e7681] hover:text-white"
+                ? "bg-[#238636] text-white shadow"
+                : "text-[#8b949e] hover:text-white"
             }`}
           >
             Option Pricing
@@ -203,7 +203,7 @@ export function InputPanel({
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "implied_vol"
                 ? "bg-[#238636] text-white shadow"
-                : "text-[#6e7681] hover:text-white"
+                : "text-[#8b949e] hover:text-white"
             }`}
           >
             Implied Volatility
@@ -214,7 +214,7 @@ export function InputPanel({
             className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pnl_explain"
                 ? "bg-[#238636] text-white shadow"
-                : "text-[#6e7681] hover:text-white"
+                : "text-[#8b949e] hover:text-white"
             }`}
           >
             P&amp;L Explain
@@ -268,7 +268,7 @@ export function InputPanel({
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "US"
                   ? "bg-[#238636] text-white"
-                  : "text-[#6e7681] hover:text-white"
+                  : "text-[#8b949e] hover:text-white"
               }`}
             >
               US
@@ -279,7 +279,7 @@ export function InputPanel({
               className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "IN"
                   ? "bg-[#238636] text-white"
-                  : "text-[#6e7681] hover:text-white"
+                  : "text-[#8b949e] hover:text-white"
               }`}
             >
               IN (.NS)
@@ -299,18 +299,20 @@ export function InputPanel({
                 updateField("spot_override", e.target.value ? roundClean(Number(e.target.value), 2) : null)
               }
               placeholder="Market default"
+              aria-label="Spot price (S₀)"
               className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
           <div>
             <label className="block text-xs text-[#8b949e] mb-1">Dividend Yield (q)</label>
-            <input
-              type="number"
-              step="0.001"
-              value={inputs.dividend_yield ?? 0}
-              onChange={(e) => updateField("dividend_yield", roundClean(Number(e.target.value), 4))}
-              className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
-            />
+              <input
+                type="number"
+                step="0.001"
+                value={inputs.dividend_yield ?? 0}
+                onChange={(e) => updateField("dividend_yield", roundClean(Number(e.target.value), 4))}
+                aria-label="Dividend yield (q)"
+                className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              />
             {(!inputs.dividend_yield || inputs.dividend_yield === 0) && (
               <p className="text-[10px] text-[#58a6ff]/90 mt-1 font-mono flex items-center gap-1">
                 <span className="text-[#d29922]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Dividend yield 0.0% (defaulted/no payout)
@@ -333,7 +335,7 @@ export function InputPanel({
               className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "call"
                   ? "bg-[#30363d] text-white"
-                  : "text-[#6e7681] hover:text-white"
+                  : "text-[#8b949e] hover:text-white"
               }`}
             >
               CALL
@@ -344,7 +346,7 @@ export function InputPanel({
               className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "put"
                   ? "bg-[#30363d] text-white"
-                  : "text-[#6e7681] hover:text-white"
+                  : "text-[#8b949e] hover:text-white"
               }`}
             >
               PUT
@@ -356,13 +358,14 @@ export function InputPanel({
         <div>
           <div className="flex justify-between items-center mb-1">
             <label className="text-xs text-[#8b949e]">Strike Price (K)</label>
-            <input
-              type="number"
-              step={strikeStep}
-              value={inputs.strike}
-              onChange={(e) => updateField("strike", Number(e.target.value))}
-              className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
-            />
+              <input
+                type="number"
+                step={strikeStep}
+                value={inputs.strike}
+                onChange={(e) => updateField("strike", Number(e.target.value))}
+                aria-label="Strike price (K)"
+                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              />
           </div>
           <input
             type="range"
@@ -371,6 +374,7 @@ export function InputPanel({
             step={strikeStep}
             value={inputs.strike}
             onChange={(e) => updateField("strike", Number(e.target.value))}
+            aria-label="Strike price (K)"
             className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           />
         </div>
@@ -382,6 +386,7 @@ export function InputPanel({
             type="date"
             value={inputs.expiry_date}
             onChange={(e) => updateField("expiry_date", e.target.value)}
+            aria-label="Expiration date"
             className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           />
         </div>
@@ -421,6 +426,7 @@ export function InputPanel({
                 step="0.01"
                 value={inputs.volatility}
                 onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
+                aria-label="Volatility (σ)"
                 className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
@@ -431,6 +437,7 @@ export function InputPanel({
               step="0.01"
               value={inputs.volatility}
               onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
+              aria-label="Volatility (σ)"
               className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
@@ -447,18 +454,20 @@ export function InputPanel({
                 step="0.005"
                 value={inputs.risk_free_rate}
                 onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
+                aria-label="Risk-free rate (r)"
                 className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
           </div>
-          <input
-            type="range"
-            min="-0.02"
-            max="0.20"
-            step="0.0025"
-            value={inputs.risk_free_rate}
-            onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
-            className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
-          />
+            <input
+              type="range"
+              min="-0.02"
+              max="0.20"
+              step="0.0025"
+              value={inputs.risk_free_rate}
+              onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
+              aria-label="Risk-free rate (r)"
+              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+            />
         </div>
       </div>
 
@@ -483,7 +492,7 @@ export function InputPanel({
                   className={`py-1 text-xs font-mono rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                     inputs.n_simulations === nVal
                       ? "bg-[#238636] text-white font-bold"
-                      : "bg-[#0d1117] text-[#6e7681] hover:text-white border border-[#21262d]"
+                      : "bg-[#0d1117] text-[#8b949e] hover:text-white border border-[#21262d]"
                   }`}
                 >
                   {nVal >= 1000000 ? `${nVal / 1000000}M` : `${nVal / 1000}k`}
@@ -497,6 +506,7 @@ export function InputPanel({
               step="5000"
               value={inputs.n_simulations}
               onChange={(e) => updateField("n_simulations", Number(e.target.value))}
+              aria-label="Number of simulations (N)"
               className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
@@ -509,6 +519,7 @@ export function InputPanel({
               onChange={(e) =>
                 updateField("variance_reduction", e.target.value as VarianceReductionMethod)
               }
+              aria-label="Variance reduction method"
               className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-xs font-mono text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               <option value="all">All 5 Estimators (Standard / Anti / CV / Combined / RQMC)</option>
@@ -529,6 +540,7 @@ export function InputPanel({
                 value={inputs.seed}
                 disabled={seedLocked}
                 onChange={(e) => updateField("seed", Number(e.target.value))}
+                aria-label="RNG seed"
                 className="input-field flex-1 bg-[#0d1117] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
               <button
@@ -545,7 +557,7 @@ export function InputPanel({
                 className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                   seedLocked
                     ? "bg-[#161b22] border-[#30363d] text-[#d29922]"
-                    : "bg-[#161b22] border-[#30363d] text-[#6e7681] hover:text-white"
+                    : "bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-white"
                 }`}
               >
                 {seedLocked ? "Locked" : "Unlocked"}
@@ -575,6 +587,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
                 }
+                aria-label="Spot shift (ΔS)"
                 className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
@@ -587,6 +600,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
               }
+              aria-label="Spot shift (ΔS)"
               className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
@@ -604,6 +618,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
                 }
+                aria-label="Volatility shift (Δσ)"
                 className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
@@ -616,6 +631,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
               }
+              aria-label="Volatility shift (Δσ)"
               className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
@@ -635,6 +651,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.max(0, Number(e.target.value)) })
                 }
+                aria-label="Time elapsed (Δt)"
                 className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
@@ -647,6 +664,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Number(e.target.value) })
               }
+              aria-label="Time elapsed (Δt)"
               className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
@@ -664,6 +682,7 @@ export function InputPanel({
                 onChange={(e) =>
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
                 }
+                aria-label="Rate shift (Δr)"
                 className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
@@ -676,6 +695,7 @@ export function InputPanel({
               onChange={(e) =>
                 onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
               }
+              aria-label="Rate shift (Δr)"
               className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
@@ -711,12 +731,12 @@ export function InputPanel({
               className="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-[#0d1117]/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               <span>{isFullSimulating ? "Simulating..." : "▶ Run Full Simulation"}</span>
-              <span className="text-xs font-mono text-[#79c0ff]">(N={inputs.n_simulations.toLocaleString()})</span>
+              <span className="text-xs font-mono text-white">(N={inputs.n_simulations.toLocaleString()})</span>
             </button>
-            <p className="text-[11px] text-[#6e7681] text-center mt-1.5 font-mono">
-              <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#6e7681] text-[10px]">Ctrl</kbd>
+            <p className="text-[11px] text-[#8b949e] text-center mt-1.5 font-mono">
+              <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#b1bac4] text-[10px]">Ctrl</kbd>
               {" + "}
-              <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#6e7681] text-[10px]">Enter</kbd>
+              <kbd className="px-1.5 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#b1bac4] text-[10px]">Enter</kbd>
             </p>
           </>
         )}

@@ -116,10 +116,10 @@ export default function ValidationPage() {
                   : "N/A"}
               </div>
 
-              <div className="text-[11px] font-mono text-[#6e7681] space-y-1">
+              <div className="text-[11px] font-mono text-[#8b949e] space-y-1">
                 <div>Target: {(summary.ci_coverage.nominal_confidence * 100).toFixed(1)}% · Trials: {summary.ci_coverage.trials}</div>
                 {summary.ci_coverage.last_run && (
-                  <div className="text-[#6e7681] pt-1 border-t border-[#21262d] mt-2">
+                  <div className="text-[#8b949e] pt-1 border-t border-[#21262d] mt-2">
                     Last Run: {formatDateTime(summary.ci_coverage.last_run)}
                   </div>
                 )}
@@ -141,11 +141,11 @@ export default function ValidationPage() {
                 {summary.edge_cases.passed} / {summary.edge_cases.total}
               </div>
 
-              <div className="text-[11px] font-mono text-[#6e7681] space-y-1">
+              <div className="text-[11px] font-mono text-[#8b949e] space-y-1">
                 <div>Boundary checks (T→0, σ→0)</div>
                 <div>Put-Call Parity ≤ 1e-5</div>
                 {summary.edge_cases.last_run && (
-                  <div className="text-[#6e7681] pt-1 border-t border-[#21262d] mt-2">
+                  <div className="text-[#8b949e] pt-1 border-t border-[#21262d] mt-2">
                     Last Run: {formatDateTime(summary.edge_cases.last_run)}
                   </div>
                 )}
@@ -167,7 +167,7 @@ export default function ValidationPage() {
                 {summary.greeks_validation.passed} / {summary.greeks_validation.total}
               </div>
 
-              <div className="text-[11px] font-mono text-[#6e7681] space-y-1">
+              <div className="text-[11px] font-mono text-[#8b949e] space-y-1">
                 <div>FD vs Analytical BS</div>
                 <div>CRN verified</div>
               </div>

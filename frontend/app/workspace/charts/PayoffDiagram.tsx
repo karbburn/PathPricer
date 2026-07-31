@@ -57,7 +57,7 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
           <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             Deterministic Option Payoff Diagram at Expiry
           </h3>
-          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
+          <p className="text-xs text-[#8b949e] font-mono mt-0.5">
             Hockey-stick payoff &bull; Strike: {currencySymbol}{K.toFixed(2)} &bull; Spot: {currencySymbol}{S0.toFixed(2)} &bull; Breakeven: {currencySymbol}{breakeven.toFixed(2)}
           </p>
         </div>
@@ -71,13 +71,13 @@ export function PayoffDiagram({ request, optionPrice, currencySymbol }: PayoffDi
           <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <XAxis
               dataKey="spot"
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${currencySymbol}${v}`}
             />
             <YAxis
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               tickFormatter={(v) => `${currencySymbol}${v}`}

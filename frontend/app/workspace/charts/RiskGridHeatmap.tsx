@@ -159,7 +159,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
           <h3 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
             <span className="flex items-center gap-2"><svg className="w-5 h-5 text-[#58a6ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 2D Risk Surface Heatmap</span>
           </h3>
-          <p className="text-xs text-[#6e7681] mt-0.5">
+          <p className="text-xs text-[#8b949e] mt-0.5">
             Vectorized Black-Scholes surface evaluation across 2D parameter grid (25×25)
           </p>
         </div>
@@ -172,7 +172,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "spot_vol"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
-                : "text-[#6e7681] hover:text-white"
+                : "text-[#8b949e] hover:text-white"
             }`}
           >
             Spot × Vol (Classic)
@@ -183,7 +183,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "strike_expiry"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
-                : "text-[#6e7681] hover:text-white"
+                : "text-[#8b949e] hover:text-white"
             }`}
           >
             Strike × Expiry
@@ -194,7 +194,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
               preset === "custom"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
-                : "text-[#6e7681] hover:text-white"
+                : "text-[#8b949e] hover:text-white"
             }`}
           >
             Custom Grid
@@ -205,7 +205,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
       {/* Metric Selector & Axis Configurator */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#0d1117]/60 p-4 rounded-lg border border-[#21262d]">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-[#6e7681] mb-1">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#8b949e] mb-1">
             Target Metric
           </label>
           <select
@@ -224,7 +224,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
         {preset === "custom" && (
           <>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#6e7681] mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#8b949e] mb-1">
                 X-Axis Parameter
               </label>
               <select
@@ -243,7 +243,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#6e7681] mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#8b949e] mb-1">
                 Y-Axis Parameter
               </label>
               <select
@@ -282,7 +282,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
         <div className="space-y-3">
           {/* Active Hover Tooltip Diagnostic Bar */}
           <div className="bg-[#0d1117] border border-[#21262d] px-4 py-2 rounded-lg flex items-center justify-between text-xs font-mono">
-            <span className="text-[#6e7681]">
+            <span className="text-[#8b949e]">
               {hoveredCell
                 ? `Cell Details: [${PARAM_LABELS[axisX]} = ${formatAxisVal(axisX, hoveredCell.x)}, ${
                     PARAM_LABELS[axisY]
@@ -296,14 +296,14 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
           {/* 2D Heatmap Grid Container */}
           <div className="flex flex-col items-center">
-            <div className="text-xs font-mono font-bold text-[#6e7681] mb-1">
+            <div className="text-xs font-mono font-bold text-[#8b949e] mb-1">
               Y-Axis ↑ {PARAM_LABELS[axisY]}
             </div>
 
             <div className="flex items-center gap-2">
               <div className="overflow-x-auto">
                 <div className="min-w-[600px]">
-                  <div className="text-[10px] font-mono text-[#6e7681] flex flex-col justify-between h-64 text-right">
+                  <div className="text-[10px] font-mono text-[#8b949e] flex flex-col justify-between h-64 text-right">
                     <span>{formatAxisVal(axisY, gridData.y_values[gridData.y_values.length - 1])}</span>
                     <span>{formatAxisVal(axisY, gridData.y_values[Math.floor(gridData.y_values.length / 2)])}</span>
                     <span>{formatAxisVal(axisY, gridData.y_values[0])}</span>
@@ -340,7 +340,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
               </div>
             </div>
 
-            <div className="text-xs font-mono font-bold text-[#6e7681] mt-1">
+            <div className="text-xs font-mono font-bold text-[#8b949e] mt-1">
               X-Axis → {PARAM_LABELS[axisX]} ({formatAxisVal(axisX, gridData.x_values[0])} to{" "}
               {formatAxisVal(axisX, gridData.x_values[gridData.x_values.length - 1])})
             </div>
@@ -348,11 +348,11 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
           {/* Color Legend Bar */}
           <div className="flex items-center justify-between pt-2">
-            <span className="text-xs font-mono text-[#6e7681]">
+            <span className="text-xs font-mono text-[#8b949e]">
               Min: {minVal.toFixed(4)}
             </span>
             <div className="flex-1 max-w-md mx-4 h-3 rounded-full bg-gradient-to-r from-[hsl(240,80%,25%)] via-[hsl(120,80%,45%)] to-[hsl(0,80%,60%)] border border-[#21262d]" />
-            <span className="text-xs font-mono text-[#6e7681]">
+            <span className="text-xs font-mono text-[#8b949e]">
               Max: {maxVal.toFixed(4)}
             </span>
           </div>

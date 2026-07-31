@@ -46,7 +46,7 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
           </h2>
           <button
             onClick={onClose}
-            className="text-[#6e7681] hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+            className="text-[#8b949e] hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -76,7 +76,7 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
           ))}
         </div>
 
-        <p className="text-[10px] text-[#6e7681] mt-4 text-center font-mono">
+        <p className="text-[10px] text-[#8b949e] mt-4 text-center font-mono">
           Press <kbd className="px-1 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#79c0ff]">?</kbd> or <kbd className="px-1 py-0.5 bg-[#21262d] border border-[#30363d] rounded text-[#79c0ff]">Esc</kbd> to close
         </p>
       </div>

@@ -121,11 +121,11 @@ export function TickerInput({
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#6e7681] focus:outline-none transition-colors ${focusBorderClass} ${inputClassName}`}
+        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none transition-colors ${focusBorderClass} ${inputClassName}`}
       />
 
       {market === "IN" && (
-        <span className="absolute right-3 top-2.5 text-xs text-[#6e7681] font-mono pointer-events-none">
+        <span className="absolute right-3 top-2.5 text-xs text-[#8b949e] font-mono pointer-events-none">
           Auto-appends .NS
         </span>
       )}
@@ -156,11 +156,11 @@ export function TickerInput({
                 <span className="font-bold text-white font-mono bg-[#161b22] px-1.5 py-0.5 rounded border border-[#21262d]">
                   {item.ticker}
                 </span>
-                <span className="text-[#6e7681] truncate max-w-[200px] sm:max-w-[280px]">
+                <span className="text-[#8b949e] truncate max-w-[200px] sm:max-w-[280px]">
                   {item.name}
                 </span>
               </div>
-              <span className="text-[10px] text-[#6e7681] uppercase">{item.market}</span>
+              <span className="text-[10px] text-[#8b949e] uppercase">{item.market}</span>
             </button>
           ))}
         </div>

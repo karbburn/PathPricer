@@ -54,7 +54,7 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
           <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider">
             MC Estimator Prices &amp; 95% Confidence Intervals vs BS Benchmark
           </h3>
-          <p className="text-xs text-[#6e7681] font-mono mt-0.5">
+          <p className="text-xs text-[#8b949e] font-mono mt-0.5">
             Error bars reflect [&plusmn;1.96 SE] confidence width &bull; Reference line = BS analytical benchmark
           </p>
         </div>
@@ -68,12 +68,12 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
           <BarChart data={chartData} margin={{ top: 15, right: 20, left: 10, bottom: 25 }}>
             <XAxis
               dataKey="name"
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={10}
               fontFamily="monospace"
             />
             <YAxis
-              stroke="#6e7681"
+              stroke="#8b949e"
               fontSize={11}
               fontFamily="monospace"
               domain={[yMin, yMax]}
@@ -109,7 +109,7 @@ export function ComparisonChart({ fullResult, currencySymbol }: ComparisonChartP
         </ResponsiveContainer>
       </div>
 
-      <div className="text-xs text-[#6e7681] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
+      <div className="text-xs text-[#8b949e] font-mono bg-[#0d1117] p-2.5 rounded border border-[#21262d] flex justify-between items-center">
         <span>
           Blue Reference Line = BS Benchmark. Blue Caps = 95% Confidence Intervals.
         </span>

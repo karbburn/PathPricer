@@ -67,7 +67,7 @@ export function TickerStrip() {
               key={ticker.symbol}
               className="flex items-center gap-2 text-[10px] font-mono hover:bg-[#21262d]/40 px-2 py-1 rounded transition-colors min-h-[44px]"
             >
-              <span className="text-[#6e7681] font-semibold">{ticker.symbol}</span>
+              <span className="text-[#8b949e] font-semibold">{ticker.symbol}</span>
               <span className="text-[#e6edf3]">
                 {q ? formatPrice(q.spot_price, ticker.currency) : "—"}
               </span>

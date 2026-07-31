@@ -79,7 +79,7 @@ export default function MarketOverviewPage() {
         <h1 className="text-lg font-bold text-white tracking-tight uppercase font-mono">
           Market Overview
         </h1>
-        <p className="text-xs text-[#6e7681] font-mono mt-1">
+        <p className="text-xs text-[#8b949e] font-mono mt-1">
           Underlying asset data, historical volatility, and dividend yields
         </p>
       </div>
@@ -95,7 +95,7 @@ export default function MarketOverviewPage() {
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 marketInput === "US"
                   ? "bg-[#238636] text-white"
-                  : "text-[#6e7681] hover:text-white"
+                  : "text-[#8b949e] hover:text-white"
               }`}
             >
               US Market
@@ -106,7 +106,7 @@ export default function MarketOverviewPage() {
               className={`px-4 py-2 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 marketInput === "IN"
                   ? "bg-[#238636] text-white"
-                  : "text-[#6e7681] hover:text-white"
+                  : "text-[#8b949e] hover:text-white"
               }`}
             >
               IN Market (.NS)

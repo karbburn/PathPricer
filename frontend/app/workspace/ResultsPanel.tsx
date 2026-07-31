@@ -73,13 +73,13 @@ export function ResultsPanel({
         <div className="px-6 py-5 space-y-3">
           <p className="text-sm text-[#8b949e] leading-relaxed">{error.message}</p>
           {error.field && (
-            <div className="flex items-center gap-2 text-xs text-[#6e7681]">
-              <span className="text-[#6e7681]">Field:</span>
+            <div className="flex items-center gap-2 text-xs text-[#8b949e]">
+              <span className="text-[#8b949e]">Field:</span>
               <code className="bg-[#21262d] border border-[#30363d] px-2 py-0.5 rounded font-mono text-red-300">{error.field}</code>
             </div>
           )}
           {error.statusCode >= 500 && (
-            <p className="text-xs text-[#6e7681] mt-2">
+            <p className="text-xs text-[#8b949e] mt-2">
               If this persists, the backend pricing engine may be unreachable.
             </p>
           )}
@@ -112,7 +112,7 @@ export function ResultsPanel({
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
           <h3 className="text-lg font-bold text-white">Implied Volatility Solver</h3>
-          <p className="text-sm text-[#6e7681] max-w-md mx-auto">
+          <p className="text-sm text-[#8b949e] max-w-md mx-auto">
             Enter a target market option price and click &quot;Solve Implied Volatility&quot; to compute the implied volatility (&sigma;) that yields that price under Black-Scholes.
           </p>
         </div>
@@ -126,7 +126,7 @@ export function ResultsPanel({
             <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
               <span>Implied Volatility Solver Output</span>
             </h2>
-            <p className="text-xs text-[#6e7681] mt-0.5">
+            <p className="text-xs text-[#8b949e] mt-0.5">
               Closed-form BSM Newton-Raphson / Brent Fallback root finder
             </p>
           </div>
@@ -143,7 +143,7 @@ export function ResultsPanel({
           <div className="text-5xl font-extrabold text-[#79c0ff] tracking-tight font-mono">
             {formatPercent(impliedVolResult.implied_vol, 2)}
           </div>
-          <p className="text-xs text-[#6e7681]">
+          <p className="text-xs text-[#8b949e]">
             Annualized Volatility Parameter
           </p>
         </div>
@@ -151,7 +151,7 @@ export function ResultsPanel({
         {/* Solver Diagnostics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               Solver Method
             </span>
             <span className={`inline-block px-2 py-0.5 text-xs font-mono font-bold rounded ${
@@ -164,7 +164,7 @@ export function ResultsPanel({
           </div>
 
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               Convergence
             </span>
             <span className={`inline-block px-2 py-0.5 text-xs font-mono font-bold rounded ${
@@ -177,7 +177,7 @@ export function ResultsPanel({
           </div>
 
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               Iterations Used
             </span>
             <span className="text-sm font-mono font-bold text-white">
@@ -186,7 +186,7 @@ export function ResultsPanel({
           </div>
 
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               BS Price at Soln
             </span>
             <span className="text-sm font-mono font-bold text-white">
@@ -196,7 +196,7 @@ export function ResultsPanel({
         </div>
 
         {/* Residual diagnostic line */}
-        <div className="bg-[#0d1117]/50 border border-[#21262d] px-4 py-2.5 rounded-lg flex items-center justify-between text-xs font-mono text-[#6e7681]">
+        <div className="bg-[#0d1117]/50 border border-[#21262d] px-4 py-2.5 rounded-lg flex items-center justify-between text-xs font-mono text-[#8b949e]">
           <span>Final Price Residual:</span>
           <span className="text-[#e6edf3]">
             {impliedVolResult.final_residual >= 0 ? "+" : ""}
@@ -231,7 +231,7 @@ export function ResultsPanel({
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
           </div>
           <h3 className="text-lg font-bold text-white">P&amp;L Explain &amp; Greek Attribution</h3>
-          <p className="text-sm text-[#6e7681] max-w-md mx-auto">
+          <p className="text-sm text-[#8b949e] max-w-md mx-auto">
             Adjust hypothetical scenario shift sliders (&Delta;S, &Delta;&sigma;, &Delta;t, &Delta;r) and click &quot;Explain P&amp;L Attribution&quot; to decompose actual option P&amp;L into Greek contributions and higher-order residual.
           </p>
         </div>
@@ -267,7 +267,7 @@ export function ResultsPanel({
             <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
               <span>P&amp;L Explain &amp; Greek Attribution Output</span>
             </h2>
-            <p className="text-xs text-[#6e7681] mt-0.5">
+            <p className="text-xs text-[#8b949e] mt-0.5">
               1st &amp; 2nd order Taylor Series decomposition vs actual BSM repriced P&amp;L
             </p>
           </div>
@@ -279,7 +279,7 @@ export function ResultsPanel({
         {/* Base vs Shifted Summary Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               Base Price (V₀)
             </span>
             <span className="text-sm font-mono font-bold text-white">
@@ -288,7 +288,7 @@ export function ResultsPanel({
           </div>
 
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               Shifted Price (V_shift)
             </span>
             <span className="text-sm font-mono font-bold text-white">
@@ -297,7 +297,7 @@ export function ResultsPanel({
           </div>
 
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               Actual Repriced P&amp;L
             </span>
             <span className={`text-sm font-mono font-bold ${actual_pnl >= 0 ? "text-[#3fb950]" : "text-[#f85149]"}`}>
@@ -306,7 +306,7 @@ export function ResultsPanel({
           </div>
 
           <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-            <span className="text-[10px] uppercase font-bold text-[#6e7681] block mb-1">
+            <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">
               Predicted P&amp;L Total
             </span>
             <span className="text-sm font-mono font-bold text-[#79c0ff]">
@@ -348,7 +348,7 @@ export function ResultsPanel({
               {unexplained_pnl >= 0 ? "+" : ""}{currencySymbol}{formatPrice(unexplained_pnl, 4)}
             </span>
           </div>
-          <p className="text-[11px] text-[#6e7681] leading-relaxed">
+          <p className="text-[11px] text-[#8b949e] leading-relaxed">
             This residual captures higher-order and cross-Greek interactions (such as Vanna, Volga, and cross-gamma between spot and volatility) that first- and second-order single-variable Greeks do not account for.
           </p>
         </div>
@@ -501,14 +501,14 @@ export function ResultsPanel({
             <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider">
               Monte Carlo Estimator Comparison &amp; Variance Reduction
             </h3>
-            <span className="text-xs text-[#6e7681] font-mono">
+            <span className="text-xs text-[#8b949e] font-mono">
               Relative Efficiency = Var(Std) / Var(Method)
             </span>
           </div>
 
           <div className="overflow-x-auto">
               <table className="w-full text-xs font-mono text-left">
-                <thead className="bg-[#0d1117] text-[#6e7681] border-b border-[#21262d]">
+                <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
                   <tr>
                     <th className="table-cell p-2.5">Method</th>
                     <th className="table-cell p-2.5 text-right">Price</th>
@@ -541,13 +541,13 @@ export function ResultsPanel({
                         <td className="table-cell p-2.5 text-right text-[#58a6ff] font-bold">
                           &plusmn;${mc.standard_error.toFixed(4)}
                         </td>
-                        <td className="table-cell p-2.5 text-right text-[#6e7681]">
+                        <td className="table-cell p-2.5 text-right text-[#8b949e]">
                           ${mc.ci_width.toFixed(4)}
                         </td>
-                        <td className="table-cell p-2.5 text-right text-[#6e7681]">
+                        <td className="table-cell p-2.5 text-right text-[#8b949e]">
                           {mc.runtime_ms.toFixed(1)}ms
                         </td>
-                        <td className="table-cell p-2.5 text-right text-[#6e7681]">
+                        <td className="table-cell p-2.5 text-right text-[#8b949e]">
                           {mc.n_effective.toLocaleString()}
                         </td>
 
@@ -566,7 +566,7 @@ export function ResultsPanel({
                             className={`text-sm ${
                               isFocalPoint
                                 ? "text-[#79c0ff] font-extrabold text-base"
-                                : "text-[#6e7681]"
+                                : "text-[#8b949e]"
                             }`}
                           >
                             {mc.relative_efficiency > 9999 ? ">9999" : mc.relative_efficiency.toFixed(2)}x
@@ -587,14 +587,14 @@ export function ResultsPanel({
             <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider">
               Greeks Comparison: Analytical BS vs Finite-Difference MC (CRN)
             </h3>
-            <span className="text-xs text-[#6e7681] font-mono">
+            <span className="text-xs text-[#8b949e] font-mono">
               Deltas shown explicitly &bull; CRN seed={fullResult.request_echo.seed}
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs font-mono text-left">
-              <thead className="bg-[#0d1117] text-[#6e7681] border-b border-[#21262d]">
+              <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
                 <tr>
                   <th className="table-cell p-2.5">Greek</th>
                   <th className="table-cell p-2.5 text-right">Analytical BS</th>
@@ -636,7 +636,7 @@ export function ResultsPanel({
                         {diff >= 0 ? "+" : ""}
                         {diff.toFixed(5)}
                       </td>
-                      <td className="table-cell p-2.5 text-right text-[#6e7681]">
+                      <td className="table-cell p-2.5 text-right text-[#8b949e]">
                         {isNearZero ? "N/A (near 0)" : `${(relErr * 100).toFixed(2)}%`}
                       </td>
                       <td className="table-cell p-2.5 text-center">
@@ -758,7 +758,7 @@ export function ResultsPanel({
             <div className="text-4xl font-black text-[#8b949e] font-mono">
               {currencySymbol}{previewResult.black_scholes.price.toFixed(2)}
             </div>
-            <div className="mt-3 flex gap-4 text-xs font-mono text-[#6e7681]">
+            <div className="mt-3 flex gap-4 text-xs font-mono text-[#8b949e]">
               <span>&Delta;: {previewResult.black_scholes.delta.toFixed(4)}</span>
               <span>&Gamma;: {previewResult.black_scholes.gamma.toFixed(5)}</span>
             </div>
@@ -771,7 +771,7 @@ export function ResultsPanel({
             <div className="text-4xl font-black text-[#8b949e] font-mono">
               {currencySymbol}{previewResult.monte_carlo_standard.price.toFixed(2)}
             </div>
-            <div className="mt-3 flex gap-4 text-xs font-mono text-[#6e7681]">
+            <div className="mt-3 flex gap-4 text-xs font-mono text-[#8b949e]">
               <span>&Delta;: {previewResult.monte_carlo_standard.delta.toFixed(4)}</span>
               <span>&Gamma;: {previewResult.monte_carlo_standard.gamma.toFixed(5)}</span>
             </div>
