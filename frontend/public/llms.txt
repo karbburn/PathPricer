@@ -1,0 +1,46 @@
+# PathPricer
+
+Institutional-grade European option pricing platform using Monte Carlo simulation with variance reduction techniques and Black-Scholes analytical benchmarks.
+
+## What It Does
+
+PathPricer prices European call/put options via Monte Carlo simulation with 5 variance reduction estimators (Standard, Antithetic Variates, Control Variates, Combined, Randomized QMC/Sobol). It benchmarks results against Black-Scholes closed-form solutions, computes analytical and finite-difference Greeks, and provides convergence diagnostics.
+
+## Key Features
+
+- 5 Monte Carlo estimators with variance reduction
+- Black-Scholes analytical benchmark
+- Analytical Greeks (Delta, Gamma, Vega, Theta, Rho)
+- Finite-difference Greeks with Common Random Numbers
+- Convergence analysis (slope, R², log-log)
+- Implied volatility solver (Newton-Raphson / Brent)
+- P&L attribution via Taylor decomposition (Delta, Gamma, Vega, Theta, Greeks)
+- Risk grid heatmap (underlying × volatility mesh)
+- Payoff diagram and terminal distribution charts
+- CSV and PDF report export
+- Live market data for US and Indian equities
+
+## Pages
+
+- `/` — Markets: live quotes and ticker strip
+- `/workspace` — Workspace: option pricing, IV solver, P&L explain
+- `/validation` — Validation: CI coverage, edge cases, Greeks tests
+- `/docs` — Documentation: mathematical specification, method descriptions, convergence theory
+
+## API
+
+Backend is FastAPI at `https://pathpricer-backend.onrender.com`:
+
+- `POST /api/v1/price/full` — Full simulation with all estimators and Greeks
+- `POST /api/v1/price/preview` — Fast preview (≤10k paths)
+- `POST /api/v1/price/implied-vol` — Implied volatility solver
+- `POST /api/v1/price/pnl-explain` — P&L attribution decomposition
+- `POST /api/v1/price/risk-grid` — Risk grid heatmap data
+- `GET /api/v1/market/quote` — Live market quote
+- `POST /report/pdf` — PDF report generation
+
+## Tech Stack
+
+- Frontend: Next.js 16, React 19, Tailwind CSS 4, Recharts, KaTeX
+- Backend: FastAPI, NumPy, SciPy, ReportLab
+- Deployment: Vercel (frontend), Render (backend)

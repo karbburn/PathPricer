@@ -25,10 +25,39 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const SITE_URL = "https://pathpricer.vercel.app";
+
 export const metadata: Metadata = {
-  title: "PathPricer — Institutional Option Pricing",
+  title: {
+    default: "PathPricer — Institutional Option Pricing",
+    template: "%s | PathPricer",
+  },
   description:
-    "European option pricing application (Monte Carlo + Black-Scholes benchmark) with variance reduction, analytical & FD Greeks, and mathematical validation.",
+    "European option pricing platform: Monte Carlo simulation with 5 variance reduction estimators, Black-Scholes benchmark, analytical & finite-difference Greeks, implied volatility solver, and P&L attribution.",
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: "PathPricer",
+    title: "PathPricer — Institutional Option Pricing",
+    description:
+      "European option pricing platform: Monte Carlo simulation with variance reduction, Black-Scholes benchmark, Greeks, and convergence diagnostics.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PathPricer — Institutional Option Pricing",
+    description:
+      "European option pricing: Monte Carlo + Black-Scholes, 5 estimators, Greeks, implied vol solver.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
 };
 
 export default function RootLayout({
