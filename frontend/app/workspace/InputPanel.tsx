@@ -189,7 +189,7 @@ export function InputPanel({
           <button
             type="button"
             onClick={() => onWorkspaceModeChange("pricing")}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+            className={`flex-1 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pricing"
                 ? "bg-[#238636] text-white shadow"
                 : "text-[#8b949e] hover:text-white"
@@ -200,7 +200,7 @@ export function InputPanel({
           <button
             type="button"
             onClick={() => onWorkspaceModeChange("implied_vol")}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+            className={`flex-1 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "implied_vol"
                 ? "bg-[#238636] text-white shadow"
                 : "text-[#8b949e] hover:text-white"
@@ -211,7 +211,7 @@ export function InputPanel({
           <button
             type="button"
             onClick={() => onWorkspaceModeChange("pnl_explain")}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+            className={`flex-1 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-bold rounded-md transition-all whitespace-nowrap px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               workspaceMode === "pnl_explain"
                 ? "bg-[#238636] text-white shadow"
                 : "text-[#8b949e] hover:text-white"
@@ -255,7 +255,7 @@ export function InputPanel({
               type="button"
               onClick={handleMarketFetch}
               disabled={fetchingMarket}
-              className="bg-[#30363d] hover:bg-[#3a424b] text-white text-xs px-3 py-2 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className="bg-[#30363d] hover:bg-[#3a424b] text-white text-xs px-3 py-2.5 sm:py-2 min-h-[44px] sm:min-h-0 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
               {fetchingMarket ? "Syncing..." : "Sync Market"}
             </button>
@@ -265,7 +265,7 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => updateField("market", "US")}
-              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              className={`flex-1 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "US"
                   ? "bg-[#238636] text-white"
                   : "text-[#8b949e] hover:text-white"
@@ -276,7 +276,7 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => updateField("market", "IN")}
-              className={`flex-1 py-1 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              className={`flex-1 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.market === "IN"
                   ? "bg-[#238636] text-white"
                   : "text-[#8b949e] hover:text-white"
@@ -332,7 +332,7 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => updateField("option_type", "call")}
-              className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              className={`px-3 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "call"
                   ? "bg-[#30363d] text-white"
                   : "text-[#8b949e] hover:text-white"
@@ -343,7 +343,7 @@ export function InputPanel({
             <button
               type="button"
               onClick={() => updateField("option_type", "put")}
-              className={`px-3 py-1 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              className={`px-3 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-bold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 inputs.option_type === "put"
                   ? "bg-[#30363d] text-white"
                   : "text-[#8b949e] hover:text-white"
@@ -364,7 +364,7 @@ export function InputPanel({
                 value={inputs.strike}
                 onChange={(e) => updateField("strike", Number(e.target.value))}
                 aria-label="Strike price (K)"
-                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
           </div>
           <input
@@ -427,19 +427,9 @@ export function InputPanel({
                 value={inputs.volatility}
                 onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
                 aria-label="Volatility (σ)"
-                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
-            <input
-              type="range"
-              min="0.01"
-              max="2.00"
-              step="0.01"
-              value={inputs.volatility}
-              onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
-              aria-label="Volatility (σ)"
-              className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
-            />
           </div>
         )}
 
@@ -455,7 +445,7 @@ export function InputPanel({
                 value={inputs.risk_free_rate}
                 onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
                 aria-label="Risk-free rate (r)"
-                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
           </div>
             <input
@@ -489,7 +479,7 @@ export function InputPanel({
                   key={nVal}
                   type="button"
                   onClick={() => updateField("n_simulations", nVal)}
-                  className={`py-1 text-xs font-mono rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+                  className={`py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                     inputs.n_simulations === nVal
                       ? "bg-[#238636] text-white font-bold"
                       : "bg-[#0d1117] text-[#8b949e] hover:text-white border border-[#21262d]"
@@ -541,20 +531,20 @@ export function InputPanel({
                 disabled={seedLocked}
                 onChange={(e) => updateField("seed", Number(e.target.value))}
                 aria-label="RNG seed"
-                className="input-field flex-1 bg-[#0d1117] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field flex-1 bg-[#0d1117] border border-[#30363d] rounded px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
               <button
                 type="button"
                 onClick={handleRandomizeSeed}
                 disabled={seedLocked}
-                className="bg-[#30363d] hover:bg-[#3a424b] text-white text-xs px-3 py-1.5 rounded font-mono disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="bg-[#30363d] hover:bg-[#3a424b] text-white text-xs px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded font-mono disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               >
                 Randomize
               </button>
               <button
                 type="button"
                 onClick={() => setSeedLocked(!seedLocked)}
-                className={`text-xs px-3 py-1.5 rounded font-mono border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+                className={`text-xs px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded font-mono border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                   seedLocked
                     ? "bg-[#161b22] border-[#30363d] text-[#d29922]"
                     : "bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-white"
@@ -588,7 +578,7 @@ export function InputPanel({
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_spot: Number(e.target.value) })
                 }
                 aria-label="Spot shift (ΔS)"
-                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -619,7 +609,7 @@ export function InputPanel({
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_vol: roundClean(Number(e.target.value), 4) })
                 }
                 aria-label="Volatility shift (Δσ)"
-                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -652,7 +642,7 @@ export function InputPanel({
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.max(0, Number(e.target.value)) })
                 }
                 aria-label="Time elapsed (Δt)"
-                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input
@@ -683,7 +673,7 @@ export function InputPanel({
                   onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
                 }
                 aria-label="Rate shift (Δr)"
-                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-1 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+                className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
             </div>
             <input

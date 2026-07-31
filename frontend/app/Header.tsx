@@ -76,7 +76,7 @@ export function Header() {
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="sm:hidden p-2 rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+          className="sm:hidden p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           aria-label="Toggle navigation"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -99,22 +99,22 @@ export function Header() {
       {/* Mobile dropdown */}
       {mobileOpen && (
         <nav className="sm:hidden mt-3 pb-2 border-t border-[#21262d] pt-3 space-y-1">
-          <Link href="/" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
+          <Link href="/" onClick={() => setMobileOpen(false)} className="block px-3 py-3 min-h-[44px] flex items-center text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
             Markets
           </Link>
-          <Link href="/workspace" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
+          <Link href="/workspace" onClick={() => setMobileOpen(false)} className="block px-3 py-3 min-h-[44px] flex items-center text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
             Workspace
           </Link>
-          <Link href="/validation" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
+          <Link href="/validation" onClick={() => setMobileOpen(false)} className="block px-3 py-3 min-h-[44px] flex items-center text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
             Validate
           </Link>
-          <Link href="/docs" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
+          <Link href="/docs" onClick={() => setMobileOpen(false)} className="block px-3 py-3 min-h-[44px] flex items-center text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
             Docs
           </Link>
           <button
             type="button"
             onClick={() => { toggle(); setMobileOpen(false); }}
-            className="block w-full text-left px-3 py-2 text-sm font-mono rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors border border-[#30363d] mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+            className="block w-full text-left px-3 py-3 min-h-[44px] flex items-center text-sm font-mono rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors border border-[#30363d] mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
             Density: {density === "compact" ? "Compact" : "Comfortable"}
           </button>
