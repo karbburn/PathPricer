@@ -676,6 +676,38 @@ export const TICKER_DATABASE: TickerEntry[] = [
   { ticker: "VEDL", name: "Vedanta", market: "IN" },
   { ticker: "WIPRO", name: "Wipro", market: "IN" },
   { ticker: "ZYDUSLIFE", name: "Zydus Lifesciences", market: "IN" },
+
+  // Forex Majors
+  { ticker: "EURUSD", name: "EUR/USD", market: "FX" },
+  { ticker: "GBPUSD", name: "GBP/USD", market: "FX" },
+  { ticker: "USDJPY", name: "USD/JPY", market: "FX" },
+  { ticker: "USDCHF", name: "USD/CHF", market: "FX" },
+  { ticker: "AUDUSD", name: "AUD/USD", market: "FX" },
+  { ticker: "USDCAD", name: "USD/CAD", market: "FX" },
+  { ticker: "NZDUSD", name: "NZD/USD", market: "FX" },
+
+  // Forex Minors
+  { ticker: "EURGBP", name: "EUR/GBP", market: "FX" },
+  { ticker: "EURJPY", name: "EUR/JPY", market: "FX" },
+  { ticker: "GBPJPY", name: "GBP/JPY", market: "FX" },
+  { ticker: "AUDJPY", name: "AUD/JPY", market: "FX" },
+  { ticker: "EURAUD", name: "EUR/AUD", market: "FX" },
+  { ticker: "EURCHF", name: "EUR/CHF", market: "FX" },
+  { ticker: "USDINR", name: "USD/INR", market: "FX" },
+
+  // Crypto
+  { ticker: "BTC", name: "Bitcoin", market: "CRYPTO" },
+  { ticker: "ETH", name: "Ethereum", market: "CRYPTO" },
+  { ticker: "SOL", name: "Solana", market: "CRYPTO" },
+  { ticker: "BNB", name: "Binance Coin", market: "CRYPTO" },
+  { ticker: "XRP", name: "Ripple", market: "CRYPTO" },
+  { ticker: "ADA", name: "Cardano", market: "CRYPTO" },
+  { ticker: "DOGE", name: "Dogecoin", market: "CRYPTO" },
+  { ticker: "AVAX", name: "Avalanche", market: "CRYPTO" },
+  { ticker: "DOT", name: "Polkadot", market: "CRYPTO" },
+  { ticker: "MATIC", name: "Polygon", market: "CRYPTO" },
+  { ticker: "LINK", name: "Chainlink", market: "CRYPTO" },
+  { ticker: "UNI", name: "Uniswap", market: "CRYPTO" },
 ];
 
 /**

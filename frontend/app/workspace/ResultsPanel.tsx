@@ -22,7 +22,7 @@ interface ResultsPanelProps {
   isCalculatingPnL?: boolean;
 }
 
-const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9" };
+const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9", FX: "$", CRYPTO: "$" };
 
 // Validation tolerances for FD Greeks comparison
 const GREEK_TOLERANCES: Record<string, { name: string; symbol: string; tolerance: number }> = {

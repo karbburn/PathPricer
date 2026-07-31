@@ -2,7 +2,7 @@
  * TypeScript types mirroring backend Pydantic schemas.
  */
 
-export type MarketRegion = "US" | "IN";
+export type MarketRegion = "US" | "IN" | "FX" | "CRYPTO";
 export type OptionType = "call" | "put";
 export type VarianceReductionMethod =
   | "standard"
@@ -255,8 +255,6 @@ export interface RiskGridResponse {
 // ---------------------------------------------------------------------------
 // Options Chain types
 // ---------------------------------------------------------------------------
-
-export type MarketRegionExtended = "US" | "IN" | "FX" | "CRYPTO";
 
 export interface OptionContract {
   contractSymbol?: string;

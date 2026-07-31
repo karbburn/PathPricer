@@ -17,7 +17,7 @@ interface ChartTabContainerProps {
 
 type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid";
 
-const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9" };
+const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9", FX: "$", CRYPTO: "$" };
 
 export function ChartTabContainer({ request, fullResult }: ChartTabContainerProps) {
   const [activeTab, setActiveTab] = useState<ChartTab>("paths");
