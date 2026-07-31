@@ -39,7 +39,7 @@ export function formatCurrency(val: number | null | undefined, currency: string 
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
-  return `${currency}${formatted}`;
+  return `${currency}\u2009${formatted}`;
 }
 
 export function formatMarketCap(val: number | null | undefined, currency: string = "$"): string {

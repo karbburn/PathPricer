@@ -67,7 +67,7 @@ export function Header() {
               onClick={toggle}
               className="px-2 py-1 rounded text-xs font-mono text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors border border-[#30363d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
-              {density === "compact" ? "Cmpct" : "Cmft"}
+              {density === "compact" ? "Compact" : "Comfort"}
             </button>
           </div>
         </nav>

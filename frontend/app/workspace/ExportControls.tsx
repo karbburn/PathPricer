@@ -32,9 +32,9 @@ export function ExportControls({ fullResult, request }: ExportControlsProps) {
   return (
     <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 overflow-hidden">
       <div className="min-w-0 flex-1">
-        <h4 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider">
+        <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider">
           Export &amp; Reporting Suite
-        </h4>
+        </h3>
         <p className="text-xs text-[#8b949e] font-mono mt-1">
           PDF (backend) &middot; CSV (client-side)
         </p>

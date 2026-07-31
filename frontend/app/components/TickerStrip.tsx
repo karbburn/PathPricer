@@ -57,7 +57,7 @@ export function TickerStrip() {
   }, [fetchAll]);
 
   return (
-    <div className="h-10 bg-[#0d1117] border-b border-[#21262d] flex items-center overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain" }}>
+    <div className="h-10 bg-[#0d1117] border-b border-[#21262d] flex items-center overflow-x-auto relative" style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain" }}>
       <div className="flex items-center gap-6 px-4 whitespace-nowrap">
         {TICKERS.map((ticker, i) => {
           const q = quotes[i];
@@ -82,6 +82,7 @@ export function TickerStrip() {
           );
         })}
       </div>
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0d1117] to-transparent" />
     </div>
   );
 }
