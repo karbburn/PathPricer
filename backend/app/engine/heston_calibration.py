@@ -81,15 +81,12 @@ def _model_prices(
     params = HestonParams(v0=float(v0), kappa=float(kappa), theta_v=float(theta_v),
                           sigma_v=float(sigma_v), rho=float(rho))
     out = np.empty(len(contracts))
-    # Group indices by unique expiry to vectorize per-T pricing.
-    expiries: dict[float, list[int]] = {}
+    # Group indices by unique expiry AND option type to vectorize per-T pricing.
+    groups: dict[tuple[float, str], list[int]] = {}
     for i, c in enumerate(contracts):
-        expiries.setdefault(c.ttm, []).append(i)
-    for ttm, idxs in expiries.items():
+        groups.setdefault((c.ttm, c.option_type.lower()), []).append(i)
+    for (ttm, opt_type), idxs in groups.items():
         ks = np.asarray([contracts[i].strike for i in idxs], dtype=np.float64)
-        types = {contracts[i].option_type.lower() for i in idxs}
-        # Contract list is expected homogeneous per expiry in type.
-        opt_type = types.pop() if len(types) == 1 else "call"
         prices = price_european_many(S0, ks, ttm, r, q, params, opt_type)
         for j, i in enumerate(idxs):
             out[i] = prices[j]
