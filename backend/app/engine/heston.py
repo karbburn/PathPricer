@@ -70,6 +70,24 @@ class HestonParams:
     sigma_v: float
     rho: float
 
+    def __post_init__(self) -> None:
+        if self.v0 <= 0 or self.kappa <= 0 or self.theta_v <= 0 or self.sigma_v <= 0:
+            raise ValueError(
+                "v0, kappa, theta_v, sigma_v must all be strictly positive."
+            )
+        if abs(self.rho) >= 1.0:
+            raise ValueError("|rho| must be strictly less than 1.")
+        if self.rho != self.rho or not math.isfinite(self.rho):
+            raise ValueError("rho must be a finite number.")
+        for name, val in (
+            ("v0", self.v0),
+            ("kappa", self.kappa),
+            ("theta_v", self.theta_v),
+            ("sigma_v", self.sigma_v),
+        ):
+            if not math.isfinite(val):
+                raise ValueError(f"{name} must be finite.")
+
 
 @dataclass(frozen=True)
 class HestonResult:

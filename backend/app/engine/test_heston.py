@@ -88,6 +88,21 @@ def _run_tests() -> None:
             assert math.isfinite(price), f"Non-finite price for {eparams} at T={TT}"
             assert 0.0 <= price <= S0, f"Call out of no-arbitrage bounds: {price} for {eparams} T={TT}"
 
+    # --- 7. Parameter validation ----------------------------------------------
+    invalid_params = [
+        dict(v0=-0.1, kappa=1.0, theta_v=0.05, sigma_v=0.3, rho=-0.5),
+        dict(v0=0.04, kappa=0.0, theta_v=0.05, sigma_v=0.3, rho=-0.5),
+        dict(v0=0.04, kappa=1.0, theta_v=0.05, sigma_v=-0.3, rho=-0.5),
+        dict(v0=0.04, kappa=1.0, theta_v=0.05, sigma_v=0.3, rho=1.5),
+        dict(v0=float("nan"), kappa=1.0, theta_v=0.05, sigma_v=0.3, rho=-0.5),
+    ]
+    for bad in invalid_params:
+        try:
+            HestonParams(**bad)
+            raise AssertionError(f"Expected ValueError for {bad}")
+        except ValueError:
+            pass
+
     print("Heston engine self-check OK")
     print(f"  benchmark call = {call:.4f} (expect ~6.078)")
     print(f"  delta={res.delta:.4f} gamma={res.gamma:.4f} vega={res.vega:.4f} "
