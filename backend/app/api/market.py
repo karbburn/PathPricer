@@ -26,7 +26,7 @@ router = APIRouter(prefix="/market", tags=["market"])
 )
 def get_market_quote(
     ticker: str = Query(..., description="Stock ticker symbol"),
-    market: str = Query(..., description="Market region (US or IN)"),
+    market: str = Query(..., description="Market region (US, IN, FX, CRYPTO)"),
     market_data: MarketDataService = Depends(get_market_data_service),
 ) -> MarketQuoteResponse | ErrorResponse:
     """Fetch current market data and historical volatility for a ticker."""

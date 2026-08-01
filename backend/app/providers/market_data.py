@@ -1,6 +1,6 @@
 """Market Data Service provider using yfinance.
 
-Isolates yfinance integration, ticker symbol resolution (US / Indian .NS),
+Isolates yfinance integration, ticker symbol resolution (US / Indian .NS / FX / CRYPTO),
 historical quote extraction, and dividend yield handling.
 """
 
@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import math
 import time
+import pandas as pd
 import yfinance as yf
 
 from ..engine.volatility import all_windows_volatility
@@ -53,8 +54,8 @@ class MarketQuote:
 
     Attributes:
         ticker: Original ticker input.
-        market: Market region ('US' or 'IN').
-        resolved_symbol: Resolved yfinance ticker symbol (e.g. RELIANCE.NS).
+        market: Market region ('US', 'IN', 'FX', 'CRYPTO').
+        resolved_symbol: Resolved yfinance ticker symbol (e.g. RELIANCE.NS, EURUSD=X).
         spot_price: Latest closing price.
         daily_return: Latest 1-day percentage return.
         historical_volatility: Trailing volatility estimates (20d, 60d, 126d, 252d).
@@ -82,11 +83,11 @@ class MarketDataService:
     """Service handling ticker resolution and yfinance market data extraction."""
 
     def resolve_symbol(self, ticker: str, market: str) -> str:
-        """Resolve ticker to standard exchange symbol (e.g., append .NS for Indian tickers).
+        """Resolve ticker to standard exchange symbol.
 
         Args:
-            ticker: Stock ticker string (e.g. 'RELIANCE', 'AAPL').
-            market: Market region ('US' or 'IN').
+            ticker: Stock ticker string (e.g. 'RELIANCE', 'AAPL', 'EURUSD', 'BTC').
+            market: Market region ('US', 'IN', 'FX', 'CRYPTO').
 
         Returns:
             str: Resolved yfinance ticker symbol.
@@ -96,6 +97,16 @@ class MarketDataService:
 
         if clean_market == "IN" and not clean_ticker.endswith((".NS", ".BO")):
             return f"{clean_ticker}.NS"
+        if clean_market == "FX":
+            # Forex: EURUSD -> EURUSD=X
+            if not clean_ticker.endswith("=X"):
+                return f"{clean_ticker}=X"
+            return clean_ticker
+        if clean_market == "CRYPTO":
+            # Crypto: BTC -> BTC-USD
+            if not clean_ticker.endswith("-USD"):
+                return f"{clean_ticker}-USD"
+            return clean_ticker
         return clean_ticker
 
     def get_quote(self, ticker: str, market: str) -> MarketQuote:
@@ -103,7 +114,7 @@ class MarketDataService:
 
         Args:
             ticker: Stock ticker string.
-            market: Market region ('US' or 'IN').
+            market: Market region ('US', 'IN', 'FX', 'CRYPTO').
 
         Returns:
             MarketQuote: Populated market data quote object.
@@ -179,7 +190,7 @@ class MarketDataService:
         except Exception:
             info = {}
 
-        currency = str(info.get("currency", "USD" if market.strip().upper() == "US" else "INR"))
+        currency = str(info.get("currency", "USD" if market.strip().upper() in ("US", "FX", "CRYPTO") else "INR"))
         market_cap_raw = info.get("marketCap") or info.get("market_cap")
         market_cap = float(market_cap_raw) if market_cap_raw is not None else None
 
@@ -258,21 +269,39 @@ class MarketDataService:
                 fallback_available=False,
             )
 
-        chain = ticker_obj.option_chain(expiry)
+        try:
+            chain = ticker_obj.option_chain(expiry)
+        except Exception as exc:
+            raise MarketDataError(
+                message=f"Options data temporarily unavailable for '{symbol}': {exc}",
+                ticker=symbol,
+                fallback_available=True,
+            ) from exc
         calls = chain.calls.to_dict(orient="records")
         puts = chain.puts.to_dict(orient="records")
 
-        # Clean NaN values from serialisation
+        # Clean NaN/inf values from serialisation
         for row in calls + puts:
             for k, v in row.items():
-                if isinstance(v, float) and math.isnan(v):
+                if isinstance(v, float) and not math.isfinite(v):
                     row[k] = None
+
+        # Single fetch for underlying price (reuse ticker_obj)
+        underlying_price = None
+        try:
+            hist_1d = ticker_obj.history(period="1d")
+            if not hist_1d.empty:
+                last_close = float(hist_1d["Close"].iloc[-1])
+                if math.isfinite(last_close):
+                    underlying_price = last_close
+        except Exception:
+            pass
 
         return {
             "ticker": ticker,
             "market": market.strip().upper(),
             "resolved_symbol": symbol,
-            "underlying_price": float(yf.Ticker(symbol).history(period="1d")["Close"].iloc[-1]) if not yf.Ticker(symbol).history(period="1d").empty else None,
+            "underlying_price": underlying_price,
             "expiries": expiries,
             "selected_expiry": expiry,
             "calls": calls,
@@ -293,6 +322,23 @@ class MarketDataService:
         Returns:
             dict with metadata and list of OHLCV bars.
         """
+        VALID_PERIODS = {"1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"}
+        VALID_INTERVALS = {"1d", "1wk", "1mo"}
+        MAX_ROWS = 5000
+
+        if period not in VALID_PERIODS:
+            raise MarketDataError(
+                message=f"Invalid period '{period}'. Valid: {sorted(VALID_PERIODS)}",
+                ticker=ticker,
+                fallback_available=False,
+            )
+        if interval not in VALID_INTERVALS:
+            raise MarketDataError(
+                message=f"Invalid interval '{interval}'. Valid: {sorted(VALID_INTERVALS)}",
+                ticker=ticker,
+                fallback_available=False,
+            )
+
         symbol = self.resolve_symbol(ticker, market)
         ticker_obj = yf.Ticker(symbol)
 
@@ -309,17 +355,30 @@ class MarketDataService:
         except Exception:
             info = {}
 
-        currency = str(info.get("currency", "USD"))
+        currency = str(info.get("currency", "USD" if market.strip().upper() in ("US", "FX", "CRYPTO") else "INR"))
+
+        hist = hist.dropna(subset=["Open", "High", "Low", "Close"])
+        hist = hist.tail(MAX_ROWS)
 
         bars = []
         for idx, row in hist.iterrows():
+            open_val = float(row.get("Open", 0))
+            high_val = float(row.get("High", 0))
+            low_val = float(row.get("Low", 0))
+            close_val = float(row.get("Close", 0))
+            vol_raw = row.get("Volume", 0)
+            vol_val = int(vol_raw) if pd.notna(vol_raw) and vol_raw == vol_raw else 0
+
+            if not all(math.isfinite(v) for v in [open_val, high_val, low_val, close_val]):
+                continue
+
             bar = {
                 "date": idx.strftime("%Y-%m-%d"),
-                "open": round(float(row.get("Open", 0)), 4),
-                "high": round(float(row.get("High", 0)), 4),
-                "low": round(float(row.get("Low", 0)), 4),
-                "close": round(float(row.get("Close", 0)), 4),
-                "volume": int(row.get("Volume", 0)),
+                "open": round(open_val, 6),
+                "high": round(high_val, 6),
+                "low": round(low_val, 6),
+                "close": round(close_val, 6),
+                "volume": vol_val,
             }
             bars.append(bar)
 
