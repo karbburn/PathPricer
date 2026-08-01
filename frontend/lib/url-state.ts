@@ -70,7 +70,7 @@ export function deserializeParams(
   if (ticker) result.ticker = ticker.trim().toUpperCase();
 
   const market = getParam("market")?.toUpperCase();
-  if (market === "US" || market === "IN") result.market = market as MarketRegion;
+  if (market === "US" || market === "IN" || market === "FX" || market === "CRYPTO") result.market = market as MarketRegion;
 
   const spot = getParam("spot_override") ?? getParam("spot");
   if (spot !== null && !isNaN(Number(spot))) result.spot_override = Number(spot);

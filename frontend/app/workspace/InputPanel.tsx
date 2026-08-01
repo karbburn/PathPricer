@@ -262,28 +262,20 @@ export function InputPanel({
           </div>
 
           <div className="flex bg-[#0d1117] p-1 rounded border border-[#30363d]">
-            <button
-              type="button"
-              onClick={() => updateField("market", "US")}
-              className={`flex-1 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-                inputs.market === "US"
-                  ? "bg-[#238636] text-white"
-                  : "text-[#8b949e] hover:text-white"
-              }`}
-            >
-              US
-            </button>
-            <button
-              type="button"
-              onClick={() => updateField("market", "IN")}
-              className={`flex-1 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-                inputs.market === "IN"
-                  ? "bg-[#238636] text-white"
-                  : "text-[#8b949e] hover:text-white"
-              }`}
-            >
-              IN (.NS)
-            </button>
+            {(["US", "IN", "FX", "CRYPTO"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => updateField("market", m)}
+                className={`flex-1 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+                  inputs.market === m
+                    ? "bg-[#238636] text-white"
+                    : "text-[#8b949e] hover:text-white"
+                }`}
+              >
+                {m === "US" ? "US" : m === "IN" ? "IN (.NS)" : m === "FX" ? "FX" : "CRYPTO"}
+              </button>
+            ))}
           </div>
         </div>
 
