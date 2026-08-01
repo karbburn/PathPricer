@@ -7,29 +7,33 @@ historical quote extraction, and dividend yield handling.
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import math
-import time
+import threading
+import time as _time
 import pandas as pd
 import yfinance as yf
 
+from ..core.config import settings
 from ..engine.volatility import all_windows_volatility
 
 # In-memory TTL cache for market quotes. Key: (symbol, market).
-# ponytail: global dict, fine for single-process Render free tier.
-_CACHE_TTL: float = 300.0  # 5 minutes
+_CACHE_TTL: float = float(settings.market_data_cache_ttl)
+_CACHE_MAX: int = 512
 _quote_cache: dict[tuple[str, str], tuple[float, "MarketQuote"]] = {}
+_fetch_locks: dict[tuple[str, str], threading.Lock] = {}
 
 
 def _cache_get(key: tuple[str, str]) -> "MarketQuote | None":
     entry = _quote_cache.get(key)
-    if entry and (time.time() - entry[0]) < _CACHE_TTL:
+    if entry and (_time.monotonic() - entry[0]) < _CACHE_TTL:
         return entry[1]
-    if entry:
-        del _quote_cache[key]
+    _quote_cache.pop(key, None)
     return None
 
 
 def _cache_set(key: tuple[str, str], quote: "MarketQuote") -> None:
-    _quote_cache[key] = (time.time(), quote)
+    if key not in _quote_cache and len(_quote_cache) >= _CACHE_MAX:
+        _quote_cache.pop(next(iter(_quote_cache)))
+    _quote_cache[key] = (_time.monotonic(), quote)
 
 
 class MarketDataError(Exception):
@@ -129,99 +133,105 @@ class MarketDataService:
         if cached is not None:
             return cached
 
-        data_warnings: list[str] = []
+        lock = _fetch_locks.setdefault(cache_key, threading.Lock())
+        with lock:
+            cached = _cache_get(cache_key)
+            if cached is not None:
+                return cached
 
-        ticker_obj = yf.Ticker(symbol)
-        hist = None
+            data_warnings: list[str] = []
 
-        # Attempt 1: Ticker.history(period="1y")
-        try:
-            hist = ticker_obj.history(period="1y")
-        except Exception:
+            ticker_obj = yf.Ticker(symbol)
             hist = None
 
-        # Attempt 2: Fallback to yf.download if history() returned empty or failed
-        if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
+            # Attempt 1: Ticker.history(period="1y")
             try:
-                hist_dl = yf.download(symbol, period="1y", progress=False)
-                if hist_dl is not None and not hist_dl.empty:
-                    # Handle MultiIndex columns from yf.download
-                    if hasattr(hist_dl.columns, "levels") and len(hist_dl.columns.levels) > 1:
-                        if symbol in hist_dl.columns.levels[1]:
-                            hist = hist_dl.xs(symbol, level=1, axis=1)
+                hist = ticker_obj.history(period="1y")
+            except Exception:
+                hist = None
+
+            # Attempt 2: Fallback to yf.download if history() returned empty or failed
+            if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
+                try:
+                    hist_dl = yf.download(symbol, period="1y", progress=False)
+                    if hist_dl is not None and not hist_dl.empty:
+                        # Handle MultiIndex columns from yf.download
+                        if hasattr(hist_dl.columns, "levels") and len(hist_dl.columns.levels) > 1:
+                            if symbol in hist_dl.columns.levels[1]:
+                                hist = hist_dl.xs(symbol, level=1, axis=1)
+                            else:
+                                hist = hist_dl.droplevel(1, axis=1)
                         else:
-                            hist = hist_dl.droplevel(1, axis=1)
-                    else:
-                        hist = hist_dl
-            except Exception:
-                pass
+                            hist = hist_dl
+                except Exception:
+                    pass
 
-        # Attempt 3: Fallback to period="6m" if 1y returned empty
-        if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
+            # Attempt 3: Fallback to period="6m" if 1y returned empty
+            if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
+                try:
+                    hist = ticker_obj.history(period="6m")
+                except Exception:
+                    pass
+
+            if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
+                raise MarketDataError(
+                    message=f"Symbol '{symbol}' not found or no historical market data returned.",
+                    ticker=symbol,
+                    fallback_available=True,
+                )
+
+            close_prices = hist["Close"].dropna().to_numpy()
+            if len(close_prices) == 0:
+                raise MarketDataError(
+                    message=f"No valid closing prices found for symbol '{symbol}'.",
+                    ticker=symbol,
+                    fallback_available=True,
+                )
+
+            spot_price = float(close_prices[-1])
+            daily_return = float((close_prices[-1] / close_prices[-2]) - 1.0) if len(close_prices) >= 2 else 0.0
+
+            # Calculate historical volatility windows (20d, 60d, 126d, 252d)
+            hist_vol = all_windows_volatility(close_prices)
+
+            # Extract info metadata
             try:
-                hist = ticker_obj.history(period="6m")
+                info = ticker_obj.info or {}
             except Exception:
-                pass
+                info = {}
 
-        if hist is None or hist.empty or "Close" not in hist or len(hist["Close"].dropna()) == 0:
-            raise MarketDataError(
-                message=f"Symbol '{symbol}' not found or no historical market data returned.",
-                ticker=symbol,
-                fallback_available=True,
+            currency = str(info.get("currency", "USD" if market.strip().upper() in ("US", "FX", "CRYPTO") else "INR"))
+            market_cap_raw = info.get("marketCap") or info.get("market_cap")
+            market_cap = float(market_cap_raw) if market_cap_raw is not None else None
+
+            # Dividend yield extraction
+            raw_div = info.get("dividendYield")
+            if raw_div is not None and not math.isnan(float(raw_div)):
+                div_val = float(raw_div)
+                if div_val > 0.20:
+                    div_val /= 100.0
+                dividend_yield = div_val
+            else:
+                dividend_yield = 0.0
+                data_warnings.append("Dividend yield data unavailable for ticker; defaulted to 0.0.")
+
+            last_updated = datetime.now(timezone.utc).isoformat()
+
+            quote = MarketQuote(
+                ticker=ticker,
+                market=market.strip().upper(),
+                resolved_symbol=symbol,
+                spot_price=spot_price,
+                daily_return=daily_return,
+                historical_volatility=hist_vol,
+                dividend_yield=dividend_yield,
+                market_cap=market_cap,
+                currency=currency,
+                last_updated=last_updated,
+                data_warnings=data_warnings,
             )
-
-        close_prices = hist["Close"].dropna().to_numpy()
-        if len(close_prices) == 0:
-            raise MarketDataError(
-                message=f"No valid closing prices found for symbol '{symbol}'.",
-                ticker=symbol,
-                fallback_available=True,
-            )
-
-        spot_price = float(close_prices[-1])
-        daily_return = float((close_prices[-1] / close_prices[-2]) - 1.0) if len(close_prices) >= 2 else 0.0
-
-        # Calculate historical volatility windows (20d, 60d, 126d, 252d)
-        hist_vol = all_windows_volatility(close_prices)
-
-        # Extract info metadata
-        try:
-            info = ticker_obj.info or {}
-        except Exception:
-            info = {}
-
-        currency = str(info.get("currency", "USD" if market.strip().upper() in ("US", "FX", "CRYPTO") else "INR"))
-        market_cap_raw = info.get("marketCap") or info.get("market_cap")
-        market_cap = float(market_cap_raw) if market_cap_raw is not None else None
-
-        # Dividend yield extraction
-        raw_div = info.get("dividendYield")
-        if raw_div is not None and not math.isnan(float(raw_div)):
-            div_val = float(raw_div)
-            if div_val > 0.20:
-                div_val /= 100.0
-            dividend_yield = div_val
-        else:
-            dividend_yield = 0.0
-            data_warnings.append("Dividend yield data unavailable for ticker; defaulted to 0.0.")
-
-        last_updated = datetime.now(timezone.utc).isoformat()
-
-        quote = MarketQuote(
-            ticker=ticker,
-            market=market.strip().upper(),
-            resolved_symbol=symbol,
-            spot_price=spot_price,
-            daily_return=daily_return,
-            historical_volatility=hist_vol,
-            dividend_yield=dividend_yield,
-            market_cap=market_cap,
-            currency=currency,
-            last_updated=last_updated,
-            data_warnings=data_warnings,
-        )
-        _cache_set(cache_key, quote)
-        return quote
+            _cache_set(cache_key, quote)
+            return quote
 
     def get_options_chain(self, ticker: str, market: str, expiry: str | None = None) -> dict:
         """Fetch options chain for a ticker. US equities only.

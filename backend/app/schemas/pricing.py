@@ -12,6 +12,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+MarketRegionType = Literal["US", "IN", "FX", "CRYPTO"]
+
 
 # ---------------------------------------------------------------------------
 # Shared request schema
@@ -22,7 +24,7 @@ class PricingRequestSchema(BaseModel):
     """Pricing request shared by preview and full endpoints."""
 
     ticker: str
-    market: Literal["US", "IN"]
+    market: MarketRegionType
     spot_override: float | None = None
     strike: float = Field(..., gt=0)
     expiry_date: date
@@ -241,7 +243,7 @@ class ImpliedVolRequest(BaseModel):
     """Request schema for implied volatility solver endpoint."""
 
     ticker: str
-    market: Literal["US", "IN"]
+    market: MarketRegionType
     spot_override: float | None = None
     strike: float = Field(..., gt=0)
     expiry_date: date
@@ -280,7 +282,7 @@ class PnLExplainRequest(BaseModel):
     """Request schema for P&L explain endpoint."""
 
     ticker: str
-    market: Literal["US", "IN"]
+    market: MarketRegionType
     spot_override: float | None = None
     strike: float = Field(..., gt=0)
     expiry_date: date
@@ -323,7 +325,7 @@ class RiskGridRequest(BaseModel):
     """Request schema for 2D risk grid surface calculation endpoint."""
 
     ticker: str
-    market: Literal["US", "IN"]
+    market: MarketRegionType
     spot_override: float | None = None
     strike: float = Field(..., gt=0)
     expiry_date: date
