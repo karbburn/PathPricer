@@ -149,11 +149,12 @@ class ModelValidationResponse(BaseModel):
     spot: float
     rate: float
     dividend_yield: float
-    price_rmse: float
+    price_rel_rmse: float
     price_mape: float
     iv_rmse: float | None
-    parity_max_error: float
+    market_parity_violation: float
     parity_holds: bool
     feller_condition_holds: bool
+    in_sample: bool
     contracts: list[ValidationContractView]
     warnings: list[str] = Field(default_factory=list)

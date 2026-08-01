@@ -398,12 +398,13 @@ export interface ModelValidationResponse {
   spot: number;
   rate: number;
   dividend_yield: number;
-  price_rmse: number;
+  price_rel_rmse: number;
   price_mape: number;
   iv_rmse: number | null;
-  parity_max_error: number;
+  market_parity_violation: number;
   parity_holds: boolean;
   feller_condition_holds: boolean;
+  in_sample: boolean;
   contracts: ValidationContractView[];
   warnings: string[];
 }

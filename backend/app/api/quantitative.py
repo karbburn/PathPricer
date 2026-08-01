@@ -347,12 +347,13 @@ def _validate_chain(
         spot=calib.spot,
         rate=calib.rate,
         dividend_yield=calib.dividend_yield,
-        price_rmse=result.price_rmse,
+        price_rel_rmse=result.price_rel_rmse,
         price_mape=result.price_mape,
-        iv_rmse=result.iv_rmse if math.isfinite(result.iv_rmse) else None,
-        parity_max_error=result.parity_max_error,
+        iv_rmse=result.iv_rmse,
+        market_parity_violation=result.market_parity_violation,
         parity_holds=result.parity_holds,
         feller_condition_holds=result.feller_condition_holds,
+        in_sample=result.in_sample,
         contracts=views,
     )
 

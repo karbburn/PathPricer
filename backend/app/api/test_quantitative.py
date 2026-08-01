@@ -105,8 +105,9 @@ def test_model_validation_smoke() -> None:
         resp = client.post("/api/v1/quant/model-validate", json={"ticker": "SYNTH"})
     assert resp.status_code == 200, resp.text
     body = resp.json()
-    assert body["price_rmse"] < 1e-2, body["price_rmse"]
+    assert body["price_rel_rmse"] < 1e-2, body["price_rel_rmse"]
     assert body["feller_condition_holds"] in (True, False)
+    assert body["in_sample"] is True
     assert body["contracts"], "expected per-contract validation views"
 
 

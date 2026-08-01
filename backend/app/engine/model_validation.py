@@ -49,12 +49,13 @@ class ModelValidationResult:
     """Aggregate validation metrics for a fitted Heston model."""
 
     contracts: list[ContractValidation]
-    price_rmse: float
+    price_rel_rmse: float
     price_mape: float
-    iv_rmse: float
-    parity_max_error: float
+    iv_rmse: float | None
+    market_parity_violation: float
     parity_holds: bool
     feller_condition_holds: bool
+    in_sample: bool
     n_contracts: int
 
 
@@ -64,7 +65,7 @@ def validate_model_fit(
     S0: float,
     r: float,
     q: float,
-    parity_tolerance: float = 1e-6,
+    parity_tolerance: float = 0.10,
 ) -> ModelValidationResult:
     """Validate a calibrated Heston model against market option contracts.
 
@@ -75,6 +76,8 @@ def validate_model_fit(
         r: risk-free rate (continuous).
         q: continuous dividend yield.
         parity_tolerance: max abs put-call parity violation in price units.
+            Default 0.10 reflects realistic bid/ask width on market quotes
+            (a 1e-6 tolerance would only ever hold for synthetic data).
 
     Returns:
         ModelValidationResult with per-contract detail and aggregate metrics.
@@ -104,7 +107,9 @@ def validate_model_fit(
         residual = mp - c.market_price
         rel = residual / c.market_price
 
-        # Put-call parity check: price the complement type, compare parity identity.
+        # Market put-call parity check: price the complement type under the
+        # model and see how far the implied parity RHS sits from the observed
+        # market price. A violation flags inconsistent market quotes.
         other_type = "put" if c.option_type.lower() == "call" else "call"
         other_price = float(
             price_european_many(
@@ -134,19 +139,23 @@ def validate_model_fit(
 
     rel_errs = np.asarray([d.relative_error for d in detail])
     iv_errs = np.asarray([d.iv_error for d in detail])
-    price_rmse = float(np.sqrt(np.mean(rel_errs**2)))
+    finite_iv = iv_errs[np.isfinite(iv_errs)]
+    price_rel_rmse = float(np.sqrt(np.mean(rel_errs**2)))
     price_mape = float(np.mean(np.abs(rel_errs)) * 100.0)
-    iv_rmse = float(np.sqrt(np.mean(iv_errs**2)))
+    iv_rmse = (
+        float(np.sqrt(np.mean(finite_iv**2))) if finite_iv.size else None
+    )
     feller_ok = 2.0 * params.kappa * params.theta_v >= params.sigma_v**2
 
     return ModelValidationResult(
         contracts=detail,
-        price_rmse=price_rmse,
+        price_rel_rmse=price_rel_rmse,
         price_mape=price_mape,
         iv_rmse=iv_rmse,
-        parity_max_error=max_parity_error,
+        market_parity_violation=max_parity_error,
         parity_holds=max_parity_error <= parity_tolerance,
         feller_condition_holds=feller_ok,
+        in_sample=True,
         n_contracts=len(contracts),
     )
 

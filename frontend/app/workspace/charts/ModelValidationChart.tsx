@@ -83,10 +83,10 @@ export function ModelValidationChart({ request }: ModelValidationChartProps) {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
             {[
-              ["Price RMSE", formatPrice(data.price_rmse, 4)],
+              ["Price Rel RMSE", formatPrice(data.price_rel_rmse, 4)],
               ["Price MAPE", formatPercent(data.price_mape)],
               ["IV RMSE", data.iv_rmse != null ? formatPercent(data.iv_rmse) : "—"],
-              ["Parity Max Err", formatPrice(data.parity_max_error, 4)],
+              ["Parity Violation", formatPrice(data.market_parity_violation, 4)],
             ].map(([label, val]) => (
               <div key={label} className="bg-[#0d1117] border border-[#21262d] rounded-lg p-2">
                 <div className="text-[9px] uppercase tracking-wider text-[#8b949e] font-bold">{label}</div>
@@ -101,6 +101,9 @@ export function ModelValidationChart({ request }: ModelValidationChartProps) {
             </span>
             <span className={`px-2.5 py-1 rounded border ${data.feller_condition_holds ? "bg-green-950/30 border-green-800/50 text-green-400" : "bg-amber-950/30 border-amber-800/50 text-amber-300"}`}>
               Feller: {data.feller_condition_holds ? "HOLDS" : "VIOLATED"}
+            </span>
+            <span className="px-2.5 py-1 rounded border border-[#21262d] text-[#8b949e]">
+              {data.in_sample ? "In-Sample" : "Out-of-Sample"}
             </span>
           </div>
 
