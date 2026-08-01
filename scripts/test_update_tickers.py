@@ -1,0 +1,54 @@
+"""Self-check for update_tickers merge logic (no network)."""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from scripts.update_tickers import ENTRY_RE, generate_ticker_data, parse_existing
+
+FIXTURE = """/**
+ * Header
+ */
+export const TICKER_DATABASE: TickerEntry[] = [
+  // US Stocks & ETFs
+  { ticker: "AAPL", name: "APPLE INC.", market: "US" },
+  { ticker: "SPY", name: "SPDR S&P 500 ETF", market: "US" },
+
+  // Indian Stocks
+  { ticker: "RELIANCE", name: "Reliance", market: "IN" },
+];
+export function filterTickers() { return 1; }
+"""
+
+
+def test_merge_preserves_existing_and_adds_new():
+    header, footer, body = parse_existing(FIXTURE)
+    assert "export function filterTickers()" in footer
+    assert header.strip() == "/**\n * Header\n */"
+
+    us_new = [("AAPL", "Apple Inc."), ("MSFT", "Microsoft Corp")]
+    in_new = [("RELIANCE", "Reliance Ind"), ("TCS", "Tata Consultancy")]
+    out = generate_ticker_data(header, body, us_new, in_new, footer)
+
+    assert out.count('market: "US"') == 3  # AAPL + SPY + MSFT
+    assert out.count('market: "IN"') == 2  # RELIANCE + TCS
+    assert "SPY" in out
+    assert "MSFT" in out
+    assert "TCS" in out
+    assert "export function filterTickers()" in out
+    # Idempotent: re-parsing output and merging same candidates adds nothing
+    _, footer2, body2 = parse_existing(out)
+    out2 = generate_ticker_data(header, body2, us_new, in_new, footer2)
+    assert out2 == out
+
+
+def test_regex_matches_entry():
+    m = ENTRY_RE.search('  { ticker: "A", name: "Agilent", market: "US" },')
+    assert m and m.group(1) == "A" and m.group(3) == "US"
+
+
+if __name__ == "__main__":
+    test_merge_preserves_existing_and_adds_new()
+    test_regex_matches_entry()
+    print("update_tickers self-check OK")

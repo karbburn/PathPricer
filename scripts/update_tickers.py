@@ -1,26 +1,27 @@
 """Regenerate the frontend ticker database from Wikipedia constituent lists.
 
-Fetches S&P 500 tickers from Wikipedia and Nifty 50 tickers from Wikipedia,
-validates them with yfinance, and writes an updated ticker-data.ts file.
+Fetches S&P 500 tickers from Wikipedia and Nifty 50 tickers from Wikipedia
+and merges them into the existing ticker-data.ts file. Existing entries are
+preserved verbatim (curated US/IN stocks, ETFs, FX, CRYPTO); Wikipedia is
+only a source of new/renamed tickers. The `filterTickers` export is always
+preserved unchanged.
 
-Preserves existing FX, CRYPTO, and curated entries already in the file.
-The `filterTickers` export is always preserved unchanged.
+yfinance validation is skipped on CI (GitHub Actions) where it is rate-limited
+and unreliable; the Wikipedia fetch + MIN_* abort guards are the safety net.
 
 Usage:
     python scripts/update_tickers.py
 
 Requires:
-    pip install yfinance requests beautifulsoup4
+    pip install requests beautifulsoup4
 """
 
 import os
 import re
 import sys
-import time
 from pathlib import Path
 
 import requests
-import yfinance as yf
 from bs4 import BeautifulSoup
 
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
@@ -34,6 +35,10 @@ HEADERS = {"User-Agent": USER_AGENT}
 
 MIN_US = 450
 MIN_IN = 40
+
+ENTRY_RE = re.compile(
+    r'\{\s*ticker:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*market:\s*"([^"]+)"\s*\}'
+)
 
 
 def fetch_sp500_tickers() -> list[tuple[str, str]]:
@@ -80,23 +85,6 @@ def fetch_nifty50_tickers() -> list[tuple[str, str]]:
     return tickers
 
 
-def validate_ticker(ticker: str, market: str) -> bool:
-    """Check if a ticker exists on yfinance. Returns True if valid."""
-    symbol = ticker
-    if market == "IN" and not ticker.endswith((".NS", ".BO")):
-        symbol = f"{ticker}.NS"
-
-    for attempt in range(3):
-        try:
-            t = yf.Ticker(symbol)
-            h = t.fast_info
-            return h is not None
-        except Exception:
-            if attempt < 2:
-                time.sleep(1.0 * (attempt + 1))
-    return False
-
-
 def read_existing_file() -> str:
     """Read the current ticker-data.ts content."""
     if not TICKER_FILE.exists():
@@ -104,78 +92,56 @@ def read_existing_file() -> str:
     return TICKER_FILE.read_text(encoding="utf-8")
 
 
-def preserve_fx_crypto_entries(content: str) -> list[str]:
-    """Extract FX, CRYPTO, and curated entries from the existing file."""
-    entries: list[str] = []
-    in_array = False
-    for line in content.splitlines():
-        stripped = line.strip()
-        if "TICKER_DATABASE" in line and "[" in line:
-            in_array = True
-            continue
-        if in_array and stripped == "];":
-            break
-        if in_array and "market:" in stripped:
-            if '"FX"' in stripped or '"CRYPTO"' in stripped:
-                entries.append(stripped)
-    return entries
+ARRAY_MARKER = "export const TICKER_DATABASE: TickerEntry[] = ["
 
 
-def preserve_filter_tickers(content: str) -> str | None:
-    """Extract the filterTickers function verbatim."""
-    idx = content.find("export function filterTickers(")
-    if idx == -1:
-        return None
-    return content[idx:]
+def parse_existing(content: str) -> tuple[str, str, list[str]]:
+    """Return (header, footer, database-body-lines) split from the current file.
+
+    The database body is everything between the `[...=` line and the closing
+    `];`, preserved verbatim (comments, indentation, blanks).
+    """
+    start = content.find(ARRAY_MARKER)
+    if start == -1:
+        return "", "", []
+    header = content[:start]
+    bracket = start + len(ARRAY_MARKER)
+    close = content.find("];", bracket)
+    if close == -1:
+        return "", "", []
+
+    body = content[bracket:close].splitlines()
+    if body and not body[0].strip():
+        body = body[1:]
+    return header, content[close + 2 :], body
 
 
 def generate_ticker_data(
-    us_tickers: list[tuple[str, str]],
-    in_tickers: list[tuple[str, str]],
-    fx_crypto: list[str],
-    filter_fn: str,
+    header: str,
+    body: list[str],
+    us_new: list[tuple[str, str]],
+    in_new: list[tuple[str, str]],
+    footer: str,
 ) -> str:
-    """Generate the ticker-data.ts file content."""
-    lines = [
-        "/**",
-        " * Shared Ticker Database & Autocomplete Utilities.",
-        " */",
-        "",
-        'import { MarketRegion } from "./types";',
-        "",
-        "export interface TickerEntry {",
-        "  ticker: string;",
-        "  name: string;",
-        "  market: MarketRegion;",
-        "}",
-        "",
-        "export const TICKER_DATABASE: TickerEntry[] = [",
-    ]
+    """Append missing Wikipedia tickers to the existing database body."""
+    existing_us = {ENTRY_RE.search(e).group(1) for e in body if '"US"' in e}
+    existing_in = {ENTRY_RE.search(e).group(1) for e in body if '"IN"' in e}
 
-    for ticker, name in us_tickers:
-        safe_name = name.replace('"', '\\"').replace("\n", " ").strip()
-        lines.append(f'  {{ ticker: "{ticker}", name: "{safe_name}", market: "US" }},')
+    added: list[str] = []
+    for ticker, name in us_new:
+        if ticker not in existing_us:
+            safe_name = name.replace('"', '\\"').replace("\n", " ").strip()
+            added.append(f'  {{ ticker: "{ticker}", name: "{safe_name}", market: "US" }},')
+    for ticker, name in in_new:
+        if ticker not in existing_in:
+            safe_name = name.replace('"', '\\"').replace("\n", " ").strip()
+            added.append(f'  {{ ticker: "{ticker}", name: "{safe_name}", market: "IN" }},')
 
-    lines.append("")
+    if added:
+        body.extend(["", "  // Newly added from Wikipedia"])
+        body.extend(added)
 
-    for ticker, name in in_tickers:
-        safe_name = name.replace('"', '\\"').replace("\n", " ").strip()
-        lines.append(f'  {{ ticker: "{ticker}", name: "{safe_name}", market: "IN" }},')
-
-    if fx_crypto:
-        lines.append("")
-        for entry in fx_crypto:
-            lines.append(f"  {entry}")
-
-    lines.append("];")
-    lines.append("")
-
-    if filter_fn:
-        lines.append("")
-        lines.append(filter_fn)
-        lines.append("")
-
-    return "\n".join(lines)
+    return header + ARRAY_MARKER + "\n" + "\n".join(body) + "\n];" + footer
 
 
 def main() -> None:
@@ -207,49 +173,44 @@ def main() -> None:
         )
         sys.exit(1)
 
-    print("Validating US tickers with yfinance (may take a few minutes)...")
-    valid_us: list[tuple[str, str]] = []
-    for i, (ticker, name) in enumerate(sp500):
-        if i % 50 == 0 and i > 0:
-            print(f"  Validated {i}/{len(sp500)} US tickers...")
-        if validate_ticker(ticker, "US"):
-            valid_us.append((ticker, name))
+    # On CI, yfinance validation is rate-limited/unreliable and not needed:
+    # Wikipedia constituents are trusted and the existing DB is preserved.
+    if os.environ.get("CI") != "true":
+        try:
+            import yfinance as yf
+        except ImportError:
+            yf = None
+        if yf:
+            valid_sp500 = [t for t in sp500 if _validate(t[0], "US", yf)]
+            valid_nifty = [t for t in nifty50 if _validate(t[0], "IN", yf)]
+            print(f"  Valid US: {len(valid_sp500)}/{len(sp500)}")
+            print(f"  Valid IN: {len(valid_nifty)}/{len(nifty50)}")
+            if len(valid_sp500) < MIN_US or len(valid_nifty) < MIN_IN:
+                print("Error: too few valid tickers after yfinance validation; aborting", file=sys.stderr)
+                sys.exit(1)
+            sp500, nifty50 = valid_sp500, valid_nifty
 
-    print("Validating IN tickers with yfinance...")
-    valid_in: list[tuple[str, str]] = []
-    for i, (ticker, name) in enumerate(nifty50):
-        if i % 10 == 0 and i > 0:
-            print(f"  Validated {i}/{len(nifty50)} IN tickers...")
-        if validate_ticker(ticker, "IN"):
-            valid_in.append((ticker, name))
+    header = existing[: existing.find("TICKER_DATABASE")]
+    header, footer, body = parse_existing(existing)
 
-    print(f"  Valid US: {len(valid_us)}/{len(sp500)}")
-    print(f"  Valid IN: {len(valid_in)}/{len(nifty50)}")
-
-    if len(valid_us) < MIN_US:
-        print(
-            f"Error: too few valid US tickers ({len(valid_us)} < {MIN_US}); "
-            "aborting without writing",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    if len(valid_in) < MIN_IN:
-        print(
-            f"Error: too few valid IN tickers ({len(valid_in)} < {MIN_IN}); "
-            "aborting without writing",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    fx_crypto = preserve_fx_crypto_entries(existing)
-    filter_fn = preserve_filter_tickers(existing)
-
-    content = generate_ticker_data(valid_us, valid_in, fx_crypto, filter_fn)
+    content = generate_ticker_data(header, body, sp500, nifty50, footer)
 
     tmp_path = TICKER_FILE.with_suffix(".ts.tmp")
     tmp_path.write_text(content, encoding="utf-8")
     os.replace(tmp_path, TICKER_FILE)
-    print(f"\nWrote {TICKER_FILE} ({len(valid_us)} US + {len(valid_in)} IN + {len(fx_crypto)} FX/CRYPTO)")
+    print(f"\nWrote {TICKER_FILE} ({len(body)} entries + {len(sp500) + len(nifty50)} Wikipedia candidates merged)")
+
+
+def _validate(ticker: str, market: str, yf) -> bool:
+    """Check a ticker resolves on yfinance. `fast_info` is empty on failure."""
+    symbol = ticker
+    if market == "IN" and not ticker.endswith((".NS", ".BO")):
+        symbol = f"{ticker}.NS"
+    try:
+        t = yf.Ticker(symbol)
+        return bool(t.fast_info)
+    except Exception:
+        return False
 
 
 if __name__ == "__main__":
