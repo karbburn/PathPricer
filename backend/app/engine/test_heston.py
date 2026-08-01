@@ -54,6 +54,21 @@ def _run_tests() -> None:
     assert res.theta < 0, f"Theta should be negative for long call: {res.theta}"
     assert abs(res.rho) < K * T, f"Rho magnitude implausible: {res.rho}"
 
+    # --- 5. Volga cross-check (finite-difference of vega wrt sigma) -----------
+    # volga = d2V/d(sqrt(v0))^2. Verify against a central FD of vega computed
+    # directly from price_european at bumped v0. This catches a missing
+    # chain-rule term (dV/dv0 * 2) in the analytic volga.
+    h = 1e-3
+    v0 = p.v0
+    s = math.sqrt(v0)
+    v_up = price_european(S0, K, T, r, q, HestonParams(v0=v0 + 2 * s * h + h * h, kappa=p.kappa, theta_v=p.theta_v, sigma_v=p.sigma_v, rho=p.rho), "call")
+    v_dn = price_european(S0, K, T, r, q, HestonParams(v0=v0 - 2 * s * h + h * h, kappa=p.kappa, theta_v=p.theta_v, sigma_v=p.sigma_v, rho=p.rho), "call")
+    v_mid = price_european(S0, K, T, r, q, HestonParams(v0=v0, kappa=p.kappa, theta_v=p.theta_v, sigma_v=p.sigma_v, rho=p.rho), "call")
+    fd_volga = (v_up - 2.0 * v_mid + v_dn) / h**2
+    assert abs(res.volga - fd_volga) < max(1e-3, 0.05 * abs(fd_volga)), (
+        f"Volga {res.volga:.4f} does not match FD {fd_volga:.4f}"
+    )
+
     print("Heston engine self-check OK")
     print(f"  benchmark call = {call:.4f} (expect ~6.078)")
     print(f"  delta={res.delta:.4f} gamma={res.gamma:.4f} vega={res.vega:.4f} "

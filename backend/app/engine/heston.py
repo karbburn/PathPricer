@@ -276,9 +276,11 @@ def price_and_greeks(
     dV_dv0 = (price_v_up - price_v_dn) / (2.0 * h_v0)
     d2V_dv0_2 = (price_v_up - 2.0 * base + price_v_dn) / h_v0**2
 
-    # Chain rule w.r.t. sigma = sqrt(v0): dV/ds = dV/dv0 * 2s, d2V/ds2 = 4 v0 d2V/dv0^2
+    # Chain rule w.r.t. sigma = sqrt(v0):
+    #   vega  = dV/dv0 * 2s
+    #   volga = d2V/ds^2 = 4 v0 d2V/dv0^2 + 2 dV/dv0
     vega = dV_dv0 * 2.0 * sigma0
-    volga = d2V_dv0_2 * 4.0 * v0
+    volga = d2V_dv0_2 * 4.0 * v0 + 2.0 * dV_dv0
 
     # Vanna: d2V / dS dsigma = 2 s * d2V/dS dv0 (cross bump)
     price_up_up = price_european(S0 + h_S, K, T_eff, r, q, _bump_v0(h_v0), opt_type)
