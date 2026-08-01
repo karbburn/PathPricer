@@ -40,7 +40,10 @@ _B_MIN, _B_MAX = 0.0, 10.0
 _RHO_MIN, _RHO_MAX = -0.999, 0.999
 _SIGMA_MIN, _SIGMA_MAX = 1e-4, 5.0
 _M_MIN, _M_MAX = -3.0, 3.0
-_A_MIN, _A_MAX = -2.0, 10.0
+# a is bounded so that the implied minimum of total variance (w_min = a +
+# b*sigma*sqrt(1-rho^2)) stays near non-negative — a too-negative level would
+# need heavy clipping to stay arbitrage-free.
+_A_MIN, _A_MAX = -0.5, 10.0
 _SVI_BOUNDS = (
     (_A_MIN, _B_MIN, _RHO_MIN, _M_MIN, _SIGMA_MIN),
     (_A_MAX, _B_MAX, _RHO_MAX, _M_MAX, _SIGMA_MAX),
@@ -160,13 +163,16 @@ def _initial_params(k: np.ndarray, total_var: np.ndarray) -> tuple[float, float,
     kmax = max(abs(ks[0]), abs(ks[-1]))
     if kmax <= 1e-8:
         return (float(ws.mean()), 0.5, 0.0, 0.0, 0.2)
-    # Wing slopes from far OTM points on each side.
+    # Wing slopes from far OTM points on each side. Normalize by the *log-moneyness*
+    # distance, not the index distance: SVI's b scales with w per unit of k.
     w_min = min(ws)
     i_min = int(np.argmin(ws))
-    slope_lo = max(0.0, (ws[i_min] - ws[0]) / max(i_min - 0, 1e-8)) if i_min > 0 else 0.0
-    slope_hi = max(0.0, (ws[-1] - ws[i_min]) / max(len(ws) - 1 - i_min, 1e-8)) if i_min < len(ws) - 1 else 0.0
+    dk_lo = max(ks[i_min] - ks[0], 1e-8) if i_min > 0 else 1.0
+    dk_hi = max(ks[-1] - ks[i_min], 1e-8) if i_min < len(ks) - 1 else 1.0
+    slope_lo = max(0.0, (ws[i_min] - ws[0]) / dk_lo) if i_min > 0 else 0.0
+    slope_hi = max(0.0, (ws[-1] - ws[i_min]) / dk_hi) if i_min < len(ws) - 1 else 0.0
     # SVI wings: slope = b(1 - rho) on left, b(1 + rho) on right (roughly).
-    b = 0.5 * (slope_lo + slope_hi) / (kmax if kmax > 0 else 1.0)
+    b = 0.5 * (slope_lo + slope_hi)
     rho = (slope_hi - slope_lo) / max(2.0 * b, 1e-6)
     rho = max(-0.9, min(0.9, rho))
     m = float(ks[i_min])
@@ -193,6 +199,8 @@ def fit_svi(
     sigma_imp = np.asarray(implied_vol, dtype=np.float64)
     if k.shape != sigma_imp.shape or k.size < 5:
         raise ValueError("Need at least 5 (k, sigma_imp) observations per slice.")
+    if not (np.all(np.isfinite(k)) and np.all(np.isfinite(sigma_imp))):
+        raise ValueError("Log-moneyness and implied vols must be finite.")
     if np.any(sigma_imp <= 0):
         raise ValueError("Implied vols must be positive.")
     total_var = sigma_imp**2 * max(ttm, 1e-12)
@@ -216,7 +224,7 @@ def fit_svi(
             )
         except ValueError:
             continue
-        if res.cost < best_cost:
+        if res.cost < best_cost and np.isfinite(res.cost):
             best, best_cost = res, res.cost
 
     if best is None or not np.isfinite(best.cost):
@@ -246,10 +254,36 @@ def build_surface(
 
     Returns:
         SVISurface.
+
+    Raises:
+        ValueError: on invalid inputs, or if the slices admit a calendar
+            arbitrage (total variance decreasing in T at a fixed moneyness).
     """
     if spot <= 0:
         raise ValueError("Spot must be positive.")
     ordered = sorted(slices, key=lambda s: s.ttm)
     if not ordered:
         raise ValueError("Need at least one SVI slice.")
+    _check_no_calendar_arb(ordered)
     return SVISurface(spot=spot, rate=rate, dividend_yield=dividend_yield, slices=ordered)
+
+
+def _check_no_calendar_arb(slices: list[SVIExpiry]) -> None:
+    """Total variance must be non-decreasing in T at fixed log-moneyness.
+
+    A slice whose total variance lies below an earlier expiry's at the same k
+    admits a calendar spread arbitrage, so the surface would be unusable for
+    pricing. Checked on a grid spanning the fitted moneyness range.
+    """
+    if len(slices) < 2:
+        return
+    k_grid = np.linspace(-1.5, 1.5, 61)
+    w_prev = slices[0].params.total_variance(k_grid)
+    for slice_ in slices[1:]:
+        w_cur = slice_.params.total_variance(k_grid)
+        if np.any(w_cur < w_prev - 1e-6):
+            raise ValueError(
+                f"Calendar arbitrage between T={slices[0].ttm:.3f} and "
+                f"T={slice_.ttm:.3f}: total variance decreases in time-to-maturity."
+            )
+        w_prev = w_cur

@@ -80,6 +80,27 @@ def _run_tests() -> None:
     except ValueError:
         pass
 
+    try:
+        fit_svi(k, np.full_like(k, np.nan), ttm)
+        raise AssertionError("Expected ValueError for non-finite implied vols")
+    except ValueError:
+        pass
+
+    # --- 5. Calendar-arbitrage rejection ------------------------------------
+    # A later slice with LOWER total variance than an earlier one at the same
+    # moneyness admits a calendar spread arbitrage; build_surface must reject it.
+    try:
+        build_surface(
+            spot, rate, q,
+            [
+                SVIExpiry(ttm=0.25, params=SVIParams(a=0.06, b=0.5, rho=-0.6, m=-0.15, sigma=0.2)),
+                SVIExpiry(ttm=1.0, params=SVIParams(a=0.03, b=0.45, rho=-0.6, m=-0.15, sigma=0.2)),
+            ],
+        )
+        raise AssertionError("Expected ValueError for calendar arbitrage")
+    except ValueError:
+        pass
+
     print("SVI surface self-check OK")
     print(f"  recovered params: a={fitted.a:.4f} b={fitted.b:.4f} rho={fitted.rho:.4f} "
           f"m={fitted.m:.4f} sigma={fitted.sigma:.4f}")
