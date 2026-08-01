@@ -11,6 +11,7 @@ model_validation) to real options-chain market data.
 from __future__ import annotations
 
 import math
+import time
 from datetime import date, datetime
 
 import numpy as np
@@ -41,9 +42,16 @@ router = APIRouter(prefix="/quant", tags=["quantitative"])
 
 # Moneyness band for calibration contracts: skip extreme OTM quotes whose tiny
 # prices would dominate relative-error metrics and blow up the optimizer.
-_MAX_ABS_MONEYNESS = 0.6
+_MAX_ABS_MONEYNESS = 0.4
 # Minimum market price (currency) for a contract to be used in calibration.
 _MIN_MARKET_PRICE = 0.02
+# Maximum bid/ask width (relative to mid) beyond which a quote is too
+# illiquid to trust for calibration.
+_MAX_RELATIVE_SPREAD = 0.5
+# Chain-fetch cache TTL: chains are large and change slowly; reuse the last
+# fetch for a short window so calibration + validation share consistent data.
+_CHAIN_CACHE_TTL = 30.0
+_chain_cache: dict[tuple, tuple[float, dict]] = {}
 
 
 def _ttm_from_expiry(expiry: str) -> float:
@@ -90,10 +98,56 @@ def _solve_iv(S0: float, K: float, T: float, r: float, q: float, opt: str, price
 def _fetch_chain(
     service: MarketDataService, ticker: str, market: str, expiry: str | None = None
 ) -> dict | None:
+    """Fetch an options chain with a short TTL cache.
+
+    Catches any provider/network failure (MarketDataError and other
+    transport-level exceptions) and returns None so callers degrade to a
+    clean 404 instead of a 500.
+    """
+    key = (ticker, market, expiry)
+    now = time.monotonic()
+    cached = _chain_cache.get(key)
+    if cached is not None and now - cached[0] < _CHAIN_CACHE_TTL:
+        return cached[1]
     try:
-        return service.get_options_chain(ticker, market, expiry)
-    except MarketDataError:
+        chain = service.get_options_chain(ticker, market, expiry)
+    except Exception:
         return None
+    _chain_cache[key] = (now, chain)
+    return chain
+
+
+def _resolve_chain(
+    service: MarketDataService, req: QuantSurfaceRequest
+) -> tuple[dict, str, float, float, float]:
+    """Fetch and resolve the chain, expiry, spot, rate and dividend yield.
+
+    Single fetch shared by calibration and validation so both use the same
+    snapshot of quotes.
+    """
+    chain = _fetch_chain(service, req.ticker, req.market)
+    if chain is None:
+        raise MarketDataError(
+            message=f"Options chain unavailable for '{req.ticker}'.",
+            ticker=req.ticker,
+            fallback_available=False,
+        )
+    expiry = (req.expiries or [None])[0] or chain.get("selected_expiry")
+    if expiry not in (chain.get("expiries") or []):
+        expiry = (chain.get("expiries") or [None])[0]
+    if expiry is None:
+        raise MarketDataError(
+            message=f"No option expiries found for '{req.ticker}'.",
+            ticker=req.ticker,
+            fallback_available=False,
+        )
+    if expiry != chain.get("selected_expiry"):
+        chain = _fetch_chain(service, req.ticker, req.market, expiry) or chain
+
+    spot = _spot_for(chain, req.spot_override)
+    r = req.risk_free_rate
+    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+    return chain, expiry, spot, r, q
 
 
 def _build_vol_surface(
@@ -203,10 +257,15 @@ def _build_vol_surface(
 def _calibration_contracts(
     chain: dict, spot: float, r: float, q: float, expiry: str
 ) -> list[CalibrationContract]:
-    """Build calibration contracts from a chain, filtering junk quotes."""
+    """Build calibration contracts from a chain, filtering junk quotes.
+
+    Filters: non-finite/duplicate strikes, prices below a floor, moneyness
+    outside the band, and quotes whose bid/ask width exceeds a relative
+    threshold (illiquid). Duplicate strikes keep the tightest-spread quote.
+    """
     T = _ttm_from_expiry(expiry)
     forward = spot * math.exp((r - q) * T)
-    contracts: list[CalibrationContract] = []
+    seen: dict[tuple[float, str], tuple[float, CalibrationContract]] = {}
     for opt, rows in (("call", chain.get("calls") or []), ("put", chain.get("puts") or [])):
         for c in rows:
             strike = c.get("strike")
@@ -218,40 +277,34 @@ def _calibration_contracts(
             moneyness = math.log(strike / forward)
             if abs(moneyness) > _MAX_ABS_MONEYNESS:
                 continue
-            contracts.append(
-                CalibrationContract(strike=strike, ttm=T, market_price=price, option_type=opt)
-            )
-    return contracts
+            spread = _relative_spread(c, price)
+            if spread is not None and spread > _MAX_RELATIVE_SPREAD:
+                continue
+            key = (strike, opt)
+            prev = seen.get(key)
+            if prev is None or spread is not None and (prev[0] is None or spread < prev[0]):
+                seen[key] = (
+                    spread,
+                    CalibrationContract(strike=strike, ttm=T, market_price=price, option_type=opt),
+                )
+    return [c for _, c in seen.values()]
+
+
+def _relative_spread(contract: dict, mid: float) -> float | None:
+    """Bid/ask width as a fraction of the mid price; None if no two-sided quote."""
+    bid = contract.get("bid")
+    ask = contract.get("ask")
+    if isinstance(bid, float) and isinstance(ask, float) and math.isfinite(bid) and math.isfinite(ask):
+        if ask >= bid:
+            return (ask - bid) / max(mid, 1e-12)
+    return None
 
 
 def _calibrate_chain(
     service: MarketDataService, req: QuantSurfaceRequest
 ) -> HestonCalibrationResponse:
     """Calibrate Heston to the nearest expiry's option chain."""
-    chain = _fetch_chain(service, req.ticker, req.market)
-    if chain is None:
-        raise MarketDataError(
-            message=f"Options chain unavailable for '{req.ticker}'.",
-            ticker=req.ticker,
-            fallback_available=False,
-        )
-    expiry = (req.expiries or [None])[0] or chain.get("selected_expiry")
-    if expiry not in (chain.get("expiries") or []):
-        expiry = (chain.get("expiries") or [None])[0]
-    if expiry is None:
-        raise MarketDataError(
-            message=f"No option expiries found for '{req.ticker}'.",
-            ticker=req.ticker,
-            fallback_available=False,
-        )
-
-    spot = _spot_for(chain, req.spot_override)
-    r = req.risk_free_rate
-    q = req.dividend_yield if req.dividend_yield is not None else 0.0
-
-    if expiry != chain.get("selected_expiry"):
-        chain = _fetch_chain(service, req.ticker, req.market, expiry) or chain
-
+    chain, expiry, spot, r, q = _resolve_chain(service, req)
     contracts = _calibration_contracts(chain, spot, r, q, expiry)
     if len(contracts) < 5:
         raise MarketDataError(
@@ -311,20 +364,23 @@ def _model_prices(
 def _validate_chain(
     service: MarketDataService, req: QuantSurfaceRequest
 ) -> ModelValidationResponse:
-    """Validate a calibrated Heston model against the market chain."""
-    calib = _calibrate_chain(service, req)
-    chain = _fetch_chain(service, req.ticker, req.market)
-    if chain is None:
+    """Validate a calibrated Heston model against the market chain.
+
+    Calibration and validation share the same chain fetch and contract set, so
+    the model is judged against exactly the quotes it was fitted to.
+    """
+    chain, expiry, spot, r, q = _resolve_chain(service, req)
+    contracts = _calibration_contracts(chain, spot, r, q, expiry)
+    if len(contracts) < 5:
         raise MarketDataError(
-            message=f"Options chain unavailable for '{req.ticker}'.",
+            message=f"Not enough usable option quotes at expiry {expiry} to validate.",
             ticker=req.ticker,
             fallback_available=False,
         )
-    expiry = calib_contracts_meta(chain, req)
-    contracts = _calibration_contracts(chain, calib.spot, calib.rate, calib.dividend_yield, expiry)
 
-    p = _params_obj(calib.params)
-    result = validate_model_fit(contracts, p, calib.spot, calib.rate, calib.dividend_yield)
+    calib = calibrate_heston(contracts, spot, r, q)
+    p = calib.params
+    result = validate_model_fit(contracts, p, spot, r, q)
 
     views = []
     for d in result.contracts:
@@ -341,12 +397,12 @@ def _validate_chain(
             )
         )
     return ModelValidationResponse(
-        ticker=calib.ticker,
-        market=calib.market,
-        resolved_symbol=calib.resolved_symbol,
-        spot=calib.spot,
-        rate=calib.rate,
-        dividend_yield=calib.dividend_yield,
+        ticker=req.ticker.upper(),
+        market=req.market.upper(),
+        resolved_symbol=chain.get("resolved_symbol") or req.ticker.upper(),
+        spot=spot,
+        rate=r,
+        dividend_yield=q,
         price_rel_rmse=result.price_rel_rmse,
         price_mape=result.price_mape,
         iv_rmse=result.iv_rmse,
@@ -358,26 +414,6 @@ def _validate_chain(
     )
 
 
-def calib_contracts_meta(chain: dict, req: QuantSurfaceRequest) -> str:
-    expiry = (req.expiries or [None])[0] or chain.get("selected_expiry")
-    if expiry not in (chain.get("expiries") or []):
-        expiry = (chain.get("expiries") or [None])[0]
-    if expiry is None:
-        raise MarketDataError(
-            message=f"No option expiries found for '{req.ticker}'.",
-            ticker=req.ticker,
-            fallback_available=False,
-        )
-    return expiry
-
-
-def _params_obj(schema: HestonParamsSchema):
-    from ..engine.heston import HestonParams
-
-    return HestonParams(v0=schema.v0, kappa=schema.kappa, theta_v=schema.theta_v,
-                        sigma_v=schema.sigma_v, rho=schema.rho)
-
-
 def _error_response(err: MarketDataError) -> JSONResponse:
     return JSONResponse(
         status_code=404,
@@ -385,6 +421,17 @@ def _error_response(err: MarketDataError) -> JSONResponse:
             error="quant_data_unavailable",
             message=err.message,
             fallback_available=err.fallback_available,
+        ).model_dump(),
+    )
+
+
+def _error_response_value(err: ValueError) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content=ErrorResponse(
+            error="quant_calculation_failed",
+            message=str(err),
+            fallback_available=False,
         ).model_dump(),
     )
 
@@ -420,6 +467,8 @@ def quant_heston_calibrate(
         return _calibrate_chain(market_data, req)
     except MarketDataError as err:
         return _error_response(err)
+    except ValueError as err:
+        return _error_response_value(err)
 
 
 @router.post(
@@ -436,3 +485,5 @@ def quant_model_validate(
         return _validate_chain(market_data, req)
     except MarketDataError as err:
         return _error_response(err)
+    except ValueError as err:
+        return _error_response_value(err)
