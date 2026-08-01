@@ -57,6 +57,7 @@ export function HestonCalibrationChart({ request }: HestonCalibrationChartProps)
   const [error, setError] = useState<string | null>(null);
 
   const run = useCallback(async () => {
+    setData(null);
     setIsLoading(true);
     setError(null);
     try {
@@ -87,6 +88,9 @@ export function HestonCalibrationChart({ request }: HestonCalibrationChartProps)
       type: c.option_type,
     })) ?? [];
 
+  const callData = chartData.filter((d) => d.type === "call");
+  const putData = chartData.filter((d) => d.type === "put");
+
   const maxP = Math.max(...chartData.map((d) => Math.max(d.market, d.model)), 1);
 
   return (
@@ -108,7 +112,13 @@ export function HestonCalibrationChart({ request }: HestonCalibrationChartProps)
         </div>
       )}
 
-      {data && (
+      {data && data.contracts.length === 0 && (
+        <div className="text-[#8b949e] font-mono text-xs p-8 text-center border border-[#21262d] rounded-lg">
+          Calibration produced no contracts — check the moneyness and price filters.
+        </div>
+      )}
+
+      {data && data.contracts.length > 0 && (
         <>
           <ParamsTable data={data} />
 
@@ -129,8 +139,8 @@ export function HestonCalibrationChart({ request }: HestonCalibrationChartProps)
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
                 <CartesianGrid stroke="#21262d" strokeDasharray="3 3" />
-                <XAxis type="number" dataKey="market" name="Market Price" stroke="#8b949e" fontSize={10} fontFamily="monospace" domain={[0, maxP]} tickFormatter={(v) => v.toFixed(2)} />
-                <YAxis type="number" dataKey="model" name="Model Price" stroke="#8b949e" fontSize={10} fontFamily="monospace" domain={[0, maxP]} tickFormatter={(v) => v.toFixed(2)} />
+                <XAxis type="number" dataKey="market" name="Market Price" stroke="#8b949e" fontSize={10} fontFamily="monospace" domain={[0, maxP]} tickFormatter={(v) => v.toFixed(2)} label={{ value: "Market Price", position: "insideBottom", offset: -5, fill: "#8b949e", fontSize: 10, fontFamily: "monospace" }} />
+                <YAxis type="number" dataKey="model" name="Model Price" stroke="#8b949e" fontSize={10} fontFamily="monospace" domain={[0, maxP]} tickFormatter={(v) => v.toFixed(2)} label={{ value: "Model Price", angle: -90, position: "insideLeft", offset: 0, fill: "#8b949e", fontSize: 10, fontFamily: "monospace" }} />
                 <Tooltip
                   cursor={{ strokeDasharray: "3 3", stroke: "#8b949e" }}
                   contentStyle={{ backgroundColor: "#0d1117", borderColor: "#21262d", fontSize: "12px", fontFamily: "monospace", color: "#e2e8f0" }}
@@ -141,12 +151,15 @@ export function HestonCalibrationChart({ request }: HestonCalibrationChartProps)
                 <ReferenceLine y={0} stroke="#21262d" />
                 <ReferenceLine x={0} stroke="#21262d" />
                 <ReferenceLine segment={[{ x: 0, y: 0 }, { x: maxP, y: maxP }]} stroke="#58a6ff" strokeDasharray="4 4" />
-                <Scatter data={chartData} fill="#3fb950" isAnimationActive={false} />
+                <Scatter name="Calls" data={callData} fill="#3fb950" isAnimationActive={false} />
+                <Scatter name="Puts" data={putData} fill="#f78166" isAnimationActive={false} />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
-          <div className="text-[10px] font-mono text-[#8b949e]">
-            Dashed line = perfect fit (model price = market price). Each dot is one option contract.
+          <div className="flex flex-wrap gap-3 text-[10px] font-mono text-[#8b949e]">
+            <span><span className="inline-block w-2 h-2 rounded-full bg-[#3fb950] mr-1" />Calls</span>
+            <span><span className="inline-block w-2 h-2 rounded-full bg-[#f78166] mr-1" />Puts</span>
+            <span>Dashed line = perfect fit (model price = market price). Each dot is one option contract.</span>
           </div>
         </>
       )}

@@ -26,7 +26,10 @@ export function VolSurfaceChart({ request }: VolSurfaceChartProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+const [maxExpiries, setMaxExpiries] = useState(3);
+
   const run = useCallback(async () => {
+    setData(null);
     setIsLoading(true);
     setError(null);
     try {
@@ -37,7 +40,7 @@ export function VolSurfaceChart({ request }: VolSurfaceChartProps) {
         risk_free_rate: request.risk_free_rate,
         dividend_yield: request.dividend_yield,
         expiries: null,
-        max_expiries: 3,
+        max_expiries: maxExpiries,
       };
       setData(await postVolSurface(req));
     } catch (err) {
@@ -47,7 +50,7 @@ export function VolSurfaceChart({ request }: VolSurfaceChartProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [request]);
+  }, [request, maxExpiries]);
 
   return (
     <QuantChartShell
@@ -68,8 +71,28 @@ export function VolSurfaceChart({ request }: VolSurfaceChartProps) {
         </div>
       )}
 
-      {data &&
-        data.slices.map((slice) => {
+      {data && data.slices.length === 0 && (
+        <div className="text-[#8b949e] font-mono text-xs p-8 text-center border border-[#21262d] rounded-lg">
+          No SVI slices could be fitted from the options chain.
+        </div>
+      )}
+
+      {data && data.slices.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 text-xs font-mono mb-2">
+            <label htmlFor="max-expiries" className="text-[#8b949e]">Max expiries:</label>
+            <select
+              id="max-expiries"
+              value={maxExpiries}
+              onChange={(e) => setMaxExpiries(Number(e.target.value))}
+              className="bg-[#0d1117] border border-[#21262d] text-[#e2e8f0] font-mono text-xs rounded px-2 py-1"
+            >
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+          {data.slices.map((slice) => {
           const chartData = slice.points.map((p) => ({
             strike: p.strike,
             market_iv: p.market_iv,
@@ -89,8 +112,8 @@ export function VolSurfaceChart({ request }: VolSurfaceChartProps) {
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
                     <CartesianGrid stroke="#21262d" strokeDasharray="3 3" />
-                    <XAxis dataKey="strike" stroke="#8b949e" fontSize={10} fontFamily="monospace" tickFormatter={(v) => v.toFixed(0)} />
-                    <YAxis stroke="#8b949e" fontSize={10} fontFamily="monospace" domain={["auto", "auto"]} tickFormatter={(v) => formatPercent(v)} />
+                    <XAxis dataKey="strike" stroke="#8b949e" fontSize={10} fontFamily="monospace" tickFormatter={(v) => v.toFixed(0)} label={{ value: "Strike", position: "insideBottom", offset: -5, fill: "#8b949e", fontSize: 10, fontFamily: "monospace" }} />
+                    <YAxis stroke="#8b949e" fontSize={10} fontFamily="monospace" domain={["auto", "auto"]} tickFormatter={(v) => formatPercent(v)} label={{ value: "Implied Vol", angle: -90, position: "insideLeft", offset: 0, fill: "#8b949e", fontSize: 10, fontFamily: "monospace" }} />
                     <Tooltip
                       contentStyle={{ backgroundColor: "#0d1117", borderColor: "#21262d", fontSize: "12px", fontFamily: "monospace", color: "#e2e8f0" }}
                       labelFormatter={(v) => `Strike ${Number(v).toFixed(2)}`}
@@ -105,6 +128,8 @@ export function VolSurfaceChart({ request }: VolSurfaceChartProps) {
             </div>
           );
         })}
+        </>
+      )}
     </QuantChartShell>
   );
 }
