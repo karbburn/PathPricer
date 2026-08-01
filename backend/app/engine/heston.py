@@ -187,13 +187,29 @@ def _integrate_fourier_many(
     """
     K = np.asarray(K, dtype=np.float64)
     T_eff = max(T, MIN_T)
-    x = np.log(K / S0)
+    cf = _cf_set(params, T_eff, r, q)
+    return _integrate_prepared(cf, S0, K)
 
+
+def _cf_set(params: HestonParams, T: float, r: float, q: float):
+    """Precompute the quadrature nodes and characteristic functions.
+
+    These depend only on (params, T, r, q), not on the strike or spot, so a
+    single set can price many strikes *and* many bumped spots. Returns a tuple
+    consumed by _integrate_prepared / _price_prepared.
+    """
     u, w = _quadrature_nodes()
-    phi = _characteristic_function(u, params, T_eff, r, q)
-    phi_shifted = _characteristic_function(u - 1j, params, T_eff, r, q)
-    phi_neg_i = math.exp((r - q) * T_eff)
+    phi = _characteristic_function(u, params, T, r, q)
+    phi_shifted = _characteristic_function(u - 1j, params, T, r, q)
+    phi_neg_i = math.exp((r - q) * T)
+    return u, w, phi, phi_shifted, phi_neg_i
 
+
+def _integrate_prepared(cf, S0: float, K: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """(P1, P2) from a precomputed CF set for arbitrary spot and strikes."""
+    u, w, phi, phi_shifted, phi_neg_i = cf
+    K = np.asarray(K, dtype=np.float64)
+    x = np.log(K / S0)
     # exp(-i u x): [n_strikes, n_nodes] outer product, integrated over u.
     exp_terms = np.exp(-1j * np.outer(x, u))
     p2 = 0.5 + (1.0 / math.pi) * np.real(
@@ -203,6 +219,21 @@ def _integrate_fourier_many(
         (exp_terms * (phi_shifted / phi_neg_i / (1j * u))).dot(w)
     )
     return p1, p2
+
+
+def _price_prepared(cf, S0, K, T: float, r: float, q: float, option_type: str) -> np.ndarray:
+    """Prices from a precomputed CF set.
+
+    S0 and K may be scalars or arrays of the same shape (used to batch the
+    spot bumps of price_and_greeks through a single Fourier evaluation).
+    """
+    p1, p2 = _integrate_prepared(cf, S0, K)
+    discounted_spot = S0 * math.exp(-q * max(T, MIN_T))
+    discounted_strike = K * math.exp(-r * max(T, MIN_T))
+    call = discounted_spot * p1 - discounted_strike * p2
+    if option_type == "call":
+        return call
+    return call - discounted_spot + discounted_strike
 
 
 def price_european_many(
@@ -280,8 +311,6 @@ def price_and_greeks(
     v0 = params.v0
     sigma0 = math.sqrt(v0)
 
-    base = price_european(S0, K, T_eff, r, q, params, opt_type)
-
     # Bump sizes
     h_S = max(bump_frac * S0, 1e-4)
     h_v0 = max(bump_frac * v0, 1e-5)
@@ -297,41 +326,52 @@ def price_and_greeks(
             rho=params.rho,
         )
 
+    # Precompute the CF set once per unique (params, T, r, q). The spot and
+    # vanna bumps only vary S0 / v0, so one CF set serves many bumped prices —
+    # 6 Fourier evaluations instead of 12.
+    spots = np.asarray([S0, S0 + h_S, S0 - h_S])
+    strikes = np.full(3, K)
+
+    cf_base = _cf_set(params, T_eff, r, q)
+    base_prices = _price_prepared(cf_base, spots, strikes, T_eff, r, q, opt_type)
+    base = float(base_prices[0])
+    price_S_up, price_S_dn = float(base_prices[1]), float(base_prices[2])
+
     # Delta / Gamma (spot)
-    price_S_up = price_european(S0 + h_S, K, T_eff, r, q, params, opt_type)
-    price_S_dn = price_european(S0 - h_S, K, T_eff, r, q, params, opt_type)
     delta = (price_S_up - price_S_dn) / (2.0 * h_S)
     gamma = (price_S_up - 2.0 * base + price_S_dn) / h_S**2
 
-    # Vega / Volga (initial variance bumps, reported w.r.t. sigma0 = sqrt(v0))
-    price_v_up = price_european(S0, K, T_eff, r, q, _bump_v0(h_v0), opt_type)
-    price_v_dn = price_european(S0, K, T_eff, r, q, _bump_v0(-h_v0), opt_type)
+    # Vega / Volga / Vanna (v0 bumps; same spots so the cross bumps are reused)
+    cf_v_up = _cf_set(_bump_v0(h_v0), T_eff, r, q)
+    cf_v_dn = _cf_set(_bump_v0(-h_v0), T_eff, r, q)
+    up_prices = _price_prepared(cf_v_up, spots, strikes, T_eff, r, q, opt_type)
+    dn_prices = _price_prepared(cf_v_dn, spots, strikes, T_eff, r, q, opt_type)
+    price_v_up, price_up_up, price_dn_up = (float(v) for v in up_prices)
+    price_v_dn, price_up_dn, price_dn_dn = (float(v) for v in dn_prices)
+
     dV_dv0 = (price_v_up - price_v_dn) / (2.0 * h_v0)
     d2V_dv0_2 = (price_v_up - 2.0 * base + price_v_dn) / h_v0**2
+    d2V_dS_dv0 = (price_up_up - price_up_dn - price_dn_up + price_dn_dn) / (4.0 * h_S * h_v0)
 
     # Chain rule w.r.t. sigma = sqrt(v0):
     #   vega  = dV/dv0 * 2s
     #   volga = d2V/ds^2 = 4 v0 d2V/dv0^2 + 2 dV/dv0
     vega = dV_dv0 * 2.0 * sigma0
     volga = d2V_dv0_2 * 4.0 * v0 + 2.0 * dV_dv0
-
-    # Vanna: d2V / dS dsigma = 2 s * d2V/dS dv0 (cross bump)
-    price_up_up = price_european(S0 + h_S, K, T_eff, r, q, _bump_v0(h_v0), opt_type)
-    price_up_dn = price_european(S0 + h_S, K, T_eff, r, q, _bump_v0(-h_v0), opt_type)
-    price_dn_up = price_european(S0 - h_S, K, T_eff, r, q, _bump_v0(h_v0), opt_type)
-    price_dn_dn = price_european(S0 - h_S, K, T_eff, r, q, _bump_v0(-h_v0), opt_type)
-    d2V_dS_dv0 = (price_up_up - price_up_dn - price_dn_up + price_dn_dn) / (4.0 * h_S * h_v0)
     vanna = d2V_dS_dv0 * 2.0 * sigma0
 
     # Theta (one-sided, per calendar day)
     T_down = max(T_eff - h_T, 1e-6)
-    price_T_down = price_european(S0, K, T_down, r, q, params, opt_type)
+    cf_t_down = _cf_set(params, T_down, r, q)
+    price_T_down = float(_price_prepared(cf_t_down, S0, K, T_down, r, q, opt_type))
     theta_annual = (price_T_down - base) / h_T
     theta = theta_annual / DAYS_PER_YEAR
 
     # Rho
-    price_r_up = price_european(S0, K, T_eff, r + h_r, q, params, opt_type)
-    price_r_dn = price_european(S0, K, T_eff, r - h_r, q, params, opt_type)
+    cf_r_up = _cf_set(params, T_eff, r + h_r, q)
+    cf_r_dn = _cf_set(params, T_eff, r - h_r, q)
+    price_r_up = float(_price_prepared(cf_r_up, S0, K, T_eff, r + h_r, q, opt_type))
+    price_r_dn = float(_price_prepared(cf_r_dn, S0, K, T_eff, r - h_r, q, opt_type))
     rho = (price_r_up - price_r_dn) / (2.0 * h_r)
 
     return HestonResult(
