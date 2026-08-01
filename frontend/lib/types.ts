@@ -301,5 +301,110 @@ export interface HistoryResponse {
   bars: OhlcvBar[];
 }
 
+// ---------------------------------------------------------------------------
+// Quantitative model types (SVI surface, Heston calibration, validation)
+// ---------------------------------------------------------------------------
 
+export interface QuantSurfaceRequest {
+  ticker: string;
+  market: MarketRegion;
+  spot_override?: number | null;
+  risk_free_rate: number;
+  dividend_yield?: number | null;
+  expiries?: string[] | null;
+  max_expiries: number;
+}
+
+export interface SVIParams {
+  a: number;
+  b: number;
+  rho: number;
+  m: number;
+  sigma: number;
+}
+
+export interface SurfacePoint {
+  strike: number;
+  market_iv: number | null;
+  fitted_iv: number | null;
+}
+
+export interface SVISlice {
+  expiry: string;
+  ttm: number;
+  svi_params: SVIParams;
+  points: SurfacePoint[];
+}
+
+export interface VolSurfaceResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  spot: number;
+  rate: number;
+  dividend_yield: number;
+  slices: SVISlice[];
+  warnings: string[];
+}
+
+export interface HestonParams {
+  v0: number;
+  kappa: number;
+  theta_v: number;
+  sigma_v: number;
+  rho: number;
+}
+
+export interface CalibrationContractView {
+  strike: number;
+  ttm: number;
+  option_type: string;
+  market_price: number;
+  model_price: number;
+  relative_error: number;
+}
+
+export interface HestonCalibrationResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  spot: number;
+  rate: number;
+  dividend_yield: number;
+  params: HestonParams;
+  rmse: number;
+  mape: number;
+  max_abs_error: number;
+  feller_condition_holds: boolean;
+  contracts: CalibrationContractView[];
+  warnings: string[];
+}
+
+export interface ValidationContractView {
+  strike: number;
+  ttm: number;
+  option_type: string;
+  market_price: number;
+  model_price: number;
+  market_iv: number | null;
+  model_iv: number | null;
+  iv_error: number | null;
+}
+
+export interface ModelValidationResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  spot: number;
+  rate: number;
+  dividend_yield: number;
+  price_rmse: number;
+  price_mape: number;
+  iv_rmse: number | null;
+  parity_max_error: number;
+  parity_holds: boolean;
+  feller_condition_holds: boolean;
+  contracts: ValidationContractView[];
+  warnings: string[];
+}
 

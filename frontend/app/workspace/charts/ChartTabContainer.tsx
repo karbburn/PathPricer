@@ -7,6 +7,9 @@ import { PayoffDiagram } from "./PayoffDiagram";
 import { ConvergenceChart } from "./ConvergenceChart";
 import { ComparisonChart } from "./ComparisonChart";
 import { RiskGridHeatmap } from "./RiskGridHeatmap";
+import { VolSurfaceChart } from "./VolSurfaceChart";
+import { HestonCalibrationChart } from "./HestonCalibrationChart";
+import { ModelValidationChart } from "./ModelValidationChart";
 import { exportChartSvgToPng } from "@/lib/export-helpers";
 import { PricingFullResponse, PricingRequest, MarketRegion } from "@/lib/types";
 
@@ -15,7 +18,7 @@ interface ChartTabContainerProps {
   fullResult: PricingFullResponse | null;
 }
 
-type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid";
+type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid" | "vol_surface" | "heston_calibration" | "model_validation";
 
 const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9", FX: "$", CRYPTO: "$" };
 
@@ -59,6 +62,45 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Risk Grid Heatmap
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("vol_surface")}
+            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              activeTab === "vol_surface"
+                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
+                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
+            }`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12c2-4 5-6 8-6s6 2 8 6"/><path d="M3 17c2-3 5-4 8-4s6 1 8 4"/></svg>
+            Vol Surface
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("heston_calibration")}
+            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              activeTab === "heston_calibration"
+                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
+                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
+            }`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><path d="M8 20h12"/></svg>
+            Heston Calib
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("model_validation")}
+            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              activeTab === "model_validation"
+                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
+                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
+            }`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Model Valid
           </button>
 
           <button
@@ -130,6 +172,9 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
       <div ref={chartRef}>
         {activeTab === "paths" && <PathsChart request={request} currencySymbol={currencySymbol} />}
         {activeTab === "risk_grid" && <RiskGridHeatmap request={request} />}
+        {activeTab === "vol_surface" && <VolSurfaceChart request={request} />}
+        {activeTab === "heston_calibration" && <HestonCalibrationChart request={request} />}
+        {activeTab === "model_validation" && <ModelValidationChart request={request} />}
 
         {activeTab === "distribution" && (
           fullResult ? (

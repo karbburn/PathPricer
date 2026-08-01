@@ -20,6 +20,10 @@ import {
   MarketRegion,
   OptionsChainResponse,
   HistoryResponse,
+  QuantSurfaceRequest,
+  VolSurfaceResponse,
+  HestonCalibrationResponse,
+  ModelValidationResponse,
 } from "./types";
 
 const BASE_URL =
@@ -199,6 +203,37 @@ export async function getMarketHistory(
   const url = `${BASE_URL}/market/history?${params}`;
   const response = await fetch(url, { method: "GET", signal });
   return handleResponse<HistoryResponse>(response);
+}
+
+async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  return handleResponse<T>(response);
+}
+
+export async function postVolSurface(
+  request: QuantSurfaceRequest,
+  signal?: AbortSignal
+): Promise<VolSurfaceResponse> {
+  return postJson<VolSurfaceResponse>(`${BASE_URL}/quant/vol-surface`, request, signal);
+}
+
+export async function postHestonCalibrate(
+  request: QuantSurfaceRequest,
+  signal?: AbortSignal
+): Promise<HestonCalibrationResponse> {
+  return postJson<HestonCalibrationResponse>(`${BASE_URL}/quant/heston-calibrate`, request, signal);
+}
+
+export async function postModelValidate(
+  request: QuantSurfaceRequest,
+  signal?: AbortSignal
+): Promise<ModelValidationResponse> {
+  return postJson<ModelValidationResponse>(`${BASE_URL}/quant/model-validate`, request, signal);
 }
 
 
