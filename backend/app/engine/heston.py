@@ -108,16 +108,23 @@ def _characteristic_function(
     iu = 1j * u
     kappa, theta_v, sigma_v, rho = params.kappa, params.theta_v, params.sigma_v, params.rho
 
-    d = np.sqrt((rho * sigma_v * iu - kappa) ** 2 + sigma_v**2 * (u**2 + iu))
+    discriminant = (rho * sigma_v * iu - kappa) ** 2 + sigma_v**2 * (u**2 + iu)
+    d = np.sqrt(discriminant)
+    # Keep the well-conditioned principal branch Re(d) >= 0 explicitly. numpy's
+    # sqrt defaults to this, but the explicit guard prevents a silent wrong
+    # branch for unusual parameters where the discriminant crosses the cut.
+    d = np.where(np.real(d) < 0, -d, d)
     numerator = kappa - rho * sigma_v * iu - d
     denominator = kappa - rho * sigma_v * iu + d
     g = numerator / denominator
 
     exp_dT = np.exp(-d * T)
-    # C term; use log1p-style to avoid catastrophic cancellation in 1 - g e^{-dT}
+    # C term: log((1 - g e^{-dT})/(1 - g)) computed as a difference of two
+    # principal-branch logs. A single combined-ratio log can jump the branch cut
+    # when numerator and denominator sit on opposite sides of the negative real
+    # axis; the difference form keeps each log on its own branch.
     with np.errstate(divide="ignore", invalid="ignore"):
-        ratio = (1.0 - g * exp_dT) / (1.0 - g)
-        log_ratio = np.log(ratio + 1e-300)
+        log_ratio = np.log(1.0 - g * exp_dT) - np.log(1.0 - g)
         C = (kappa * theta_v / sigma_v**2) * (numerator * T - 2.0 * log_ratio)
         D = (numerator / sigma_v**2) * (1.0 - exp_dT) / (1.0 - g * exp_dT)
 

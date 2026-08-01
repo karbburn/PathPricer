@@ -10,6 +10,7 @@ Validates the characteristic-function pricing against:
 """
 
 import math
+import numpy as np
 
 from app.engine.heston import HestonParams, price_and_greeks, price_european
 from app.engine.black_scholes import price as bs_price
@@ -68,6 +69,24 @@ def _run_tests() -> None:
     assert abs(res.volga - fd_volga) < max(1e-3, 0.05 * abs(fd_volga)), (
         f"Volga {res.volga:.4f} does not match FD {fd_volga:.4f}"
     )
+
+    # --- 6. CF robustness across extreme parameters ---------------------------
+    # Adversarial regimes (high positive rho, large vol-of-vol, short/long T)
+    # where the discriminant can cross the negative real axis. Prices must be
+    # finite and within no-arbitrage bounds.
+    S0 = 100.0
+    K = 100.0
+    extreme_cases = [
+        HestonParams(v0=0.05, kappa=1.0, theta_v=0.05, sigma_v=2.0, rho=0.99),
+        HestonParams(v0=0.01, kappa=5.0, theta_v=0.10, sigma_v=1.5, rho=-0.99),
+        HestonParams(v0=0.2, kappa=0.1, theta_v=0.2, sigma_v=0.9, rho=0.95),
+        HestonParams(v0=0.001, kappa=20.0, theta_v=0.001, sigma_v=0.2, rho=-0.5),
+    ]
+    for eparams in extreme_cases:
+        for TT, r, q in [(1e-4, 0.05, 0.0), (0.02, 0.0, 0.0), (1.0, 0.05, 0.01), (5.0, 0.03, 0.0)]:
+            price = price_european(S0, K, TT, r, q, eparams, "call")
+            assert math.isfinite(price), f"Non-finite price for {eparams} at T={TT}"
+            assert 0.0 <= price <= S0, f"Call out of no-arbitrage bounds: {price} for {eparams} T={TT}"
 
     print("Heston engine self-check OK")
     print(f"  benchmark call = {call:.4f} (expect ~6.078)")
