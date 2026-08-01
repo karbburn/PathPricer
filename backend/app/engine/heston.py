@@ -103,6 +103,10 @@ class HestonResult:
         vanna: d^2V/dS d(sqrt(v0)) — spot/vol cross-sensitivity.
         theta: dV/dT per calendar day (negative for long options).
         rho: dV/dr.
+
+    Note on theta sign: we report dV/dT (sensitivity to time-to-expiry),
+    which is negative for long options and equals the standard -dV/dt market
+    convention (since t = T_0 - T, dV/dt = -dV/dT).
     """
 
     price: float
