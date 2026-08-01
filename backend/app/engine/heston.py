@@ -45,6 +45,7 @@ Monte Carlo noise), which makes finite-difference Greeks clean.
 
 from __future__ import annotations
 
+import functools
 import math
 from dataclasses import dataclass
 
@@ -149,13 +150,20 @@ def _characteristic_function(
     return np.exp(iu * (r - q) * T + C + D * params.v0)
 
 
+@functools.lru_cache(maxsize=1)
 def _quadrature_nodes() -> tuple[np.ndarray, np.ndarray]:
-    """Gauss-Legendre nodes/weights on [0, HESTON_INTEGRATION_LIMIT]."""
+    """Gauss-Legendre nodes/weights on [0, HESTON_INTEGRATION_LIMIT].
+
+    Cached: identical for every call, so compute once. Returns immutable views
+    of the cached arrays to prevent accidental mutation.
+    """
     n = HESTON_QUADRATURE_POINTS
     x, w = leggauss(n)
     # Map [-1, 1] -> [0, U_max]
     u = 0.5 * HESTON_INTEGRATION_LIMIT * (x + 1.0)
     w = 0.5 * HESTON_INTEGRATION_LIMIT * w
+    u.flags.writeable = False
+    w.flags.writeable = False
     return u, w
 
 
