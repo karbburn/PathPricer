@@ -4,10 +4,11 @@ Fits the five Heston parameters (v0, kappa, theta_v, sigma_v, rho) so that
 model prices match market option prices as closely as possible.
 
 Approach:
-    Minimize the root-mean-square relative price error over all supplied
+    Minimize a blended relative + absolute price error over all supplied
     option contracts:
 
-        min_{p} sqrt( mean_i ( (V_model(p) - V_mkt) / V_mkt )^2 )
+        min_{p} 0.5 * sqrt( mean_i ( (V_model - V_mkt) / V_mkt )^2 )
+              + 0.5 * sqrt( mean_i (V_model - V_mkt)^2 ) / mean(V_mkt)
 
     subject to the model constraints
 
@@ -96,11 +97,19 @@ def _model_prices(
 def _objective(
     x: np.ndarray, S0: float, r: float, q: float, contracts: list[CalibrationContract]
 ) -> float:
-    """Relative RMSE plus a Feller soft penalty."""
+    """Blended relative + absolute RMSE, plus a Feller soft penalty.
+
+    A pure relative error over-penalizes deep-OTM options (whose tiny prices
+    make any small absolute misprice a huge percentage), pulling the fit toward
+    the wings. Blending in the mean-normalized absolute error keeps the ATM
+    backbone dominant while still letting relative error shape the smile.
+    """
     mkt = _market_prices(contracts)
     model = _model_prices(x, S0, r, q, contracts)
-    rel_err = (model - mkt) / mkt
-    rmse = float(np.sqrt(np.mean(rel_err**2)))
+    diff = model - mkt
+    rel_rmse = float(np.sqrt(np.mean((diff / mkt) ** 2)))
+    abs_rmse = float(np.sqrt(np.mean(diff**2))) / float(np.mean(mkt))
+    rmse = 0.5 * rel_rmse + 0.5 * abs_rmse
 
     v0, kappa, theta_v, sigma_v, rho = x
     # Feller: 2 kappa theta_v - sigma_v^2 >= 0. Penalty only when violated.
@@ -168,12 +177,17 @@ def calibrate_heston(
 
     base = _initial_params(contracts, S0, r, q)
     seeds = [base]
+    # Spread restart seeds multiplicatively on a log scale: the parameters are
+    # positive scale variables (vol^2, kappa, ...), so a uniform linear spread
+    # under- and over-samples in equal absolute terms. log-uniform draws from
+    # the same relative neighborhood, keeping far-from-ATM seeds comparable.
+    log_spread = 0.7
     for i in range(1, max(1, n_restarts)):
-        scale = np.array([1.3, 1.5, 1.3, 1.2, 1.0])
-        sign = -1.0 if i % 2 else 1.0
+        rng = np.random.default_rng(20240101 + i)
         s = base.copy()
-        s[:4] *= (scale[:4] * (0.8 + 0.4 * sign))
-        s[4] = min(0.95, max(-0.95, s[4] * (1.0 + 0.25 * sign)))
+        log_mult = rng.uniform(-log_spread, log_spread, size=4)
+        s[:4] *= np.exp(log_mult)
+        s[4] = min(0.95, max(-0.95, s[4] + rng.uniform(-0.15, 0.15)))
         seeds.append(np.clip(s, 1e-5, 2.0))
 
     best = None
@@ -184,7 +198,9 @@ def calibrate_heston(
             method="L-BFGS-B", bounds=_PARAM_BOUNDS,
             options={"maxiter": 500, "ftol": 1e-10, "gtol": 1e-6},
         )
-        if res.success and res.fun < best_fun:
+        # Accept both true convergence (success) and hitting the iteration
+        # limit (status 1) — the latter often still holds a good local fit.
+        if (res.success or res.status == 1) and res.fun < best_fun:
             best, best_fun = res, res.fun
 
     if best is None or not np.all(np.isfinite(best.x)):
