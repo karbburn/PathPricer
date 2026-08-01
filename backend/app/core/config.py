@@ -36,6 +36,13 @@ class Settings(BaseSettings):
     default_risk_grid_points: int = 25
     max_risk_grid_points: int = 100
     market_data_cache_ttl: int = 300
+    heston_v0: float = 0.04
+    heston_kappa: float = 2.0
+    heston_theta_v: float = 0.04
+    heston_sigma_v: float = 0.3
+    heston_rho: float = -0.7
+    heston_quadrature_points: int = 100
+    heston_integration_limit: float = 150.0
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -81,5 +88,12 @@ IV_INITIAL_SIGMA_MAX: float = settings.iv_initial_sigma_max
 DEFAULT_RISK_GRID_POINTS: int = settings.default_risk_grid_points
 MAX_RISK_GRID_POINTS: int = settings.max_risk_grid_points
 MARKET_DATA_CACHE_TTL: int = settings.market_data_cache_ttl
+HESTON_V0: float = settings.heston_v0
+HESTON_KAPPA: float = settings.heston_kappa
+HESTON_THETA_V: float = settings.heston_theta_v
+HESTON_SIGMA_V: float = settings.heston_sigma_v
+HESTON_RHO: float = settings.heston_rho
+HESTON_QUADRATURE_POINTS: int = settings.heston_quadrature_points
+HESTON_INTEGRATION_LIMIT: float = settings.heston_integration_limit
 
 
