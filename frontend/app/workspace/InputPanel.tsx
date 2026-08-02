@@ -60,6 +60,7 @@ export function InputPanel({
   const [inputs, setInputs] = useState<PricingRequest>(initialInputs);
   const [seedLocked, setSeedLocked] = useState<boolean>(false);
   const [fetchingMarket, setFetchingMarket] = useState<boolean>(false);
+  const [marketError, setMarketError] = useState<string | null>(null);
   const { density } = useDensity();
 
   const isMarketPriceOob = useMemo(() => {
@@ -103,6 +104,7 @@ export function InputPanel({
   const handleMarketFetch = async () => {
     if (!inputs.ticker.trim()) return;
     setFetchingMarket(true);
+    setMarketError(null);
     try {
       const quote = await getMarketQuote(inputs.ticker, inputs.market);
       setInputs((prev) => {
@@ -124,8 +126,9 @@ export function InputPanel({
         }
         return next;
       });
-    } catch {
-      // Ignore market fetch failure — manual spot override remains
+    } catch (err) {
+      const message = err instanceof Error && err.message ? err.message : "Failed to fetch market quote.";
+      setMarketError(`Quote sync failed for ${inputs.ticker.trim().toUpperCase()}: ${message}`);
     } finally {
       setFetchingMarket(false);
     }
@@ -283,6 +286,12 @@ export function InputPanel({
             ))}
           </div>
         </div>
+
+        {marketError && (
+          <p className="text-[11px] text-[#f85149] font-mono mt-1" role="alert">
+            {marketError}
+          </p>
+        )}
 
         {/* Spot Price Override */}
         <div className="grid grid-cols-2 gap-3 pt-1">
