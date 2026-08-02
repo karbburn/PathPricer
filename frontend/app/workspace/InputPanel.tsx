@@ -407,7 +407,10 @@ export function InputPanel({
               step="0.05"
               min="0.01"
               value={marketPrice}
-              onChange={(e) => onMarketPriceChange && onMarketPriceChange(Number(e.target.value))}
+              onChange={(e) => {
+                const parsed = Number(e.target.value);
+                onMarketPriceChange && onMarketPriceChange(Number.isFinite(parsed) ? parsed : 0);
+              }}
               className={`input-field w-full bg-[#0d1117] rounded px-3 py-2 text-sm font-mono text-white font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 isMarketPriceOob
                   ? "border border-[#d29922]/70 focus:border-[#d29922] focus-visible:ring-[#d29922]/60"
