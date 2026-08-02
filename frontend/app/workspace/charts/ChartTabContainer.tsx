@@ -27,7 +27,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
   const chartRef = useRef<HTMLDivElement | null>(null);
   const currencySymbol = CURRENCY_SYMBOL[request.market];
 
-  const bsPrice = fullResult ? fullResult.black_scholes.price : 10.0;
+  const bsPrice = fullResult ? fullResult.black_scholes.price : null;
 
   const handleExportPng = () => {
     exportChartSvgToPng(chartRef.current, `pathpricer_${activeTab}_chart`);
@@ -186,7 +186,15 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           )
         )}
 
-        {activeTab === "payoff" && <PayoffDiagram request={request} optionPrice={bsPrice} currencySymbol={currencySymbol} />}
+        {activeTab === "payoff" && (
+          fullResult && bsPrice !== null ? (
+            <PayoffDiagram request={request} optionPrice={bsPrice} currencySymbol={currencySymbol} />
+          ) : (
+            <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-8 text-center text-[#8b949e] font-mono text-sm">
+              Run full simulation to view the payoff diagram with a real option premium.
+            </div>
+          )
+        )}
 
         {activeTab === "convergence" && (
           fullResult ? (
