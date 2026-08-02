@@ -61,6 +61,7 @@ export function InputPanel({
   const [seedLocked, setSeedLocked] = useState<boolean>(false);
   const [fetchingMarket, setFetchingMarket] = useState<boolean>(false);
   const [marketError, setMarketError] = useState<string | null>(null);
+  const [marketWarnings, setMarketWarnings] = useState<string[]>([]);
   const { density } = useDensity();
 
   const isMarketPriceOob = useMemo(() => {
@@ -107,6 +108,7 @@ export function InputPanel({
     setMarketError(null);
     try {
       const quote = await getMarketQuote(inputs.ticker, inputs.market);
+      setMarketWarnings(quote.data_warnings || []);
       setInputs((prev) => {
         const cleanSpot = roundClean(quote.spot_price, 2);
         const cleanVol = roundClean(quote.historical_volatility["252d"] || prev.volatility, 4);
@@ -129,6 +131,7 @@ export function InputPanel({
     } catch (err) {
       const message = err instanceof Error && err.message ? err.message : "Failed to fetch market quote.";
       setMarketError(`Quote sync failed for ${inputs.ticker.trim().toUpperCase()}: ${message}`);
+      setMarketWarnings([]);
     } finally {
       setFetchingMarket(false);
     }
@@ -291,6 +294,16 @@ export function InputPanel({
           <p className="text-[11px] text-[#f85149] font-mono mt-1" role="alert">
             {marketError}
           </p>
+        )}
+
+        {marketWarnings.length > 0 && (
+          <div className="mt-1 space-y-0.5">
+            {marketWarnings.map((w) => (
+              <p key={w} className="text-[11px] text-[#d29922] font-mono">
+                {w}
+              </p>
+            ))}
+          </div>
         )}
 
         {/* Spot Price Override */}
