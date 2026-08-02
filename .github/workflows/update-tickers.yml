@@ -33,6 +33,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to ticker database."
           else
-            git commit -m "Update ticker database from Wikipedia"
+            git commit -m "Update ticker database from Wikipedia and CoinGecko"
             git push
           fi
