@@ -17,6 +17,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from ..core.config import (
+    BUMP_FRACTION_DEFAULT,
     DEFAULT_CONVERGENCE_GRID,
     DEFAULT_GREEKS_N,
     MAX_N_SIMULATIONS,
@@ -289,13 +290,31 @@ def price_preview(req: PricingRequestSchema) -> PricingPreviewResponse | JSONRes
     bs = black_scholes.price_and_greeks(S0, req.strike, T, r, q, sigma, opt)
 
     rng = make_rng(req.seed)
-    mc = monte_carlo.estimate_standard(S0, req.strike, T, r, q, sigma, opt, req.n_simulations, rng)
+    base_Z = rng.standard_normal(req.n_simulations)
+
+    mc = monte_carlo.estimate_standard(
+        S0, req.strike, T, r, q, sigma, opt, req.n_simulations, rng, base_Z=base_Z
+    )
+
+    # MC delta/gamma via central finite difference under Common Random Numbers,
+    # so sampling noise cancels between the bumped scenarios.
+    h_S = max(BUMP_FRACTION_DEFAULT * S0, 1e-4)
+    mc_price_up = monte_carlo.estimate_standard(
+        S0 + h_S, req.strike, T, r, q, sigma, opt, req.n_simulations, rng, base_Z=base_Z
+    ).price
+    mc_price_down = monte_carlo.estimate_standard(
+        S0 - h_S, req.strike, T, r, q, sigma, opt, req.n_simulations, rng, base_Z=base_Z
+    ).price
+    mc_delta = (mc_price_up - mc_price_down) / (2.0 * h_S)
+    mc_gamma = (mc_price_up - 2.0 * mc.price + mc_price_down) / (h_S**2)
 
     compute_ms = (time.perf_counter() - t_start) * 1000.0
 
     return PricingPreviewResponse(
         black_scholes=BSPreviewResult(price=bs.price, delta=bs.delta, gamma=bs.gamma),
-        monte_carlo_standard=MCPreviewResult(price=mc.price, delta=bs.delta, gamma=bs.gamma),
+        monte_carlo_standard=MCPreviewResult(
+            price=mc.price, delta=round(mc_delta, 4), gamma=round(mc_gamma, 4)
+        ),
         n_simulations=req.n_simulations,
         compute_ms=round(compute_ms, 1),
     )
