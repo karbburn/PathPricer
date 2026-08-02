@@ -4,6 +4,13 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { MarketRegion } from "@/lib/types";
 import { filterTickers, TickerEntry } from "@/lib/ticker-data";
 
+const MARKET_PLACEHOLDERS: Record<MarketRegion, string> = {
+  US: "Ticker (e.g. AAPL, MSFT)",
+  IN: "Ticker (e.g. RELIANCE, TCS)",
+  FX: "Pair (e.g. EURUSD, USDJPY)",
+  CRYPTO: "Coin (e.g. BTC, ETH)",
+};
+
 interface TickerInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -12,7 +19,6 @@ interface TickerInputProps {
   placeholder?: string;
   className?: string;
   inputClassName?: string;
-  accentColor?: string;
 }
 
 export function TickerInput({
@@ -20,10 +26,9 @@ export function TickerInput({
   onChange,
   market,
   onSelectTicker,
-  placeholder = "Enter ticker (e.g. RELIANCE, AAPL, MSFT)",
+  placeholder,
   className = "",
   inputClassName = "",
-  accentColor = "amber",
 }: TickerInputProps) {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
@@ -103,9 +108,6 @@ export function TickerInput({
     }
   }, [activeIndex]);
 
-  const focusBorderClass =
-    accentColor === "cyan" ? "focus:border-[#58a6ff]" : "focus:border-[#58a6ff]";
-
   return (
     <div ref={containerRef} className={`relative flex-1 w-full ${className}`}>
       <input
@@ -120,8 +122,8 @@ export function TickerInput({
           if (value.trim()) setShowDropdown(true);
         }}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none transition-colors ${focusBorderClass} ${market === "IN" ? "pr-20" : ""} ${inputClassName}`}
+        placeholder={placeholder || MARKET_PLACEHOLDERS[market]}
+        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none focus:border-[#58a6ff] transition-colors ${market === "IN" ? "pr-20" : ""} ${inputClassName}`}
       />
 
       {market === "IN" && (

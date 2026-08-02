@@ -18,6 +18,8 @@ const DEFAULT_TICKERS: TickerConfig[] = [
   { symbol: "MSFT", market: "US", currency: "$" },
   { symbol: "RELIANCE", market: "IN", currency: "₹" },
   { symbol: "GOOGL", market: "US", currency: "$" },
+  { symbol: "EURUSD", market: "FX", currency: "$" },
+  { symbol: "BTC", market: "CRYPTO", currency: "$" },
 ];
 
 const REFRESH_INTERVAL = 60_000;

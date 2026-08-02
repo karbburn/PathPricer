@@ -248,8 +248,6 @@ export function InputPanel({
               value={inputs.ticker}
               onChange={(val) => updateField("ticker", val)}
               market={inputs.market}
-              placeholder="Ticker (e.g. AAPL)"
-              accentColor="cyan"
             />
             <button
               type="button"

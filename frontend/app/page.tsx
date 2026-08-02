@@ -94,7 +94,7 @@ export default function MarketOverviewPage() {
               { key: "US" as const, label: "US" },
               { key: "IN" as const, label: "IN (.NS)" },
               { key: "FX" as const, label: "FX" },
-              { key: "CRYPTO" as const, label: "Crypto" },
+              { key: "CRYPTO" as const, label: "CRYPTO" },
             ]).map((m) => (
               <button
                 key={m.key}
@@ -117,7 +117,6 @@ export default function MarketOverviewPage() {
             onChange={(val) => setTickerInput(val)}
             market={marketInput}
             onSelectTicker={(selectedTicker) => fetchQuote(selectedTicker, marketInput)}
-            accentColor="#58a6ff"
           />
 
           {/* Fetch Button */}
