@@ -54,7 +54,7 @@ export function formatDateTime(isoString: string | null | undefined): string {
   if (!isoString) return "—";
   try {
     const d = new Date(isoString);
-    return d.toLocaleString("en-US", {
+    const local = d.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -62,7 +62,16 @@ export function formatDateTime(isoString: string | null | undefined): string {
       minute: "2-digit",
       second: "2-digit",
       hour12: false,
+      timeZoneName: "short",
     });
+    const utcTime = d.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    });
+    return `${local} (${utcTime} UTC)`;
   } catch {
     return isoString;
   }
