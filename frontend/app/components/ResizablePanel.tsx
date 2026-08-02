@@ -7,12 +7,16 @@ type Direction = "horizontal" | "vertical";
 interface ResizableContextValue {
   direction: Direction;
   panelSizes: number[];
+  minSizes: number[];
+  maxSizes: number[];
   setPanelSize: (index: number, size: number) => void;
 }
 
 const ResizableContext = createContext<ResizableContextValue>({
   direction: "horizontal",
   panelSizes: [],
+  minSizes: [],
+  maxSizes: [],
   setPanelSize: () => {},
 });
 
@@ -26,12 +30,27 @@ export function ResizablePanelGroup({
   className?: string;
 }) {
   const childArray = React.Children.toArray(children);
-  const panelCount = childArray.filter(
-    (c) => React.isValidElement(c) && c.type === ResizablePanel
-  ).length;
+  const panels = childArray.filter(
+    (c): c is React.ReactElement => React.isValidElement(c) && c.type === ResizablePanel
+  );
+  const panelCount = panels.length;
 
-  const defaultSizes = Array(panelCount).fill(100 / panelCount);
-  const [panelSizes, setPanelSizes] = useState(defaultSizes);
+  const minSizes: number[] = [];
+  const maxSizes: number[] = [];
+  const defaultSizes: number[] = [];
+  panels.forEach((panel) => {
+    const props = panel.props as { index: number; defaultSize?: number; minSize?: number; maxSize?: number };
+    minSizes[props.index] = props.minSize ?? 20;
+    maxSizes[props.index] = props.maxSize ?? 80;
+    defaultSizes[props.index] = props.defaultSize ?? 100 / Math.max(1, panelCount);
+  });
+  for (let i = 0; i < panelCount; i++) {
+    if (minSizes[i] === undefined) minSizes[i] = 20;
+    if (maxSizes[i] === undefined) maxSizes[i] = 80;
+    if (defaultSizes[i] === undefined) defaultSizes[i] = 100 / Math.max(1, panelCount);
+  }
+
+  const [panelSizes, setPanelSizes] = useState<number[]>(() => [...defaultSizes]);
 
   const setPanelSize = useCallback((index: number, size: number) => {
     setPanelSizes((prev) => {
@@ -42,7 +61,7 @@ export function ResizablePanelGroup({
   }, []);
 
   return (
-    <ResizableContext.Provider value={{ direction, panelSizes, setPanelSize }}>
+    <ResizableContext.Provider value={{ direction, panelSizes, minSizes, maxSizes, setPanelSize }}>
       <div
         className={`flex ${direction === "horizontal" ? "flex-row" : "flex-col"} ${className}`}
         style={{ height: "100%", width: "100%" }}
@@ -92,22 +111,34 @@ export function ResizableHandle({
   index: number;
   className?: string;
 }) {
-  const { direction, panelSizes, setPanelSize } = useContext(ResizableContext);
+  const { direction, panelSizes, minSizes, maxSizes, setPanelSize } = useContext(ResizableContext);
   const [isDragging, setIsDragging] = useState(false);
   const startPos = useRef(0);
   const startSize = useRef(0);
   const neighborStart = useRef(0);
+  const minLeft = useRef(20);
+  const maxLeft = useRef(80);
+  const minRight = useRef(20);
+  const maxRight = useRef(80);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const beginDrag = useCallback(() => {
+    startSize.current = panelSizes[index] ?? 50;
+    neighborStart.current = panelSizes[index + 1] ?? 100 - startSize.current;
+    minLeft.current = minSizes[index] ?? 20;
+    maxLeft.current = maxSizes[index] ?? 80;
+    minRight.current = minSizes[index + 1] ?? 20;
+    maxRight.current = maxSizes[index + 1] ?? 80;
+  }, [panelSizes, index, minSizes, maxSizes]);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       setIsDragging(true);
       startPos.current = direction === "horizontal" ? e.clientX : e.clientY;
-      startSize.current = panelSizes[index] ?? 50;
-      neighborStart.current = panelSizes[index + 1] ?? 100 - startSize.current;
+      beginDrag();
     },
-    [direction, panelSizes, index]
+    [direction, beginDrag]
   );
 
   const handleTouchStart = useCallback(
@@ -117,10 +148,9 @@ export function ResizableHandle({
       startPos.current = direction === "horizontal"
         ? e.touches[0].clientX
         : e.touches[0].clientY;
-      startSize.current = panelSizes[index] ?? 50;
-      neighborStart.current = panelSizes[index + 1] ?? 100 - startSize.current;
+      beginDrag();
     },
-    [direction, panelSizes, index]
+    [direction, beginDrag]
   );
 
   useEffect(() => {
@@ -135,10 +165,12 @@ export function ResizableHandle({
         ? container.getBoundingClientRect().width
         : container.getBoundingClientRect().height;
       const deltaPercent = (delta / containerSize) * 100;
-      const newSize = Math.max(20, Math.min(80, startSize.current + deltaPercent));
-      const neighborSize = neighborStart.current + startSize.current - newSize;
+      const pairTotal = startSize.current + neighborStart.current;
+      const lo = Math.max(minLeft.current, pairTotal - maxRight.current);
+      const hi = Math.min(maxLeft.current, pairTotal - minRight.current);
+      const newSize = Math.min(Math.max(startSize.current + deltaPercent, lo), hi);
       setPanelSize(index, newSize);
-      setPanelSize(index + 1, neighborSize);
+      setPanelSize(index + 1, pairTotal - newSize);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -153,10 +185,12 @@ export function ResizableHandle({
         ? container.getBoundingClientRect().width
         : container.getBoundingClientRect().height;
       const deltaPercent = (delta / containerSize) * 100;
-      const newSize = Math.max(20, Math.min(80, startSize.current + deltaPercent));
-      const neighborSize = neighborStart.current + startSize.current - newSize;
+      const pairTotal = startSize.current + neighborStart.current;
+      const lo = Math.max(minLeft.current, pairTotal - maxRight.current);
+      const hi = Math.min(maxLeft.current, pairTotal - minRight.current);
+      const newSize = Math.min(Math.max(startSize.current + deltaPercent, lo), hi);
       setPanelSize(index, newSize);
-      setPanelSize(index + 1, neighborSize);
+      setPanelSize(index + 1, pairTotal - newSize);
     };
 
     const handleMouseUp = () => setIsDragging(false);
