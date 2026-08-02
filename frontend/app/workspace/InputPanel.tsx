@@ -308,7 +308,7 @@ export function InputPanel({
 
         {/* Spot Price Override */}
         <div className="grid grid-cols-2 gap-3 pt-1">
-          <div>
+          <div className={inputs.market === "CRYPTO" ? "col-span-2" : ""}>
             <label className="block text-xs text-[#8b949e] mb-1">Spot Price (S₀)</label>
             <input
               type="number"
@@ -329,8 +329,11 @@ export function InputPanel({
               className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
-          <div>
-            <label className="block text-xs text-[#8b949e] mb-1">Dividend Yield (q)</label>
+          {inputs.market !== "CRYPTO" && (
+            <div>
+              <label className="block text-xs text-[#8b949e] mb-1">
+                {inputs.market === "FX" ? "Foreign Rate (r_f)" : "Dividend Yield (q)"}
+              </label>
               <input
                 type="number"
                 step="0.001"
@@ -338,15 +341,17 @@ export function InputPanel({
                 max="1"
                 value={inputs.dividend_yield ?? 0}
                 onChange={(e) => updateField("dividend_yield", roundClean(clampNum(e.target.value, 0, 1.0, inputs.dividend_yield ?? 0), 4))}
-                aria-label="Dividend yield (q)"
+                aria-label={inputs.market === "FX" ? "Foreign rate (r_f)" : "Dividend yield (q)"}
                 className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
-            {(!inputs.dividend_yield || inputs.dividend_yield === 0) && (
-              <p className="text-[10px] text-[#58a6ff]/90 mt-1 font-mono flex items-center gap-1">
-                <span className="text-[#d29922]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Dividend yield 0.0% (defaulted/no payout)
-              </p>
-            )}
-          </div>
+              {(!inputs.dividend_yield || inputs.dividend_yield === 0) && (
+                <p className="text-[10px] text-[#58a6ff]/90 mt-1 font-mono flex items-center gap-1">
+                  <span className="text-[#d29922]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                  {inputs.market === "FX" ? "Foreign rate 0.0% (defaulted)" : "Dividend yield 0.0% (defaulted/no payout)"}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

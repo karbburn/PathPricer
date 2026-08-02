@@ -61,6 +61,25 @@ export function formatMarketCap(val: number | null | undefined, currency: string
   return `${currency}${val.toLocaleString()}`;
 }
 
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$", INR: "₹", EUR: "€", GBP: "£", JPY: "¥", CNY: "¥", CAD: "C$", AUD: "A$",
+  CHF: "Fr", KRW: "₩", HKD: "HK$", SGD: "S$", THB: "฿", ZAR: "R", BTC: "₿", ETH: "Ξ",
+  USDT: "$", USDC: "$",
+};
+
+export function currencySymbolFor(code: string): string {
+  return CURRENCY_SYMBOLS[code.toUpperCase()] ?? `${code} `;
+}
+
+// ponytail: FX symbol comes from the ticker's quote currency (yfinance "CCY1CCY2=X" convention); swap for quote.currency when a quote is in scope
+export function marketCurrencySymbol(market: string, ticker: string): string {
+  if (market === "FX") {
+    const base = /^([A-Za-z]{6})/.exec(ticker)?.[1]?.toUpperCase();
+    if (base) return currencySymbolFor(base.slice(3));
+  }
+  return currencySymbolFor(market === "IN" ? "INR" : "USD");
+}
+
 export function formatDateTime(isoString: string | null | undefined): string {
   if (!isoString) return "—";
   try {

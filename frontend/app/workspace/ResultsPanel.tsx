@@ -5,7 +5,7 @@ import { PreviewBadge, PrecisionTier } from "./PreviewBadge";
 import { ApiError } from "@/lib/api-client";
 import { PricingPreviewResponse, PricingFullResponse, BSGreeks, MarketRegion, ImpliedVolResponse, PnLExplainResponse } from "@/lib/types";
 import { useDensity } from "@/lib/contexts/DensityContext";
-import { formatPercent, formatPrice } from "@/lib/formatters";
+import { formatPercent, formatPrice, marketCurrencySymbol } from "@/lib/formatters";
 
 interface ResultsPanelProps {
   microState: "pending" | "preview" | "error";
@@ -15,14 +15,13 @@ interface ResultsPanelProps {
   activeTier: "preview" | "full";
   isFullSimulating: boolean;
   market: MarketRegion;
+  ticker: string;
   workspaceMode?: "pricing" | "implied_vol" | "pnl_explain";
   impliedVolResult?: ImpliedVolResponse | null;
   isSolvingIv?: boolean;
   pnlExplainResult?: PnLExplainResponse | null;
   isCalculatingPnL?: boolean;
 }
-
-const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9", FX: "$", CRYPTO: "$" };
 
 // Validation tolerances for FD Greeks comparison
 const GREEK_TOLERANCES: Record<string, { name: string; symbol: string; tolerance: number }> = {
@@ -41,6 +40,7 @@ export function ResultsPanel({
   activeTier,
   isFullSimulating,
   market,
+  ticker,
   workspaceMode = "pricing",
   impliedVolResult,
   isSolvingIv = false,
@@ -49,7 +49,7 @@ export function ResultsPanel({
 }: ResultsPanelProps) {
   const { density } = useDensity();
   const compact = density === "compact";
-  const currencySymbol = CURRENCY_SYMBOL[market];
+  const currencySymbol = marketCurrencySymbol(market, ticker);
   // Error state — structured error display
   if (error) {
     const isMarketError = error.error === "ticker_not_found";

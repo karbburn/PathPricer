@@ -293,6 +293,7 @@ function WorkspaceContent() {
                 activeTier={activeTier}
                 isFullSimulating={isFullSimulating}
                 market={inputs.market}
+                ticker={inputs.ticker}
                 workspaceMode={workspaceMode}
                 impliedVolResult={impliedVolResult}
                 isSolvingIv={isSolvingIv}
@@ -360,6 +361,7 @@ function WorkspaceContent() {
                 activeTier={activeTier}
                 isFullSimulating={isFullSimulating}
                 market={inputs.market}
+                ticker={inputs.ticker}
                 workspaceMode={workspaceMode}
                 impliedVolResult={impliedVolResult}
                 isSolvingIv={isSolvingIv}

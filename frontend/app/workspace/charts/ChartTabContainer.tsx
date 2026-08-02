@@ -11,7 +11,8 @@ import { VolSurfaceChart } from "./VolSurfaceChart";
 import { HestonCalibrationChart } from "./HestonCalibrationChart";
 import { ModelValidationChart } from "./ModelValidationChart";
 import { exportChartSvgToPng } from "@/lib/export-helpers";
-import { PricingFullResponse, PricingRequest, MarketRegion } from "@/lib/types";
+import { PricingFullResponse, PricingRequest } from "@/lib/types";
+import { marketCurrencySymbol } from "@/lib/formatters";
 
 interface ChartTabContainerProps {
   request: PricingRequest;
@@ -20,12 +21,10 @@ interface ChartTabContainerProps {
 
 type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid" | "vol_surface" | "heston_calibration" | "model_validation";
 
-const CURRENCY_SYMBOL: Record<MarketRegion, string> = { US: "$", IN: "\u20B9", FX: "$", CRYPTO: "$" };
-
 export function ChartTabContainer({ request, fullResult }: ChartTabContainerProps) {
   const [activeTab, setActiveTab] = useState<ChartTab>("paths");
   const chartRef = useRef<HTMLDivElement | null>(null);
-  const currencySymbol = CURRENCY_SYMBOL[request.market];
+  const currencySymbol = marketCurrencySymbol(request.market, request.ticker);
 
   const bsPrice = fullResult ? fullResult.black_scholes.price : null;
 
