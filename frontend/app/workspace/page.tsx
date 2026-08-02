@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, Suspense } from "react";
+import { useState, useCallback, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { InputPanel } from "./InputPanel";
 import { ResultsPanel } from "./ResultsPanel";
@@ -12,6 +12,7 @@ import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
 import { useDensity } from "@/lib/contexts/DensityContext";
 import { postPriceFull, postImpliedVol, postPnLExplain, ApiError } from "@/lib/api-client";
 import { getEffectiveInputs, serializeInputs } from "@/lib/url-state";
+import { computePriceBounds, yearsToExpiry } from "@/lib/formatters";
 import {
   ImpliedVolRequest,
   ImpliedVolResponse,
@@ -29,6 +30,18 @@ function WorkspaceContent() {
   const inputs = getEffectiveInputs(
     Object.fromEntries(searchParams.entries())
   );
+
+  const priceBounds = useMemo(() => {
+    if (inputs.spot_override === null || inputs.spot_override === undefined) return null;
+    return computePriceBounds(
+      inputs.spot_override,
+      inputs.strike,
+      inputs.risk_free_rate,
+      inputs.dividend_yield ?? 0,
+      yearsToExpiry(inputs.expiry_date),
+      inputs.option_type
+    );
+  }, [inputs.spot_override, inputs.strike, inputs.risk_free_rate, inputs.dividend_yield, inputs.expiry_date, inputs.option_type]);
 
   const [workspaceMode, setWorkspaceMode] = useState<"pricing" | "implied_vol" | "pnl_explain">("pricing");
   const [marketPrice, setMarketPrice] = useState<number>(5.0);
@@ -266,6 +279,7 @@ function WorkspaceContent() {
                 onPnLShiftChange={setPnLShift}
                 onCalculatePnLExplain={handleCalculatePnLExplain}
                 isCalculatingPnL={isCalculatingPnL}
+                priceBounds={priceBounds}
               />
             </div>
           )}
@@ -328,6 +342,7 @@ function WorkspaceContent() {
                 onPnLShiftChange={setPnLShift}
                 onCalculatePnLExplain={handleCalculatePnLExplain}
                 isCalculatingPnL={isCalculatingPnL}
+                priceBounds={priceBounds}
               />
             </div>
           </ResizablePanel>

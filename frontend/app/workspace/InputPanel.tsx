@@ -14,7 +14,7 @@ import {
 } from "@/lib/types";
 import { TickerInput } from "@/app/components/TickerInput";
 
-import { computeAtmStrike, roundClean } from "@/lib/formatters";
+import { computeAtmStrike, roundClean, formatPrice } from "@/lib/formatters";
 
 interface InputPanelProps {
   initialInputs: PricingRequest;
@@ -34,6 +34,7 @@ interface InputPanelProps {
   onPnLShiftChange?: (shift: PnLShift) => void;
   onCalculatePnLExplain?: () => void;
   isCalculatingPnL?: boolean;
+  priceBounds?: { lower: number; upper: number } | null;
 }
 
 export function InputPanel({
@@ -54,11 +55,17 @@ export function InputPanel({
   onPnLShiftChange,
   onCalculatePnLExplain,
   isCalculatingPnL = false,
+  priceBounds = null,
 }: InputPanelProps) {
   const [inputs, setInputs] = useState<PricingRequest>(initialInputs);
   const [seedLocked, setSeedLocked] = useState<boolean>(false);
   const [fetchingMarket, setFetchingMarket] = useState<boolean>(false);
   const { density } = useDensity();
+
+  const isMarketPriceOob = useMemo(() => {
+    if (!priceBounds) return false;
+    return marketPrice <= priceBounds.lower || marketPrice >= priceBounds.upper;
+  }, [priceBounds, marketPrice]);
 
   // Dynamic strike bounds scaled to spot price level
   const currentSpot = inputs.spot_override ?? 100;
@@ -401,9 +408,25 @@ export function InputPanel({
               min="0.01"
               value={marketPrice}
               onChange={(e) => onMarketPriceChange && onMarketPriceChange(Number(e.target.value))}
-              className="input-field w-full bg-[#0d1117] border border-[#58a6ff]/60 focus:border-[#58a6ff] rounded px-3 py-2 text-sm font-mono text-white font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              className={`input-field w-full bg-[#0d1117] rounded px-3 py-2 text-sm font-mono text-white font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+                isMarketPriceOob
+                  ? "border border-[#d29922]/70 focus:border-[#d29922] focus-visible:ring-[#d29922]/60"
+                  : "border border-[#58a6ff]/60 focus:border-[#58a6ff] focus-visible:ring-[#58a6ff]/60"
+              }`}
               placeholder="e.g. 5.25"
             />
+            {priceBounds && (
+              <div className="mt-1.5 space-y-1">
+                <p className="text-[11px] text-[#8b949e] font-mono">
+                  Valid range: {formatPrice(priceBounds.lower, 2)} – {formatPrice(priceBounds.upper, 2)}
+                </p>
+                {isMarketPriceOob && (
+                  <p className="text-[11px] text-[#d29922] font-mono">
+                    Outside theoretical bounds — the IV solver cannot find a solution at this price.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div>

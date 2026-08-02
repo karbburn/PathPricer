@@ -78,6 +78,41 @@ export function formatDateTime(isoString: string | null | undefined): string {
 }
 
 /**
+ * Time to expiry in years (ACT/365) for a YYYY-MM-DD expiry string.
+ * Uses date-only deltas to mirror the backend's `delta.days / 365.0`.
+ */
+export function yearsToExpiry(expiryDate: string): number {
+  const exp = new Date(`${expiryDate}T00:00:00`);
+  const today = new Date();
+  const expStart = Date.UTC(exp.getFullYear(), exp.getMonth(), exp.getDate());
+  const todayStart = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  return (expStart - todayStart) / (86_400_000 * 365);
+}
+
+/**
+ * Black-Scholes arbitrage-free price bounds for a European vanilla option.
+ * Mirrors the backend bounds check in implied_vol.py: a solvable market price
+ * satisfies `lower < price < upper` strictly. Returns null when bounds are
+ * undefined (non-positive spot/strike or non-positive time to expiry).
+ */
+export function computePriceBounds(
+  spot: number,
+  strike: number,
+  r: number,
+  q: number,
+  tte: number,
+  type: "call" | "put"
+): { lower: number; upper: number } | null {
+  if (!(tte > 0) || !(spot > 0) || !(strike > 0)) return null;
+  const discountedSpot = spot * Math.exp(-q * tte);
+  const discountedStrike = strike * Math.exp(-r * tte);
+  if (type === "call") {
+    return { lower: Math.max(0, discountedSpot - discountedStrike), upper: discountedSpot };
+  }
+  return { lower: Math.max(0, discountedStrike - discountedSpot), upper: discountedStrike };
+}
+
+/**
  * Calculate At-The-Money (ATM) strike price rounded to realistic strike intervals based on spot level.
  */
 export function computeAtmStrike(spot: number): number {
