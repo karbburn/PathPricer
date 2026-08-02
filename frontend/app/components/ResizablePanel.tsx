@@ -96,6 +96,7 @@ export function ResizableHandle({
   const [isDragging, setIsDragging] = useState(false);
   const startPos = useRef(0);
   const startSize = useRef(0);
+  const neighborStart = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = useCallback(
@@ -104,6 +105,7 @@ export function ResizableHandle({
       setIsDragging(true);
       startPos.current = direction === "horizontal" ? e.clientX : e.clientY;
       startSize.current = panelSizes[index] ?? 50;
+      neighborStart.current = panelSizes[index + 1] ?? 100 - startSize.current;
     },
     [direction, panelSizes, index]
   );
@@ -116,6 +118,7 @@ export function ResizableHandle({
         ? e.touches[0].clientX
         : e.touches[0].clientY;
       startSize.current = panelSizes[index] ?? 50;
+      neighborStart.current = panelSizes[index + 1] ?? 100 - startSize.current;
     },
     [direction, panelSizes, index]
   );
@@ -133,8 +136,9 @@ export function ResizableHandle({
         : container.getBoundingClientRect().height;
       const deltaPercent = (delta / containerSize) * 100;
       const newSize = Math.max(20, Math.min(80, startSize.current + deltaPercent));
+      const neighborSize = neighborStart.current + startSize.current - newSize;
       setPanelSize(index, newSize);
-      setPanelSize(index + 1, 100 - newSize + (panelSizes[index + 1] ?? 50));
+      setPanelSize(index + 1, neighborSize);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -150,8 +154,9 @@ export function ResizableHandle({
         : container.getBoundingClientRect().height;
       const deltaPercent = (delta / containerSize) * 100;
       const newSize = Math.max(20, Math.min(80, startSize.current + deltaPercent));
+      const neighborSize = neighborStart.current + startSize.current - newSize;
       setPanelSize(index, newSize);
-      setPanelSize(index + 1, 100 - newSize + (panelSizes[index + 1] ?? 50));
+      setPanelSize(index + 1, neighborSize);
     };
 
     const handleMouseUp = () => setIsDragging(false);
