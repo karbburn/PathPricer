@@ -53,10 +53,15 @@ function CustomTooltip({ active, payload, label, currencySymbol }: { active?: bo
   );
 }
 
+function computeTteYears(expiryDate: string): number {
+  const ms = new Date(expiryDate).getTime() - Date.now();
+  return Math.max(0, ms / (365.0 * 24 * 3600 * 1000));
+}
+
 export function PathsChart({ request, currencySymbol }: PathsChartProps) {
   const numPaths = 30;
   const steps = 50;
-  const T = 0.5;
+  const T = computeTteYears(request.expiry_date);
 
   const { chartData, spotPrice, strikePrice } = useMemo(() => {
     const S0 = request.spot_override ?? 100.0;
@@ -151,7 +156,7 @@ export function PathsChart({ request, currencySymbol }: PathsChartProps) {
                 key={i}
                 type="monotone"
                 dataKey={`path${i}`}
-                stroke={i === 0 ? "#58a6ff" : i % 2 === 0 ? "#21262d" : "#30363d"}
+                stroke={i === 0 ? "#58a6ff" : i % 2 === 0 ? "#6e7681" : "#484f58"}
                 strokeWidth={i === 0 ? 1.5 : 0.8}
                 dot={false}
                 isAnimationActive={false}
