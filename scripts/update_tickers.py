@@ -232,7 +232,6 @@ def main() -> None:
                 sys.exit(1)
             sp500, nifty50, crypto = valid_sp500, valid_nifty, valid_crypto
 
-    header = existing[: existing.find("TICKER_DATABASE")]
     header, footer, body = parse_existing(existing)
 
     content = generate_ticker_data(header, body, sp500, nifty50, crypto, footer)
@@ -248,6 +247,8 @@ def _validate(ticker: str, market: str, yf) -> bool:
     symbol = ticker
     if market == "IN" and not ticker.endswith((".NS", ".BO")):
         symbol = f"{ticker}.NS"
+    elif market == "CRYPTO" and not ticker.endswith("-USD"):
+        symbol = f"{ticker}-USD"
     try:
         t = yf.Ticker(symbol)
         return bool(t.fast_info)

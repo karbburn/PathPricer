@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from scripts.update_tickers import ENTRY_RE, generate_ticker_data, parse_existing
+from scripts.update_tickers import ENTRY_RE, _validate, generate_ticker_data, parse_existing
 
 FIXTURE = """/**
  * Header
@@ -69,8 +69,25 @@ def test_regex_matches_entry():
     assert m and m.group(1) == "A" and m.group(3) == "US"
 
 
+def test_validate_resolves_market_symbols():
+    """yfinance symbol resolution: IN gets .NS, CRYPTO gets -USD, US untouched."""
+    seen = []
+
+    class FakeYf:
+        def Ticker(self, symbol):
+            seen.append(symbol)
+            return type("T", (), {"fast_info": True})()
+
+    yf = FakeYf()
+    assert _validate("BTC", "CRYPTO", yf) and seen[-1] == "BTC-USD"
+    assert _validate("BTC-USD", "CRYPTO", yf) and seen[-1] == "BTC-USD"
+    assert _validate("RELIANCE", "IN", yf) and seen[-1] == "RELIANCE.NS"
+    assert _validate("AAPL", "US", yf) and seen[-1] == "AAPL"
+
+
 if __name__ == "__main__":
     test_merge_preserves_existing_and_adds_new()
     test_crypto_and_fx_preserved()
     test_regex_matches_entry()
+    test_validate_resolves_market_symbols()
     print("update_tickers self-check OK")
