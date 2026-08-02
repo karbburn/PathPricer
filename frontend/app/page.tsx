@@ -20,7 +20,7 @@ const PRESET_TICKERS: Array<{ ticker: string; market: MarketRegion; name: string
   { ticker: "RELIANCE", market: "IN", name: "Reliance Industries" },
   { ticker: "TCS", market: "IN", name: "Tata Consultancy Services" },
   { ticker: "EURUSD", market: "FX", name: "EUR/USD" },
-  { ticker: "BTC-USD", market: "CRYPTO", name: "Bitcoin" },
+  { ticker: "BTC", market: "CRYPTO", name: "Bitcoin" },
 ];
 
 export default function MarketOverviewPage() {
