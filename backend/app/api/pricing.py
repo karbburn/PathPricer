@@ -87,6 +87,17 @@ def _compute_T(expiry_date: date) -> float:
     return delta.days / 365.0
 
 
+def _carry_yield(req: PricingRequestSchema) -> float:
+    """Cost-of-carry yield (q) for the request.
+
+    Cryptocurrencies pay no dividends, so their carry yield is always zero
+    even if a dividend_yield was supplied.
+    """
+    if req.market == "CRYPTO":
+        return 0.0
+    return req.dividend_yield if req.dividend_yield is not None else 0.0
+
+
 def run_full_simulation(req: PricingRequestSchema) -> PricingFullResponse:
     """Run full simulation: all 4 MC estimators, FD Greeks, convergence, diagnostics."""
     t_start = time.perf_counter()
@@ -94,7 +105,7 @@ def run_full_simulation(req: PricingRequestSchema) -> PricingFullResponse:
     T = _compute_T(req.expiry_date)
     S0 = req.spot_override if req.spot_override is not None else 100.0
     r = req.risk_free_rate
-    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+    q = _carry_yield(req)
     sigma = req.volatility
     opt = req.option_type
 
@@ -244,7 +255,7 @@ def price_preview(req: PricingRequestSchema) -> PricingPreviewResponse | JSONRes
     T = _compute_T(req.expiry_date)
     S0 = req.spot_override if req.spot_override is not None else 100.0
     r = req.risk_free_rate
-    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+    q = _carry_yield(req)
     sigma = req.volatility
     opt = req.option_type
 
@@ -317,7 +328,7 @@ def price_implied_vol(req: ImpliedVolRequest) -> ImpliedVolResponse | JSONRespon
     T = _compute_T(req.expiry_date)
     S0 = req.spot_override if req.spot_override is not None else 100.0
     r = req.risk_free_rate
-    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+    q = _carry_yield(req)
 
     try:
         res = implied_vol.solve_implied_volatility(
@@ -389,7 +400,7 @@ def price_pnl_explain(req: PnLExplainRequest) -> PnLExplainResponse | JSONRespon
     T = _compute_T(req.expiry_date)
     S0 = req.spot_override if req.spot_override is not None else 100.0
     r = req.risk_free_rate
-    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+    q = _carry_yield(req)
 
     res = pnl_explain.explain_pnl(
         S0=S0,
@@ -459,7 +470,7 @@ def compute_risk_grid_endpoint(req: RiskGridRequest) -> RiskGridResponse | JSONR
 
     S0 = req.spot_override if req.spot_override is not None else 100.0
     r = req.risk_free_rate
-    q = req.dividend_yield if req.dividend_yield is not None else 0.0
+    q = _carry_yield(req)
 
     try:
         res = risk_grid.compute_risk_grid(
