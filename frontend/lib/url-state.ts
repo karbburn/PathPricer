@@ -105,6 +105,7 @@ export function deserializeParams(
     vr === "antithetic" ||
     vr === "control_variate" ||
     vr === "antithetic_cv" ||
+    vr === "quasi_monte_carlo" ||
     vr === "all"
   ) {
     result.variance_reduction = vr as VarianceReductionMethod;
