@@ -54,8 +54,12 @@ router = APIRouter(prefix="/price", tags=["pricing"])
 _TERMINAL_SAMPLE_CAP = 5000
 
 
-def validate_request(req: PricingRequestSchema, max_n: int) -> ErrorResponse | None:
-    """Validate pricing request. Returns ErrorResponse or None."""
+def _validate_common(req) -> ErrorResponse | None:
+    """Validate fields shared by every pricing endpoint.
+
+    Returns ErrorResponse or None. Spot must be positive (a negative spot
+    silently produces NaN prices) and the rate must stay in a sane range.
+    """
     today = date.today()
     if req.expiry_date <= today:
         return ErrorResponse(
@@ -63,6 +67,29 @@ def validate_request(req: PricingRequestSchema, max_n: int) -> ErrorResponse | N
             message="Expiry date must be in the future.",
             field="expiry_date",
         )
+
+    if req.spot_override is not None and req.spot_override <= 0:
+        return ErrorResponse(
+            error="invalid_spot",
+            message="Spot price must be positive.",
+            field="spot_override",
+        )
+
+    if not -1.0 <= req.risk_free_rate <= 1.0:
+        return ErrorResponse(
+            error="invalid_rate",
+            message="Risk-free rate must be between -100% and 100%.",
+            field="risk_free_rate",
+        )
+
+    return None
+
+
+def validate_request(req: PricingRequestSchema, max_n: int) -> ErrorResponse | None:
+    """Validate pricing request. Returns ErrorResponse or None."""
+    common_err = _validate_common(req)
+    if common_err is not None:
+        return common_err
 
     if req.volatility <= 0:
         return ErrorResponse(
@@ -294,16 +321,9 @@ def price_full(req: PricingRequestSchema) -> PricingFullResponse | JSONResponse:
 )
 def price_implied_vol(req: ImpliedVolRequest) -> ImpliedVolResponse | JSONResponse:
     """Solve for Black-Scholes implied volatility given market option price."""
-    today = date.today()
-    if req.expiry_date <= today:
-        return JSONResponse(
-            status_code=400,
-            content=ErrorResponse(
-                error="invalid_expiry",
-                message="Expiry date must be in the future.",
-                field="expiry_date",
-            ).model_dump(),
-        )
+    common_err = _validate_common(req)
+    if common_err is not None:
+        return JSONResponse(status_code=400, content=common_err.model_dump())
 
     if req.market_price <= 0:
         return JSONResponse(
@@ -366,16 +386,9 @@ def price_implied_vol(req: ImpliedVolRequest) -> ImpliedVolResponse | JSONRespon
 )
 def price_pnl_explain(req: PnLExplainRequest) -> PnLExplainResponse | JSONResponse:
     """Decompose actual option P&L into Greek-attributed components and unexplained residual."""
-    today = date.today()
-    if req.expiry_date <= today:
-        return JSONResponse(
-            status_code=400,
-            content=ErrorResponse(
-                error="invalid_expiry",
-                message="Expiry date must be in the future.",
-                field="expiry_date",
-            ).model_dump(),
-        )
+    common_err = _validate_common(req)
+    if common_err is not None:
+        return JSONResponse(status_code=400, content=common_err.model_dump())
 
     if req.volatility <= 0:
         return JSONResponse(
@@ -437,16 +450,9 @@ def price_pnl_explain(req: PnLExplainRequest) -> PnLExplainResponse | JSONRespon
 )
 def compute_risk_grid_endpoint(req: RiskGridRequest) -> RiskGridResponse | JSONResponse:
     """Compute 2D option price or Greek risk grid across specified parameter ranges."""
-    T = _compute_T(req.expiry_date)
-    if T <= 0:
-        return JSONResponse(
-            status_code=400,
-            content=ErrorResponse(
-                error="invalid_expiry_date",
-                message="Expiry date must be strictly in the future.",
-                field="expiry_date",
-            ).model_dump(),
-        )
+    common_err = _validate_common(req)
+    if common_err is not None:
+        return JSONResponse(status_code=400, content=common_err.model_dump())
 
     if req.volatility <= 0:
         return JSONResponse(
@@ -471,6 +477,7 @@ def compute_risk_grid_endpoint(req: RiskGridRequest) -> RiskGridResponse | JSONR
     S0 = req.spot_override if req.spot_override is not None else 100.0
     r = req.risk_free_rate
     q = _carry_yield(req)
+    T = _compute_T(req.expiry_date)
 
     try:
         res = risk_grid.compute_risk_grid(
