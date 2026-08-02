@@ -4,9 +4,13 @@ Next.js 16 application with TypeScript, Tailwind CSS, and Recharts. Renders an i
 
 ## Workspace Components
 
-- **InputPanel** — Parameter controls, market quote header, estimator selector (5 modes), RNG seed management, implied volatility solver trigger, P&L shift inputs
+- **InputPanel** — Parameter controls, 4-market quote header (US/IN/FX/CRYPTO) with preset tickers, estimator selector (5 modes), RNG seed management, implied volatility solver trigger, P&L shift inputs
 - **ResultsPanel** — Price summary, analytical vs. finite-difference Greeks comparison, 5-estimator comparison table with relative efficiency, P&L attribution breakdown, PDF/CSV download
 - **Charts** — Six specialized views: Paths, Terminal Distribution histogram, Payoff diagram, Log-log Convergence, MC-vs-BS Comparison, 2D Risk Grid heatmap
+
+## Market Overview Page
+
+Separate research page (`/`) with a 4-market toggle (US, IN, FX, CRYPTO), ticker autocomplete against the shared ticker database, preset quick tickers (AAPL, MSFT, RELIANCE, TCS, EURUSD, BTC), an historical volatility grid, and a manual fallback form. Links into the Pricing Workspace via URL params.
 
 ## Key Decisions
 

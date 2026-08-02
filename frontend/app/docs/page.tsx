@@ -656,7 +656,7 @@ export default function DocsPage() {
                 ["Why normal CI, not bootstrap?", "CLT applies cleanly to i.i.d. draws; bootstrap adds cost with no benefit"],
                 ["Why FD Greeks need CRN?", "Without CRN, bumps are swamped by MC noise, not sensitivity"],
                 ["Why continuous dividend yield?", "Free data lacks reliable ex-div schedules; explicitly named gap"],
-                ["Why close-to-close vol?", "Data quality across US/IN tickers matters more than marginal efficiency"],
+                ["Why close-to-close vol?", "Data quality across US, Indian, FX, and cryptocurrency tickers matters more than marginal efficiency"],
                 ["Why default_rng not RandomState?", "PCG64 is superior; avoids shared global state in concurrent backend"],
                 ["Why Newton-Raphson + Brent?", "NR fast near root; Brent handles near-zero-Vega without derivative"],
                 ["Why residual in P&L explain?", "Taylor expansion exact only for infinitesimal moves; residual = cross-Greeks + higher-order"],

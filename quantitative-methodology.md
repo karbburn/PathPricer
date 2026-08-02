@@ -31,7 +31,7 @@ A comprehensive technical reference for every mathematical model, numerical meth
 
 ## 1. Scope
 
-PathPricer prices **European vanilla Call and Put options** on single-name equities (US and Indian markets) using two independent methods that are designed to agree:
+PathPricer prices **European vanilla Call and Put options** on single-name equities (US and Indian markets), FX pairs, and cryptocurrency assets using two independent methods that are designed to agree:
 
 1. **Black-Scholes-Merton (BSM)** — closed-form analytical benchmark providing exact prices and Greeks.
 2. **Monte Carlo simulation under Geometric Brownian Motion (GBM)** — the numerical engine under test, with five estimators (Standard, Antithetic Variates, Control Variates, Combined Antithetic+CV, and Randomized Quasi-Monte Carlo).
@@ -508,7 +508,7 @@ Log returns are used (not simple returns) because log returns are additive over 
 
 Four trailing windows are reported: 20-day, 60-day, 126-day, and 252-day realized volatility. Displaying multiple windows together is a designed feature: regime stability vs. instability is visible from how much the estimates disagree across windows.
 
-**Why close-to-close and not range-based (Parkinson/Garman-Klass/Yang-Zhang) estimators:** Range-based estimators are more statistically efficient (lower variance for the same sample size) but require reliable high/low/open data. Close-to-close is chosen for data quality consistency — yfinance reliably provides closing prices across all US and Indian tickers, but intraday range data quality is less consistent. Efficiency gain does not matter if the input data does not reliably support it.
+**Why close-to-close and not range-based (Parkinson/Garman-Klass/Yang-Zhang) estimators:** Range-based estimators are more statistically efficient (lower variance for the same sample size) but require reliable high/low/open data. Close-to-close is chosen for data quality consistency — yfinance reliably provides closing prices across all supported tickers (US, Indian, FX, cryptocurrency), but intraday range data quality is less consistent. Efficiency gain does not matter if the input data does not reliably support it.
 
 ---
 
@@ -542,7 +542,7 @@ A quick-reference summary of architectural and numerical choices made in this pr
 | Why a normal-approximation confidence interval and not bootstrap? | The CLT applies cleanly to i.i.d. discounted payoffs with finite variance. Bootstrap targets the same result at higher computational cost. |
 | Why do finite-difference Greeks need common random numbers? | Without CRN, the parameter bump is swamped by Monte Carlo noise. Reusing the same seed across the bump pair isolates the sensitivity from sampling variance. |
 | Why a continuous dividend yield approximation instead of discrete? | Free market data does not reliably provide ex-dividend schedules. The continuous approximation (Merton) is standard for equity indices and trailing yields. |
-| Why close-to-close volatility instead of a range-based estimator? | yfinance guarantees close prices across all US and Indian tickers, but intraday range data quality is inconsistent. Data reliability matters more than marginal statistical efficiency. |
+| Why close-to-close volatility instead of a range-based estimator? | yfinance guarantees close prices across all supported tickers (US, Indian, FX, cryptocurrency), but intraday range data quality is inconsistent. Data reliability matters more than marginal statistical efficiency. |
 | Why `default_rng(seed)` instead of legacy `RandomState`? | PCG64 has better statistical properties and avoids shared global state — a correctness hazard in a concurrent API backend. Each request gets an isolated generator. |
 | Why Newton-Raphson with a Brent fallback for implied volatility? | Newton-Raphson converges quadratically near the root; Brent's method handles near-zero-Vega cases (deep ITM/OTM, near-expiry) without requiring a derivative. |
 | Why does P&L attribution include a residual term? | The Taylor expansion is exact only for infinitesimal moves. The residual captures cross-Greeks (Vanna, Volga), higher-order terms, and other unmodeled effects. |

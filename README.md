@@ -98,10 +98,15 @@ Scores a calibrated Heston model against the same market quotes it was fitted to
 
 ### Market Data & Reports
 
-- Multi-tier yfinance fallback for US and Indian equities
+- Multi-tier yfinance fallback for US, Indian, FX, and cryptocurrency markets
 - Historical volatility across 4 windows (20d, 60d, 126d, 252d)
 - PDF research report via ReportLab with embedded convergence plot
 - CSV export and SVG/PNG chart downloads
+- Ticker database auto-updated daily via GitHub Actions from Wikipedia (S&P 500, Nifty 50) and CoinGecko (top 25 crypto by market cap); FX majors/minors are curated
+
+### Market Overview
+
+Research any underlying across four market regions — **US**, **Indian** (.NS suffix auto-appended), **FX** (major/minor pairs), and **CRYPTO** (top coins by market cap). Features ticker autocomplete backed by 700+ tickers, an historical volatility grid (20d/60d/126d/252d), and a manual fallback form when market data is unavailable.
 
 ---
 
