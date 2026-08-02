@@ -213,7 +213,8 @@ class MarketDataService:
                 dividend_yield = div_val
             else:
                 dividend_yield = 0.0
-                data_warnings.append("Dividend yield data unavailable for ticker; defaulted to 0.0.")
+                if market.strip().upper() not in ("FX", "CRYPTO"):
+                    data_warnings.append("Dividend yield data unavailable for ticker; defaulted to 0.0.")
 
             last_updated = datetime.now(timezone.utc).isoformat()
 
