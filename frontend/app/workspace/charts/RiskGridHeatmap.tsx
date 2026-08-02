@@ -273,88 +273,97 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
       {/* Heatmap Area */}
       {isLoading ? (
-        <div className="h-[380px] flex items-center justify-center bg-[#0d1117]/50 rounded-lg border border-[#21262d] chart-container">
+        <div className="h-[400px] flex items-center justify-center bg-[#0d1117]/50 rounded-lg border border-[#21262d]">
           <div className="text-xs text-[#58a6ff] font-mono animate-pulse">
             <svg className="inline w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Evaluating vectorized 2D Black-Scholes meshgrid...
           </div>
         </div>
       ) : gridData ? (
-        <div className="space-y-3">
-          {/* Active Hover Tooltip Diagnostic Bar */}
-          <div className="bg-[#0d1117] border border-[#21262d] px-4 py-2 rounded-lg flex items-center justify-between text-xs font-mono">
+        <div className="flex flex-col gap-3">
+          {/* Hover Tooltip — inline bar above heatmap */}
+          <div className="bg-[#0d1117] border border-[#21262d] px-4 py-2 rounded-lg flex items-center justify-between text-xs font-mono min-h-[36px]">
             <span className="text-[#8b949e]">
               {hoveredCell
-                ? `Cell Details: [${PARAM_LABELS[axisX]} = ${formatAxisVal(axisX, hoveredCell.x)}, ${
-                    PARAM_LABELS[axisY]
-                  } = ${formatAxisVal(axisY, hoveredCell.y)}]`
-                : "Hover over any grid cell to view exact coordinates & metric value"}
+                ? `${PARAM_LABELS[axisX]} = ${formatAxisVal(axisX, hoveredCell.x)}, ${PARAM_LABELS[axisY]} = ${formatAxisVal(axisY, hoveredCell.y)}`
+                : "Hover over any grid cell to inspect"}
             </span>
-            <span className="text-[#58a6ff] font-bold">
+            <span className="text-[#58a6ff] font-bold tabular-nums">
               {hoveredCell ? `${METRIC_LABELS[metric]}: ${hoveredCell.val.toFixed(4)}` : ""}
             </span>
           </div>
 
-          {/* 2D Heatmap Grid Container */}
-          <div className="flex flex-col items-center">
-            <div className="text-xs font-mono font-bold text-[#8b949e] mb-1">
-              Y-Axis ↑ {PARAM_LABELS[axisY]}
+          {/* Heatmap + Colorbar row */}
+          <div className="flex gap-3 items-stretch">
+            {/* Y-axis label */}
+            <div className="flex flex-col items-center justify-center min-w-[28px]">
+              <span className="text-[10px] font-mono font-bold text-[#8b949e] whitespace-nowrap" style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}>
+                {PARAM_LABELS[axisY]}
+              </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="overflow-x-auto">
-                <div className="min-w-[600px]">
-                  <div className="text-[10px] font-mono text-[#8b949e] flex flex-col justify-between h-64 text-right">
-                    <span>{formatAxisVal(axisY, gridData.y_values[gridData.y_values.length - 1])}</span>
-                    <span>{formatAxisVal(axisY, gridData.y_values[Math.floor(gridData.y_values.length / 2)])}</span>
-                    <span>{formatAxisVal(axisY, gridData.y_values[0])}</span>
+            {/* Y tick labels + Grid */}
+            <div className="flex-1 min-w-0 overflow-x-auto">
+              <div className="flex min-w-[500px]">
+                {/* Y-axis tick labels — 5 ticks aligned to grid rows */}
+                <div className="flex flex-col justify-between py-[3px] text-[10px] font-mono text-[#8b949e] text-right w-14 shrink-0 select-none">
+                  {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
+                    const idx = Math.round(frac * (gridData.y_values.length - 1));
+                    return <span key={frac}>{formatAxisVal(axisY, gridData.y_values[idx])}</span>;
+                  })}
+                </div>
+
+                {/* Grid cells */}
+                <div className="flex-1 min-w-0">
+                  <div
+                    className="grid gap-[1px] bg-[#0d1117] p-[3px] rounded-lg border border-[#21262d] w-full"
+                    style={{ gridTemplateColumns: `repeat(${gridData.x_values.length}, minmax(0, 1fr))`, aspectRatio: "1.6" }}
+                  >
+                    {gridData.grid
+                      .slice()
+                      .reverse()
+                      .map((row, rowRevIdx) => {
+                        const j = gridData.grid.length - 1 - rowRevIdx;
+                        const yVal = gridData.y_values[j];
+                        return row.map((cellVal, i) => {
+                          const xVal = gridData.x_values[i];
+                          return (
+                            <div
+                              key={`${j}-${i}`}
+                              onMouseEnter={() => setHoveredCell({ x: xVal, y: yVal, val: cellVal, i, j })}
+                              onMouseLeave={() => setHoveredCell(null)}
+                              style={{ backgroundColor: getCellColor(cellVal) }}
+                              className="w-full h-full rounded-[1px] transition-transform hover:scale-[1.3] hover:z-10 hover:shadow-lg cursor-pointer min-h-[8px]"
+                            />
+                          );
+                        });
+                      })}
                   </div>
 
-                  {/* Grid Cells matrix */}
-                  <div
-                    className="grid gap-[1px] bg-[#0d1117] p-1 rounded-lg border border-[#21262d] w-full max-w-xl h-64 min-w-[600px]"
-                    style={{ gridTemplateColumns: "repeat(25, minmax(0, 1fr))" }}
-                  >
-                {gridData.grid
-                  .slice()
-                  .reverse()
-                  .map((row, rowRevIdx) => {
-                    const j = gridData.grid.length - 1 - rowRevIdx;
-                    const yVal = gridData.y_values[j];
-                    return row.map((cellVal, i) => {
-                      const xVal = gridData.x_values[i];
-                      return (
-                        <div
-                          key={`${j}-${i}`}
-                          onMouseEnter={() =>
-                            setHoveredCell({ x: xVal, y: yVal, val: cellVal, i, j })
-                          }
-                          onMouseLeave={() => setHoveredCell(null)}
-                          style={{ backgroundColor: getCellColor(cellVal) }}
-                          className="w-full h-full rounded-[1px] transition-transform hover:scale-125 hover:z-10 hover:shadow-lg cursor-pointer"
-                        />
-                      );
-                    });
-                  })}
+                  {/* X-axis tick labels — 5 ticks below grid */}
+                  <div className="flex justify-between px-[3px] mt-1 text-[10px] font-mono text-[#8b949e] select-none">
+                    {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
+                      const idx = Math.round(frac * (gridData.x_values.length - 1));
+                      return <span key={frac}>{formatAxisVal(axisX, gridData.x_values[idx])}</span>;
+                    })}
+                  </div>
+
+                  {/* X-axis title */}
+                  <div className="text-center text-[10px] font-mono font-bold text-[#8b949e] mt-1 select-none">
+                    {PARAM_LABELS[axisX]}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="text-xs font-mono font-bold text-[#8b949e] mt-1">
-              X-Axis → {PARAM_LABELS[axisX]} ({formatAxisVal(axisX, gridData.x_values[0])} to{" "}
-              {formatAxisVal(axisX, gridData.x_values[gridData.x_values.length - 1])})
+            {/* Vertical Colorbar */}
+            <div className="flex flex-col items-center shrink-0 w-10 select-none">
+              <span className="text-[9px] font-mono text-[#58a6ff] font-bold mb-1">{maxVal.toFixed(2)}</span>
+              <div className="flex-1 w-3 rounded-full border border-[#21262d] overflow-hidden"
+                   style={{ background: `linear-gradient(to bottom, hsl(0,80%,60%), hsl(60,80%,50%), hsl(120,80%,45%), hsl(180,80%,35%), hsl(240,80%,25%))` }}>
+              </div>
+              <span className="text-[9px] font-mono text-[#8b949e] mt-1">{minVal.toFixed(2)}</span>
+              <span className="text-[8px] font-mono text-[#8b949e] mt-0.5">{METRIC_LABELS[metric]}</span>
             </div>
-          </div>
-
-          {/* Color Legend Bar */}
-          <div className="flex items-center justify-between pt-2">
-            <span className="text-xs font-mono text-[#8b949e]">
-              Min: {minVal.toFixed(4)}
-            </span>
-            <div className="flex-1 max-w-md mx-4 h-3 rounded-full bg-gradient-to-r from-[hsl(240,80%,25%)] via-[hsl(120,80%,45%)] to-[hsl(0,80%,60%)] border border-[#21262d]" />
-            <span className="text-xs font-mono text-[#8b949e]">
-              Max: {maxVal.toFixed(4)}
-            </span>
           </div>
         </div>
       ) : null}
