@@ -713,6 +713,24 @@ export const TICKER_DATABASE: TickerEntry[] = [
   { ticker: "FDXF", name: "FedEx Freight", market: "US" },
   { ticker: "HONA", name: "Honeywell Aerospace", market: "US" },
   { ticker: "Q", name: "Qnity Electronics", market: "US" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "USDT", name: "Tether", market: "CRYPTO" },
+  { ticker: "USDC", name: "USDC", market: "CRYPTO" },
+  { ticker: "TRX", name: "TRON", market: "CRYPTO" },
+  { ticker: "WBT", name: "WhiteBIT Coin", market: "CRYPTO" },
+  { ticker: "HYPE", name: "Hyperliquid", market: "CRYPTO" },
+  { ticker: "USDS", name: "USDS", market: "CRYPTO" },
+  { ticker: "LEO", name: "LEO Token", market: "CRYPTO" },
+  { ticker: "RAIN", name: "Rain", market: "CRYPTO" },
+  { ticker: "ZEC", name: "Zcash", market: "CRYPTO" },
+  { ticker: "XMR", name: "Monero", market: "CRYPTO" },
+  { ticker: "XLM", name: "Stellar", market: "CRYPTO" },
+  { ticker: "DAI", name: "Dai", market: "CRYPTO" },
+  { ticker: "CC", name: "Canton", market: "CRYPTO" },
+  { ticker: "BCH", name: "Bitcoin Cash", market: "CRYPTO" },
+  { ticker: "USD1", name: "USD1", market: "CRYPTO" },
+  { ticker: "USDE", name: "Ethena USDe", market: "CRYPTO" },
 ];
 
 /**
