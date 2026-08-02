@@ -1,13 +1,15 @@
-"""Regenerate the frontend ticker database from Wikipedia constituent lists.
+"""Regenerate the frontend ticker database from Wikipedia and CoinGecko.
 
-Fetches S&P 500 tickers from Wikipedia and Nifty 50 tickers from Wikipedia
-and merges them into the existing ticker-data.ts file. Existing entries are
-preserved verbatim (curated US/IN stocks, ETFs, FX, CRYPTO); Wikipedia is
-only a source of new/renamed tickers. The `filterTickers` export is always
-preserved unchanged.
+Fetches S&P 500 tickers from Wikipedia, Nifty 50 tickers from Wikipedia,
+and top crypto coins from CoinGecko, then merges them into the existing
+ticker-data.ts file. Existing entries are preserved verbatim (curated
+US/IN stocks, ETFs, FX); Wikipedia/CoinGecko is only a source of
+new/renamed tickers. The `filterTickers` export is always preserved unchanged.
+
+FX pairs are standardized majors/minors and do not change; they are not fetched.
 
 yfinance validation is skipped on CI (GitHub Actions) where it is rate-limited
-and unreliable; the Wikipedia fetch + MIN_* abort guards are the safety net.
+and unreliable; the Wikipedia/CoinGecko fetch + MIN_* abort guards are the safety net.
 
 Usage:
     python scripts/update_tickers.py
@@ -29,12 +31,14 @@ TICKER_FILE = FRONTEND_DIR / "lib" / "ticker-data.ts"
 
 SP500_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
 NIFTY50_URL = "https://en.wikipedia.org/wiki/NIFTY_50"
+COINGECKO_URL = "https://api.coingecko.com/api/v3/coins/markets"
 
 USER_AGENT = "PathPricer-ticker-updater/1.0 (https://github.com/karbburn/PathPricer)"
 HEADERS = {"User-Agent": USER_AGENT}
 
 MIN_US = 450
 MIN_IN = 40
+MIN_CRYPTO = 10
 
 ENTRY_RE = re.compile(
     r'\{\s*ticker:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*market:\s*"([^"]+)"\s*\}'
@@ -85,6 +89,25 @@ def fetch_nifty50_tickers() -> list[tuple[str, str]]:
     return tickers
 
 
+def fetch_crypto_coins() -> list[tuple[str, str]]:
+    """Fetch top crypto coins by market cap from CoinGecko (free, no key)."""
+    resp = requests.get(
+        COINGECKO_URL,
+        params={"vs_currency": "usd", "order": "market_cap_desc", "per_page": 25, "page": 1},
+        headers=HEADERS,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    coins = resp.json()
+    tickers: list[tuple[str, str]] = []
+    for coin in coins:
+        symbol = (coin.get("symbol") or "").upper()
+        name = coin.get("name") or ""
+        if symbol and name and re.fullmatch(r"[A-Z0-9]+", symbol):
+            tickers.append((symbol, name))
+    return tickers
+
+
 def read_existing_file() -> str:
     """Read the current ticker-data.ts content."""
     if not TICKER_FILE.exists():
@@ -121,11 +144,13 @@ def generate_ticker_data(
     body: list[str],
     us_new: list[tuple[str, str]],
     in_new: list[tuple[str, str]],
+    crypto_new: list[tuple[str, str]],
     footer: str,
 ) -> str:
-    """Append missing Wikipedia tickers to the existing database body."""
+    """Append missing Wikipedia/CoinGecko tickers to the existing database body."""
     existing_us = {ENTRY_RE.search(e).group(1) for e in body if '"US"' in e}
     existing_in = {ENTRY_RE.search(e).group(1) for e in body if '"IN"' in e}
+    existing_crypto = {ENTRY_RE.search(e).group(1) for e in body if '"CRYPTO"' in e}
 
     added: list[str] = []
     for ticker, name in us_new:
@@ -136,9 +161,13 @@ def generate_ticker_data(
         if ticker not in existing_in:
             safe_name = name.replace('"', '\\"').replace("\n", " ").strip()
             added.append(f'  {{ ticker: "{ticker}", name: "{safe_name}", market: "IN" }},')
+    for ticker, name in crypto_new:
+        if ticker not in existing_crypto:
+            safe_name = name.replace('"', '\\"').replace("\n", " ").strip()
+            added.append(f'  {{ ticker: "{ticker}", name: "{safe_name}", market: "CRYPTO" }},')
 
     if added:
-        body.extend(["", "  // Newly added from Wikipedia"])
+        body.extend(["", "  // Newly added from Wikipedia/CoinGecko"])
         body.extend(added)
 
     return header + ARRAY_MARKER + "\n" + "\n".join(body) + "\n];" + footer
@@ -158,6 +187,10 @@ def main() -> None:
     nifty50 = fetch_nifty50_tickers()
     print(f"  Found {len(nifty50)} Nifty 50 tickers")
 
+    print("Fetching top crypto coins from CoinGecko...")
+    crypto = fetch_crypto_coins()
+    print(f"  Found {len(crypto)} crypto coins")
+
     if len(sp500) < MIN_US:
         print(
             f"Error: too few S&P 500 tickers parsed ({len(sp500)} < {MIN_US}); "
@@ -172,9 +205,16 @@ def main() -> None:
             file=sys.stderr,
         )
         sys.exit(1)
+    if len(crypto) < MIN_CRYPTO:
+        print(
+            f"Error: too few crypto coins parsed ({len(crypto)} < {MIN_CRYPTO}); "
+            "aborting without writing",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     # On CI, yfinance validation is rate-limited/unreliable and not needed:
-    # Wikipedia constituents are trusted and the existing DB is preserved.
+    # Wikipedia/CoinGecko constituents are trusted and the existing DB is preserved.
     if os.environ.get("CI") != "true":
         try:
             import yfinance as yf
@@ -183,22 +223,24 @@ def main() -> None:
         if yf:
             valid_sp500 = [t for t in sp500 if _validate(t[0], "US", yf)]
             valid_nifty = [t for t in nifty50 if _validate(t[0], "IN", yf)]
+            valid_crypto = [t for t in crypto if _validate(t[0], "CRYPTO", yf)]
             print(f"  Valid US: {len(valid_sp500)}/{len(sp500)}")
             print(f"  Valid IN: {len(valid_nifty)}/{len(nifty50)}")
-            if len(valid_sp500) < MIN_US or len(valid_nifty) < MIN_IN:
+            print(f"  Valid CRYPTO: {len(valid_crypto)}/{len(crypto)}")
+            if len(valid_sp500) < MIN_US or len(valid_nifty) < MIN_IN or len(valid_crypto) < MIN_CRYPTO:
                 print("Error: too few valid tickers after yfinance validation; aborting", file=sys.stderr)
                 sys.exit(1)
-            sp500, nifty50 = valid_sp500, valid_nifty
+            sp500, nifty50, crypto = valid_sp500, valid_nifty, valid_crypto
 
     header = existing[: existing.find("TICKER_DATABASE")]
     header, footer, body = parse_existing(existing)
 
-    content = generate_ticker_data(header, body, sp500, nifty50, footer)
+    content = generate_ticker_data(header, body, sp500, nifty50, crypto, footer)
 
     tmp_path = TICKER_FILE.with_suffix(".ts.tmp")
     tmp_path.write_text(content, encoding="utf-8")
     os.replace(tmp_path, TICKER_FILE)
-    print(f"\nWrote {TICKER_FILE} ({len(body)} entries + {len(sp500) + len(nifty50)} Wikipedia candidates merged)")
+    print(f"\nWrote {TICKER_FILE} ({len(body)} entries + {len(sp500) + len(nifty50) + len(crypto)} candidates merged)")
 
 
 def _validate(ticker: str, market: str, yf) -> bool:

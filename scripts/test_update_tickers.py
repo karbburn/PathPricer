@@ -17,6 +17,12 @@ export const TICKER_DATABASE: TickerEntry[] = [
 
   // Indian Stocks
   { ticker: "RELIANCE", name: "Reliance", market: "IN" },
+
+  // Forex
+  { ticker: "EURUSD", name: "EUR/USD", market: "FX" },
+
+  // Crypto
+  { ticker: "BTC", name: "Bitcoin", market: "CRYPTO" },
 ];
 export function filterTickers() { return 1; }
 """
@@ -29,18 +35,33 @@ def test_merge_preserves_existing_and_adds_new():
 
     us_new = [("AAPL", "Apple Inc."), ("MSFT", "Microsoft Corp")]
     in_new = [("RELIANCE", "Reliance Ind"), ("TCS", "Tata Consultancy")]
-    out = generate_ticker_data(header, body, us_new, in_new, footer)
+    crypto_new = [("BTC", "Bitcoin"), ("ETH", "Ethereum")]
+    out = generate_ticker_data(header, body, us_new, in_new, crypto_new, footer)
 
     assert out.count('market: "US"') == 3  # AAPL + SPY + MSFT
     assert out.count('market: "IN"') == 2  # RELIANCE + TCS
+    assert out.count('market: "CRYPTO"') == 2  # BTC + ETH
+    assert out.count('market: "FX"') == 1  # EURUSD preserved
     assert "SPY" in out
     assert "MSFT" in out
     assert "TCS" in out
+    assert "ETH" in out
+    assert "EURUSD" in out
     assert "export function filterTickers()" in out
     # Idempotent: re-parsing output and merging same candidates adds nothing
     _, footer2, body2 = parse_existing(out)
-    out2 = generate_ticker_data(header, body2, us_new, in_new, footer2)
+    out2 = generate_ticker_data(header, body2, us_new, in_new, crypto_new, footer2)
     assert out2 == out
+
+
+def test_crypto_and_fx_preserved():
+    """CRYPTO and FX entries survive merge without being duplicated."""
+    header, footer, body = parse_existing(FIXTURE)
+    out = generate_ticker_data(header, body, [], [], [], footer)
+    assert 'market: "CRYPTO"' in out
+    assert 'market: "FX"' in out
+    assert "BTC" in out
+    assert "EURUSD" in out
 
 
 def test_regex_matches_entry():
@@ -50,5 +71,6 @@ def test_regex_matches_entry():
 
 if __name__ == "__main__":
     test_merge_preserves_existing_and_adds_new()
+    test_crypto_and_fx_preserved()
     test_regex_matches_entry()
     print("update_tickers self-check OK")
