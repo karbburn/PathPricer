@@ -4,11 +4,7 @@ import { useEffect, useCallback } from "react";
 
 interface ShortcutHandlers {
   onRunSimulation?: () => void;
-  onFocusTicker?: () => void;
-  onSwitchChart?: (index: number) => void;
   onToggleDensity?: () => void;
-  onExportCsv?: () => void;
-  onExportPdf?: () => void;
   onShowHelp?: () => void;
 }
 
@@ -36,37 +32,10 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
       // Skip remaining shortcuts if focused on an input
       if (isInput) return;
 
-      // Ctrl+K or /: Focus ticker search
-      if (((e.ctrlKey || e.metaKey) && e.key === "k") || e.key === "/") {
-        e.preventDefault();
-        handlers.onFocusTicker?.();
-        return;
-      }
-
-      // 1-6: Switch chart tabs (workspace only)
-      if (e.key >= "1" && e.key <= "6" && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        handlers.onSwitchChart?.(parseInt(e.key) - 1);
-        return;
-      }
-
       // Ctrl+D: Toggle density
       if ((e.ctrlKey || e.metaKey) && e.key === "d") {
         e.preventDefault();
         handlers.onToggleDensity?.();
-        return;
-      }
-
-      // Ctrl+Shift+E: Export CSV
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "E") {
-        e.preventDefault();
-        handlers.onExportCsv?.();
-        return;
-      }
-
-      // Ctrl+Shift+P: Export PDF
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "P") {
-        e.preventDefault();
-        handlers.onExportPdf?.();
         return;
       }
 

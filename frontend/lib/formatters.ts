@@ -71,7 +71,6 @@ export function currencySymbolFor(code: string): string {
   return CURRENCY_SYMBOLS[code.toUpperCase()] ?? `${code} `;
 }
 
-// ponytail: FX symbol comes from the ticker's quote currency (yfinance "CCY1CCY2=X" convention); swap for quote.currency when a quote is in scope
 export function marketCurrencySymbol(market: string, ticker: string): string {
   if (market === "FX") {
     const base = /^([A-Za-z]{6})/.exec(ticker)?.[1]?.toUpperCase();

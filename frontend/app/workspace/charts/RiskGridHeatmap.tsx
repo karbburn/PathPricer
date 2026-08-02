@@ -116,8 +116,6 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
     }
   }, [request, axisX, axisY, xMin, xMax, yMin, yMax, metric]);
 
-  // ponytail: no auto-fetch on mount or on axis changes; grid only computes on explicit button click
-
   // Color mapping bounds & color scale
   const { minVal, maxVal } = useMemo(() => {
     if (!gridData || !gridData.grid || gridData.grid.length === 0) {
