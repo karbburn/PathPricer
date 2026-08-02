@@ -121,7 +121,7 @@ export function TickerInput({
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none transition-colors ${focusBorderClass} ${inputClassName}`}
+        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none transition-colors ${focusBorderClass} ${market === "IN" ? "pr-20" : ""} ${inputClassName}`}
       />
 
       {market === "IN" && (
