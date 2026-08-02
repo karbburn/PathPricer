@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDensity } from "@/lib/contexts/DensityContext";
@@ -10,12 +10,6 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { density, toggle } = useDensity();
   const pathname = usePathname();
-  const [isMac, setIsMac] = useState(false);
-  useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      setIsMac(navigator.platform.toLowerCase().includes("mac"));
-    }
-  }, []);
 
   const navLink = (href: string, label: string) => {
     const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -54,14 +48,6 @@ export function Header() {
           {navLink("/validation", "Validate")}
           {navLink("/docs", "Docs")}
           <div className="ml-2 flex items-center gap-1.5">
-              <div className="relative group">
-                <span className="text-[10px] font-mono text-[#8b949e] bg-[#21262d]/60 px-1.5 py-0.5 rounded border border-[#30363d] cursor-default select-none">
-                  {isMac ? "⌘K" : "Ctrl+K"}
-                </span>
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs text-[#8b949e] whitespace-nowrap shadow-xl z-50 pointer-events-none">
-                  Search tickers
-                </div>
-              </div>
             <button
               type="button"
               onClick={toggle}

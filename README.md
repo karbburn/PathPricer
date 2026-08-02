@@ -142,7 +142,7 @@ PathPricer/
 - **Vectorized engine** (no path-level Python loops): ensures performance at scale and avoids NumPy anti-patterns common in quant prototypes
 - **Common Random Numbers**: noise-cancelling design for Greeks — arguably more sophisticated than the Greeks themselves
 - **Density toggle** (Compact/Comfortable): adjusts padding, font scale, table density, chart heights across the workspace
-- **Platform-aware shortcuts**: `⌘K` on macOS, `Ctrl+K` on Windows for ticker search
+- **Keyboard shortcuts**: `Ctrl+Enter` runs the simulation, `Ctrl+D` toggles density, `?` opens the help overlay
 - **Mobile layout**: tabbed workspace below `md:` with touch event handlers for resize handles
 
 ---

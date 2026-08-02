@@ -17,7 +17,7 @@ Separate research page (`/`) with a 4-market toggle (US, IN, FX, CRYPTO), ticker
 - **Two-tier compute model** — Preview ($N \leq 10$k) returns instantly; Full simulation runs all estimators. The frontend never computes prices — it only requests and displays
 - **Density toggle** — Two modes (Comfortable/Compact) that adjust padding, font scale, table density, and chart dimensions
 - **Mobile layout** — Tabbed workspace below `md:` breakpoint; dedicated touch event handlers for ResizablePanel drag handles
-- **Platform-aware shortcuts** — `⌘K` on macOS, `Ctrl+K` on Windows for ticker search
+- **Keyboard shortcuts** — `Ctrl+Enter` to run, `Ctrl+D` to toggle density, `?` for help
 
 ## Development
 
