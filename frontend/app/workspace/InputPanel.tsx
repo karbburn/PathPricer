@@ -392,8 +392,14 @@ export function InputPanel({
           <label className="block text-xs text-[#8b949e] mb-1">Expiration Date</label>
           <input
             type="date"
+            min={new Date().toISOString().slice(0, 10)}
             value={inputs.expiry_date}
-            onChange={(e) => updateField("expiry_date", e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              const todayStr = new Date().toISOString().slice(0, 10);
+              if (next && next <= todayStr) return;
+              updateField("expiry_date", next);
+            }}
             aria-label="Expiration date"
             className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-2 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           />
