@@ -19,7 +19,8 @@ const PRESET_TICKERS: Array<{ ticker: string; market: MarketRegion; name: string
   { ticker: "MSFT", market: "US", name: "Microsoft Corp." },
   { ticker: "RELIANCE", market: "IN", name: "Reliance Industries" },
   { ticker: "TCS", market: "IN", name: "Tata Consultancy Services" },
-  { ticker: "SPY", market: "US", name: "S&P 500 ETF Trust" },
+  { ticker: "EURUSD", market: "FX", name: "EUR/USD" },
+  { ticker: "BTC-USD", market: "CRYPTO", name: "Bitcoin" },
 ];
 
 export default function MarketOverviewPage() {
@@ -89,28 +90,25 @@ export default function MarketOverviewPage() {
         <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-4">
           {/* Market Toggle */}
           <div className="flex bg-[#0d1117] p-1 rounded border border-[#21262d] w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => setMarketInput("US")}
-              className={`px-4 py-2 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-                marketInput === "US"
-                  ? "bg-[#238636] text-white"
-                  : "text-[#8b949e] hover:text-white"
-              }`}
-            >
-              US Market
-            </button>
-            <button
-              type="button"
-              onClick={() => setMarketInput("IN")}
-              className={`px-4 py-2 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-                marketInput === "IN"
-                  ? "bg-[#238636] text-white"
-                  : "text-[#8b949e] hover:text-white"
-              }`}
-            >
-              IN Market (.NS)
-            </button>
+            {([
+              { key: "US" as const, label: "US" },
+              { key: "IN" as const, label: "IN (.NS)" },
+              { key: "FX" as const, label: "FX" },
+              { key: "CRYPTO" as const, label: "Crypto" },
+            ]).map((m) => (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => setMarketInput(m.key)}
+                className={`px-3 py-2 text-xs font-semibold rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+                  marketInput === m.key
+                    ? "bg-[#238636] text-white"
+                    : "text-[#8b949e] hover:text-white"
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
           </div>
 
           {/* Ticker Autocomplete Input */}
