@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   PricingRequest,
   RiskGridAxis,
@@ -116,9 +116,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
     }
   }, [request, axisX, axisY, xMin, xMax, yMin, yMax, metric]);
 
-  useEffect(() => {
-    fetchGrid();
-  }, [fetchGrid]);
+  // ponytail: no auto-fetch on mount or on axis changes; grid only computes on explicit button click
 
   // Color mapping bounds & color scale
   const { minVal, maxVal } = useMemo(() => {
@@ -264,6 +262,15 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
         )}
       </div>
 
+      <button
+        type="button"
+        onClick={fetchGrid}
+        disabled={isLoading}
+        className="w-full px-4 py-2.5 text-xs font-mono font-bold rounded bg-[#58a6ff]/20 text-[#58a6ff] border border-[#58a6ff]/40 hover:bg-[#58a6ff]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60"
+      >
+        {isLoading ? "Computing 25×25 surface..." : gridData ? "Recompute Grid" : "Compute Risk Grid"}
+      </button>
+
       {/* Error state */}
       {error && (
         <div className="bg-red-950/40 border border-red-800 text-red-300 text-xs p-3 rounded-lg font-mono">
@@ -366,7 +373,13 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
             </div>
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="h-[400px] flex items-center justify-center bg-[#0d1117]/50 rounded-lg border border-[#21262d]">
+          <div className="text-xs text-[#8b949e] font-mono text-center px-6">
+            Configure the axes and metric, then press "Compute Risk Grid" to evaluate the 2D surface.
+          </div>
+        </div>
+      )}
     </div>
   );
 }
