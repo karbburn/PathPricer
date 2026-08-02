@@ -33,6 +33,17 @@ export function roundClean(val: number, decimals: number = 4): number {
   return Math.round((val + Number.EPSILON) * factor) / factor;
 }
 
+/**
+ * Clamp a raw input string to a valid numeric range.
+ * Empty or non-finite input falls back to `fallback` so a parameter can never
+ * be pushed outside its slider/solver bounds.
+ */
+export function clampNum(raw: string, min: number, max: number, fallback: number): number {
+  const v = Number(raw);
+  if (raw.trim() === "" || !Number.isFinite(v)) return fallback;
+  return Math.min(max, Math.max(min, v));
+}
+
 export function formatCurrency(val: number | null | undefined, currency: string = "$", decimals: number = 2): string {
   if (val === null || val === undefined || isNaN(val)) return "—";
   const formatted = val.toLocaleString("en-US", {

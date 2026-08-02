@@ -14,7 +14,7 @@ import {
 } from "@/lib/types";
 import { TickerInput } from "@/app/components/TickerInput";
 
-import { computeAtmStrike, roundClean, formatPrice } from "@/lib/formatters";
+import { computeAtmStrike, roundClean, clampNum, formatPrice } from "@/lib/formatters";
 
 interface InputPanelProps {
   initialInputs: PricingRequest;
@@ -291,10 +291,17 @@ export function InputPanel({
             <input
               type="number"
               step="0.01"
+              min="0.01"
               value={inputs.spot_override ?? ""}
-              onChange={(e) =>
-                updateField("spot_override", e.target.value ? roundClean(Number(e.target.value), 2) : null)
-              }
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                updateField(
+                  "spot_override",
+                  e.target.value.trim() === "" || !Number.isFinite(v)
+                    ? null
+                    : Math.max(0.01, roundClean(v, 2))
+                );
+              }}
               placeholder="Market default"
               aria-label="Spot price (S₀)"
               className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
@@ -305,8 +312,10 @@ export function InputPanel({
               <input
                 type="number"
                 step="0.001"
+                min="0"
+                max="1"
                 value={inputs.dividend_yield ?? 0}
-                onChange={(e) => updateField("dividend_yield", roundClean(Number(e.target.value), 4))}
+                onChange={(e) => updateField("dividend_yield", roundClean(clampNum(e.target.value, 0, 1.0, inputs.dividend_yield ?? 0), 4))}
                 aria-label="Dividend yield (q)"
                 className="input-field w-full bg-[#0d1117] border border-[#30363d]/50 rounded px-3 py-1.5 text-sm text-white font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
@@ -358,8 +367,10 @@ export function InputPanel({
               <input
                 type="number"
                 step={strikeStep}
+                min={minStrike}
+                max={maxStrike}
                 value={inputs.strike}
-                onChange={(e) => updateField("strike", Number(e.target.value))}
+                onChange={(e) => updateField("strike", clampNum(e.target.value, minStrike, maxStrike, inputs.strike))}
                 aria-label="Strike price (K)"
                 className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
@@ -440,8 +451,10 @@ export function InputPanel({
               <input
                 type="number"
                 step="0.01"
+                min="0.001"
+                max="5"
                 value={inputs.volatility}
-                onChange={(e) => updateField("volatility", roundClean(Number(e.target.value), 4))}
+                onChange={(e) => updateField("volatility", roundClean(clampNum(e.target.value, 0.001, 5.0, inputs.volatility), 4))}
                 aria-label="Volatility (σ)"
                 className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
@@ -458,8 +471,10 @@ export function InputPanel({
               <input
                 type="number"
                 step="0.005"
+                min="-0.02"
+                max="0.20"
                 value={inputs.risk_free_rate}
-                onChange={(e) => updateField("risk_free_rate", roundClean(Number(e.target.value), 4))}
+                onChange={(e) => updateField("risk_free_rate", roundClean(clampNum(e.target.value, -0.02, 0.20, inputs.risk_free_rate), 4))}
                 aria-label="Risk-free rate (r)"
                 className="input-field w-24 bg-[#0d1117] border border-[#30363d]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
               />
