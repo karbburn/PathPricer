@@ -8,12 +8,7 @@ interface ShortcutsHelpProps {
 }
 
 const shortcuts = [
-  { keys: ["Ctrl", "Enter"], action: "Run Full Simulation", scope: "Workspace" },
-  { keys: ["Ctrl", "K"], action: "Focus Ticker Search", scope: "Global" },
-  { keys: ["/"], action: "Focus Ticker Search", scope: "Global" },
-  { keys: ["1", "–", "6"], action: "Switch Chart Tab", scope: "Workspace" },
-  { keys: ["Ctrl", "Shift", "E"], action: "Export CSV", scope: "Workspace" },
-  { keys: ["Ctrl", "Shift", "P"], action: "Export PDF", scope: "Workspace" },
+  { keys: ["Ctrl", "Enter"], action: "Run Simulation", scope: "Workspace" },
   { keys: ["Ctrl", "D"], action: "Toggle Density", scope: "Global" },
   { keys: ["?"], action: "Show This Help", scope: "Global" },
   { keys: ["Esc"], action: "Close / Blur", scope: "Global" },
