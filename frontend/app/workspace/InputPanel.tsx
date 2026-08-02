@@ -703,7 +703,7 @@ export function InputPanel({
                 max="180"
                 value={pnlShift.d_days}
                 onChange={(e) =>
-                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.max(0, Number(e.target.value)) })
+                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_days: Math.min(180, Math.max(0, Number(e.target.value))) })
                 }
                 aria-label="Time elapsed (Δt)"
                 className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
@@ -712,7 +712,7 @@ export function InputPanel({
             <input
               type="range"
               min="0"
-              max="90"
+              max="180"
               step="1"
               value={pnlShift.d_days}
               onChange={(e) =>
@@ -732,9 +732,11 @@ export function InputPanel({
               <input
                 type="number"
                 step="0.001"
+                min="-0.05"
+                max="0.05"
                 value={pnlShift.d_rate}
                 onChange={(e) =>
-                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Number(e.target.value), 4) })
+                  onPnLShiftChange && onPnLShiftChange({ ...pnlShift, d_rate: roundClean(Math.min(0.05, Math.max(-0.05, Number(e.target.value))), 4) })
                 }
                 aria-label="Rate shift (Δr)"
                 className="input-field w-24 bg-[#0d1117] border border-[#58a6ff]/50 rounded px-2 py-2.5 sm:py-1 min-h-[44px] sm:min-h-0 text-xs font-mono text-right text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
