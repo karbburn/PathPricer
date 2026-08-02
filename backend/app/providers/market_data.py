@@ -205,10 +205,12 @@ class MarketDataService:
             market_cap = float(market_cap_raw) if market_cap_raw is not None else None
 
             # Dividend yield extraction
+            # yfinance reports either a decimal (e.g. 0.03) or a percent (e.g. 3.0).
+            # A yield above 100% is impossible, so only percent-scaled values need /100.
             raw_div = info.get("dividendYield")
             if raw_div is not None and not math.isnan(float(raw_div)):
                 div_val = float(raw_div)
-                if div_val > 0.20:
+                if div_val > 1.0:
                     div_val /= 100.0
                 dividend_yield = div_val
             else:
