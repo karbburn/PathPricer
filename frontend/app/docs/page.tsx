@@ -14,8 +14,12 @@ const toc = [
   { id: "iv", label: "8. IV Solver" },
   { id: "pnl", label: "9. P&L Explain" },
   { id: "risk-grid", label: "10. Risk Grid" },
-  { id: "assumptions", label: "11. Assumptions" },
-  { id: "design", label: "12. Design FAQ" },
+  { id: "heston", label: "11. Heston Model" },
+  { id: "svi", label: "12. SVI Surface" },
+  { id: "calibration", label: "13. Calibration" },
+  { id: "validation", label: "14. Model Validation" },
+  { id: "assumptions", label: "15. Assumptions" },
+  { id: "design", label: "16. Design FAQ" },
 ];
 
 function SectionCard({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) {
@@ -93,7 +97,7 @@ export default function DocsPage() {
           Quantitative Methodology & Mathematical Specification
         </h1>
         <p className="text-sm text-[#8b949e]">
-          All mathematical models, Monte Carlo estimators, Greeks derivations, and defensible design decisions.
+          All mathematical models, Monte Carlo estimators, Greeks derivations, stochastic-volatility pricing, and defensible design decisions.
         </p>
       </div>
 
@@ -474,8 +478,143 @@ export default function DocsPage() {
         </p>
       </SectionCard>
 
-      {/* ════════════════════════════════════════════════════════════ 11. Assumptions */}
-      <SectionCard id="assumptions" title="11. Assumptions & Limitations">
+      {/* ════════════════════════════════════════════════════════════ 11. Heston */}
+      <SectionCard id="heston" title="11. Heston Stochastic Volatility Model">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          The Heston (1993) model lets variance follow its own mean-reverting square-root process, so the volatility smile/skew is <strong>modeled</strong> rather than assumed constant:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="dS_t = (r - q)S_t\,dt + \sqrt{v_t}\,S_t\,dW_t^S, \qquad dv_t = \kappa(\theta_v - v_t)\,dt + \sigma_v\sqrt{v_t}\,dW_t^v" />
+        </div>
+
+        <ParamGrid items={[
+          { sym: "v_t", desc: "Instantaneous variance" },
+          { sym: "κ", desc: "Mean-reversion speed" },
+          { sym: "θ_v", desc: "Long-run variance" },
+          { sym: "σ_v", desc: "Vol-of-vol" },
+          { sym: "ρ", desc: "Spot/vol correlation (skew)" },
+          { sym: "√v₀", desc: "Initial volatility (quoted)" },
+        ]} />
+
+        <h3 className="text-sm font-semibold text-[#e6edf3] mt-5 mb-2">Pricing by Fourier Inversion</h3>
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          The Heston density has no closed form, but the <strong>characteristic function</strong> of <InlineMath math="\ln S_T" /> does. Prices come from integrating two risk-neutral probabilities:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="C = S_0 e^{-qT} P_1 - K e^{-rT} P_2, \qquad P_j = \tfrac{1}{2} + \frac{1}{\pi}\int_0^{\infty}\operatorname{Re}\left[\frac{e^{-i\phi\ln K} f_j(\phi)}{i\phi}\right]d\phi" />
+        </div>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Evaluated by <strong>Gauss-Legendre quadrature</strong> on a fixed node grid (the nodes are parameter-independent and cached). Puts follow from put-call parity, exact under Heston. Two numerical guards matter: the branch of <InlineMath math="d_j" /> is chosen so <InlineMath math="\operatorname{Re}(d_j) \geq 0" />, and the term <InlineMath math="1 - g_j e^{d_j T}" /> is computed in log space to avoid catastrophic cancellation in the deep-OTM wings.
+        </p>
+
+        <h3 className="text-sm font-semibold text-[#e6edf3] mt-5 mb-2">Greeks &amp; the Volatility Chain Rule</h3>
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Because the Heston price is deterministic (no Monte Carlo noise), central finite differences are clean. Volga and Vanna are reported w.r.t. the volatility <InlineMath math="\sigma_0 = \sqrt{v_0}" />, requiring a chain-rule correction:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\text{volga} = 4v_0\frac{\partial^2 V}{\partial v_0^2} + 2\frac{\partial V}{\partial v_0}, \qquad \text{vanna} = 2\sqrt{v_0}\,\frac{\partial^2 V}{\partial S\,\partial v_0}" />
+        </div>
+
+        <Callout title="Efficiency" accent="blue">
+          The spot and vanna bumps only change <InlineMath math="S_0" /> / <InlineMath math="v_0" /> — one characteristic-function set serves all bumped prices, cutting 12 Fourier evaluations to 6.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 12. SVI */}
+      <SectionCard id="svi" title="12. SVI Volatility Surface">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          The <strong>raw SVI</strong> parameterization (Gatheral, 2004) describes the implied-vol smile at a fixed expiry as a function of log-moneyness <InlineMath math="k = \ln(K/F)" />:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="w(k) = a + b\left(\rho(k - m) + \sqrt{(k - m)^2 + \sigma^2}\right), \qquad \sigma_{imp}(k) = \sqrt{\frac{w(k)}{T}}" />
+        </div>
+
+        <ParamGrid items={[
+          { sym: "a", desc: "Total variance level" },
+          { sym: "b", desc: "Wing slope (b ≥ 0)" },
+          { sym: "ρ", desc: "Skew (−1 < ρ < 1)" },
+          { sym: "m", desc: "Smile minimum offset" },
+          { sym: "σ", desc: "Curvature at minimum" },
+        ]} />
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Each expiry&rsquo;s <InlineMath math="(k, \sigma_{imp})" /> points are fit by <strong>nonlinear least squares</strong> on total variance <InlineMath math="w = \sigma_{imp}^2 T" />, from three restarts. The fitted <InlineMath math="a" /> is clamped so <InlineMath math="w_{\min} = a + b\sigma\sqrt{1-\rho^2} \geq 0" />, keeping the slice arbitrage-free in strike.
+        </p>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          A surface is a set of slices with total variance interpolated <strong>linearly in <InlineMath math="T" /> at fixed log-moneyness</strong> (sticky-strike). A <strong>calendar-arbitrage check</strong> rejects any surface where total variance decreases with time to maturity at a fixed moneyness — such a surface would admit a riskless calendar-spread arbitrage.
+        </p>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 13. Calibration */}
+      <SectionCard id="calibration" title="13. Heston Calibration">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Fits <InlineMath math="(v_0, \kappa, \theta_v, \sigma_v, \rho)" /> to observed market option prices by minimizing a <strong>blended</strong> objective via <InlineMath math="\text{L-BFGS-B}" />:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\min_p \left[ 0.5\,\text{rel-RMSE} + 0.5\,\frac{\text{abs-RMSE}}{\overline{V^{mkt}}} \right] + \underbrace{10\,(2\kappa\theta_v - \sigma_v^2)^2}_{\text{Feller penalty, only if violated}}" />
+        </div>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          A pure relative error over-penalizes deep-OTM options (tiny prices make any small misprice a huge percentage), dragging the fit into the wings. Blending in the mean-normalized absolute error keeps the ATM backbone dominant while relative error still shapes the smile.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Feller as a Soft Penalty</div>
+            <p className="text-xs text-[#8b949e] leading-relaxed">
+              Hard-constraining <InlineMath math="2\kappa\theta_v > \sigma_v^2" /> forces infeasible optimizer restarts. A soft penalty lets the fit trade feasibility against quality — and reports whether Feller holds, as practitioners do.
+            </p>
+          </div>
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Deterministic Multi-Start</div>
+            <p className="text-xs text-[#8b949e] leading-relaxed">
+              <InlineMath math="n" /> restarts from an ATM-implied-vol seed plus <strong>log-uniformly</strong> spread seeds (<InlineMath math="s \leftarrow s\cdot e^{U(-0.7,0.7)}" />) — right for positive scale parameters. Reproducible via <InlineMath math="\text{default\_rng}(20240101+i)" />.
+            </p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 14. Validation */}
+      <SectionCard id="validation" title="14. Model Validation">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Scores a calibrated Heston model against the same market quotes it was fitted to, answering &ldquo;how well does the model reproduce observed prices/vols, and are the market quotes internally consistent?&rdquo;
+        </p>
+
+        <div className="overflow-x-auto mb-3">
+          <table className="w-full text-xs font-mono text-left">
+            <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
+              <tr><th className="p-2.5">Metric</th><th className="p-2.5">Definition</th></tr>
+            </thead>
+            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
+              {[
+                ["Price Rel RMSE", "\\sqrt{\\tfrac{1}{n}\\sum_i\\left(\\tfrac{V_i^{m} - V_i^{k}}{V_i^{k}}\\right)^2}"],
+                ["Price MAPE", "\\tfrac{1}{n}\\sum_i\\left|\\tfrac{V_i^{m} - V_i^{k}}{V_i^{k}}\\right| \\times 100\\%"],
+                ["IV RMSE", "NaN-robust: over contracts with resolvable implied vols only"],
+                ["Market parity violation", "Largest |put-call parity RHS − market price| across the chain"],
+              ].map(([metric, def]) => (
+                <tr key={metric}>
+                  <td className="p-2.5 font-bold text-white">{metric}</td>
+                  <td className="p-2.5 text-[#79c0ff]">{def.startsWith("\\") ? <InlineMath math={def} /> : def}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <Callout title="Market put-call parity" accent="green">
+          The complement option type is priced under the model and the implied parity value compared against the observed quote. A large violation flags <strong>internally inconsistent market quotes</strong>, not a bad model.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 15. Assumptions */}
+      <SectionCard id="assumptions" title="15. Assumptions & Limitations">
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono text-left">
             <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
@@ -483,7 +622,7 @@ export default function DocsPage() {
             </thead>
             <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
               {[
-                ["Constant volatility", "Smile/skew varies by strike & expiry", "Single σ input; SABR / local vol as future work"],
+                ["Constant volatility", "Smile/skew varies by strike & expiry", "Single σ input for GBM; the quant workspace fits Heston & SVI models to the smile"],
                 ["GBM / log-normal returns", "Fat tails & negative skew", "GBM; Merton jump-diffusion as extension"],
                 ["Constant risk-free rate", "Term structure, stochastic rates", "Flat r; bond curve integration as fix"],
                 ["Continuous dividend yield", "Discrete cash payments", "Continuous q approx; discrete modeling as gap"],
@@ -502,8 +641,8 @@ export default function DocsPage() {
         </div>
       </SectionCard>
 
-      {/* ════════════════════════════════════════════════════════════ 12. Cheat Sheet */}
-      <SectionCard id="design" title="12. Design Decisions FAQ">
+      {/* ════════════════════════════════════════════════════════════ 16. Cheat Sheet */}
+      <SectionCard id="design" title="16. Design Decisions FAQ">
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono text-left">
             <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
@@ -523,6 +662,10 @@ export default function DocsPage() {
                 ["Why residual in P&L explain?", "Taylor expansion exact only for infinitesimal moves; residual = cross-Greeks + higher-order"],
                 ["Why vectorise the risk grid?", "625 cell-level loops dominate runtime; broadcast evaluates all at NumPy speed"],
                 ["Why RQMC instead of standard MC?", "O(N^{-1}) vs O(N^{-1/2}) convergence for smooth integrands; CI is heuristic"],
+                ["Why Fourier inversion for Heston?", "No closed-form density, but the characteristic function is closed form — fast, deterministic, no MC noise in Greeks"],
+                ["Why Volga w.r.t. √v₀, not v₀?", "Traders quote volatility; chain rule 4v₀·V″ + 2·V′ converts variance bumps"],
+                ["Why blend relative + absolute RMSE in calibration?", "Pure relative over-penalizes deep-OTM; the blend keeps ATM dominant while the smile stays shaped"],
+                ["Why reject calendar arbitrage at build?", "Total variance decreasing in T admits a riskless spread; rejecting keeps surfaces economically sane"],
               ].map(([q, a]) => (
                 <tr key={q}>
                   <td className="p-2.5 font-bold text-white">{q}</td>

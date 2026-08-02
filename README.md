@@ -6,12 +6,12 @@ An interactive option pricing platform that benchmarks Monte Carlo simulation te
 
 ## Executive Summary
 
-PathPricer prices European options using five simulation methods and compares them against the exact closed-form solution. It solves for implied volatility from market prices, attributes P&L to individual risk factors (Delta, Gamma, Vega, Theta, Rho), and visualizes how option prices change across a two-dimensional risk grid.
+PathPricer prices European options using five simulation methods and compares them against the exact closed-form solution. It solves for implied volatility from market prices, attributes P&L to individual risk factors (Delta, Gamma, Vega, Theta, Rho), and visualizes how option prices change across a two-dimensional risk grid. It also fits **Heston stochastic-volatility** and **SVI volatility-surface** models to live option chains, calibrating and validating them against market quotes.
 
 The application demonstrates proficiency across three areas rarely combined in a single project:
-- **Quantitative methods** — analytical pricing, Monte Carlo with variance reduction, finite-difference Greeks, root-finding, convergence analysis
+- **Quantitative methods** — analytical pricing, Monte Carlo with variance reduction, finite-difference Greeks, root-finding, convergence analysis, stochastic-volatility pricing, surface fitting, calibration
 - **Production engineering** — typed Python/FastAPI backend, Next.js 16 frontend with two-tier compute model, full test coverage
-- **Real desk workflows** — P&L attribution, implied volatility solving, risk grids, PDF research reports
+- **Real desk workflows** — P&L attribution, implied volatility solving, risk grids, Heston calibration, volatility surface construction, PDF research reports
 
 ---
 
@@ -72,6 +72,30 @@ S_grid shape (25, 1), sigma_grid shape (1, 25) → broadcast to (25, 25) in one 
 
 Rendered as an interactive heatmap with hover diagnostics. Curvature along the spot axis is Gamma; curvature along the vol axis is Volga. A flat surface indicates low sensitivity; steep indicates high risk to that parameter.
 
+### Heston Stochastic Volatility
+
+Prices European options under the Heston (1993) model, where variance follows its own mean-reverting square-root process. Pricing uses **Fourier inversion** of the closed-form characteristic function, evaluated by Gauss-Legendre quadrature. Greeks (including second-order Volga and Vanna) come from central finite differences on the deterministic price, with a chain-rule correction since Volga/Vanna are reported w.r.t. the initial volatility $\sqrt{v_0}$:
+
+$$\text{volga} = 4v_0\frac{\partial^2 V}{\partial v_0^2} + 2\frac{\partial V}{\partial v_0}, \qquad \text{vanna} = 2\sqrt{v_0}\frac{\partial^2 V}{\partial S\,\partial v_0}$$
+
+Vectorized pricing groups strikes by expiry so one characteristic-function set serves many strikes — a 12-evaluation Greek bump reduces to 6.
+
+### SVI Volatility Surface
+
+Builds a **Gatheral raw SVI** implied-volatility surface from live option chains. At each expiry the total implied variance is
+
+$$w(k) = a + b\left(\rho(k - m) + \sqrt{(k - m)^2 + \sigma^2}\right), \quad k = \ln(K/F)$$
+
+with each slice fit by nonlinear least squares (three restarts) and total variance interpolated linearly in $T$ at fixed log-moneyness. A calendar-arbitrage check rejects surfaces where total variance decreases with time to maturity.
+
+### Heston Calibration
+
+Fits the five Heston parameters $(v_0, \kappa, \theta_v, \sigma_v, \rho)$ to observed market option prices via `L-BFGS-B`. The objective blends a **relative** RMSE (shape the smile) with a **mean-normalized absolute** RMSE (keep the ATM backbone dominant), plus a soft **Feller condition** penalty. A deterministic multi-start with log-uniform seeds ($\text{default\_rng}(20240101+i)$) mitigates local minima.
+
+### Model Validation
+
+Scores a calibrated Heston model against the same market quotes it was fitted to: price relative RMSE, price MAPE, implied-vol RMSE (NaN-robust), and a **market put-call parity** consistency check across the chain, alongside the Feller feasibility flag.
+
 ### Market Data & Reports
 
 - Multi-tier yfinance fallback for US and Indian equities
@@ -96,7 +120,8 @@ The frontend **never computes a price, Greek, or diagnostic** — it only reques
 PathPricer/
 ├── backend/              # FastAPI (Python 3.12, NumPy, SciPy)
 │   ├── engine/           # black_scholes, monte_carlo, greeks,
-│   │                     # implied_vol, pnl_explain, risk_grid, volatility
+│   │                     # implied_vol, pnl_explain, risk_grid, volatility,
+│   │                     # heston, heston_calibration, vol_surface, model_validation
 │   ├── api/              # REST routers
 │   ├── core/             # Config, RNG factory, rate providers
 │   ├── schemas/          # Pydantic models (preview/full structurally distinct)
@@ -104,7 +129,7 @@ PathPricer/
 ├── frontend/             # Next.js 16, React 19, TypeScript, Tailwind CSS
 │   ├── workspace/        # InputPanel, ResultsPanel, Charts (Recharts)
 │   └── components/       # Shared UI, MobileNav, Keyboard shortcuts
-└── tests/                # 69 pytest cases
+└── tests/                # pytest cases + engine self-checks
 ```
 
 ### Why These Decisions Matter
@@ -147,21 +172,26 @@ Open [http://localhost:3000](http://localhost:3000). API documentation at [http:
 | `/api/v1/market/quote` | `GET` | Live market quote, historical vol, dividend yield |
 | `/api/v1/report/pdf` | `POST` | Downloadable PDF research report |
 | `/api/v1/validation/summary` | `GET` | CI validation artifact |
+| `/api/v1/quant/vol-surface` | `POST` | Fit SVI implied-vol surface to market options chain |
+| `/api/v1/quant/heston-calibrate` | `POST` | Calibrate Heston params to market option prices |
+| `/api/v1/quant/model-validate` | `POST` | Validate calibrated Heston model vs market chain |
 
 ---
 
 ## Testing & Verification
 
 The test suite covers:
-- **69 pytest cases** across pricing, Greeks, implied volatility, P&L, risk grid, API endpoints, and edge cases
-- **Edge case coverage**: zero/negative volatility, past expiry, invalid option types, large $N$, deep ITM/OTM
+- **pytest API smoke tests** across the pricing, quant (vol-surface, Heston calibration, model validation) and market endpoints
+- **Engine self-checks** (`python -m app.engine.test_*`): closed-form benchmark prices, finite-difference volga cross-check, parameter-recovery calibration, SVI parameter recovery, and good-fit/mis-specified model validation
+- **Edge case coverage**: zero/negative volatility, past expiry, invalid option types, large $N$, deep ITM/OTM, extreme Heston parameters
 - **Put-call parity**: residual verification as a structural consistency check
 - **Convergence slope**: empirical $n^{-1/2}$ regression on Monte Carlo standard error
 - **CI coverage**: stub for statistical coverage verification
 - **Preview vs. full distinctness**: schema-level enforcement check
 
 ```bash
-pytest                              # 69 tests
+pytest                              # API smoke tests
+python -m app.engine.test_heston    # engine self-checks (per module)
 cd frontend && npm run build        # TypeScript + production build
 ```
 

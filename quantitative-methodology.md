@@ -16,11 +16,16 @@ A comprehensive technical reference for every mathematical model, numerical meth
 8. [Implied Volatility Solver](#8-implied-volatility-solver)
 9. [P&L Attribution](#9-pl-attribution)
 10. [2D Risk Grid](#10-2d-risk-grid)
-11. [Validation Methodology](#11-validation-methodology)
-12. [Why Monte Carlo for a Problem Black-Scholes Already Solves](#12-why-monte-carlo-for-a-problem-black-scholes-already-solves)
-13. [Assumptions and Limitations](#13-assumptions-and-limitations)
-14. [Historical Volatility Estimation](#14-historical-volatility-estimation)
-15. [Random Number Generation and Reproducibility](#15-random-number-generation-and-reproducibility)
+11. [Heston Stochastic Volatility Model](#11-heston-stochastic-volatility-model)
+12. [SVI Volatility Surface](#12-svi-volatility-surface)
+13. [Heston Calibration](#13-heston-calibration)
+14. [Model Validation](#14-model-validation)
+15. [Validation Methodology](#15-validation-methodology)
+16. [Why Monte Carlo for a Problem Black-Scholes Already Solves](#16-why-monte-carlo-for-a-problem-black-scholes-already-solves)
+17. [Assumptions and Limitations](#17-assumptions-and-limitations)
+18. [Historical Volatility Estimation](#18-historical-volatility-estimation)
+19. [Random Number Generation and Reproducibility](#19-random-number-generation-and-reproducibility)
+20. [Design Decisions FAQ](#20-design-decisions-faq)
 
 ---
 
@@ -33,7 +38,9 @@ PathPricer prices **European vanilla Call and Put options** on single-name equit
 
 Every other component of the application (architecture, API, frontend) is downstream of the mathematical choices documented here.
 
-**Explicitly out of scope:** American/Bermudan exercise, stochastic volatility (Heston), local volatility (SABR/Dupire), jump-diffusion, discrete dividends, options chains, and live option market data.
+Beyond the vanilla GBM pricing engine, PathPricer fits and validates **stochastic-volatility models** against live option chains: Heston calibration (§11) and the SVI volatility surface (§12). These are documented in the same depth as the closed-form engine.
+
+**Explicitly out of scope:** American/Bermudan exercise, local volatility (SABR/Dupire), jump-diffusion, discrete dividends, and the mechanics of live option market data (the engine consumes chains via a market-data provider but does not model their microstructure).
 
 ---
 
@@ -223,7 +230,7 @@ Analogous central differences are used for Vega (bump $\sigma$), Theta (bump $T$
 
 **Why common random numbers are essential:** Without CRN, finite-difference Greeks on Monte Carlo prices are dominated by simulation noise rather than the true sensitivity. Using the same random seed across the base and bumped scenarios isolates the effect of the parameter change from the random sampling variance. This is a common and easy-to-miss error.
 
-**Bump size $h$:** A relative bump of 0.5–1% of the parameter's own value by default (e.g., $h = 0.005 \cdot S_0$ for Delta), configurable. The bump must be small enough to approximate the derivative locally but large enough not to be swamped by residual Monte Carlo noise even with CRN. This trade-off (truncation error vs. residual simulation noise) is itself a validation topic (§11.2).
+**Bump size $h$:** A relative bump of 0.5–1% of the parameter's own value by default (e.g., $h = 0.005 \cdot S_0$ for Delta), configurable. The bump must be small enough to approximate the derivative locally but large enough not to be swamped by residual Monte Carlo noise even with CRN. This trade-off (truncation error vs. residual simulation noise) is itself a validation topic (§15.2).
 
 ---
 
@@ -329,26 +336,126 @@ The risk grid is the visual equivalent of a trading desk's "cube" or "surface." 
 
 ---
 
-## 11. Validation Methodology
+## 11. Heston Stochastic Volatility Model
+
+The Heston (1993) model extends GBM by letting variance follow its own mean-reverting square-root process, so the implied-volatility smile/skew is *modeled* rather than assumed constant:
+
+$$dS_t = (r - q)S_t\,dt + \sqrt{v_t}\,S_t\,dW_t^S, \qquad dv_t = \kappa(\theta_v - v_t)\,dt + \sigma_v\sqrt{v_t}\,dW_t^v$$
+
+| Symbol | Meaning |
+|---|---|
+| $v_t$ | Instantaneous variance (stochastic) |
+| $\kappa$ | Mean-reversion speed of variance |
+| $\theta_v$ | Long-run mean of variance |
+| $\sigma_v$ | Vol-of-vol |
+| $\rho$ | Correlation between $dW^S$ and $dW^v$ (drives the skew) |
+| $\sqrt{v_0}$ | Initial volatility (traders quote this, not $v_0$) |
+
+The parameters must satisfy $v_0, \kappa, \theta_v, \sigma_v > 0$ and $-1 < \rho < 1$, all enforced at construction. The **Feller condition** $2\kappa\theta_v > \sigma_v^2$ keeps the variance process strictly positive; PathPricer reports whether it holds on every fitted parameter set rather than hard-constraining the optimizer (§13).
+
+### 11.1 Pricing by Fourier Inversion
+
+The model has no closed-form density, but the **characteristic function** of $\ln S_T$ is known in closed form. Following Gilli & Kellezi, define
+
+$$u_j = \tfrac{1}{2} - j \quad (j=1,2), \qquad a_j = \kappa\theta_v\left[\frac{\kappa}{\sigma_v^2} - \frac{u_j\rho}{\sigma_v}\right], \qquad b_j = \kappa - \rho\sigma_v u_j$$
+
+$$d_j = \sqrt{(\rho\sigma_v u_j - \kappa)^2 + \sigma_v^2(u_j - u_j^2)}$$
+
+Then the Heston prices are recovered by a **Gill-Matsumoto-style** characteristic-function quadrature:
+
+$$C = S_0e^{-qT}P_1 - Ke^{-rT}P_2, \qquad P_j = \tfrac{1}{2} + \frac{1}{\pi}\int_0^{\infty}\operatorname{Re}\left[\frac{e^{-i\phi\ln K}f_j(\phi)}{i\phi}\right]\,d\phi$$
+
+where the two risk-neutral probabilities $P_j$ use the characteristic functions
+
+$$f_j(\phi) = \exp\left[i\phi(r-q)T + a_j T\right]\cdot\frac{\left(\frac{1 - g_j e^{d_j T}}{1 - g_j}\right)^{-2\kappa\theta_v/\sigma_v^2}}{\left(\frac{1 - g_j e^{d_j T}}{1 - g_j}\right)^{2\kappa\theta_v/\sigma_v^2}}\cdot\frac{\text{stable factor}}{(\text{nested CF in } v_0)}$$
+
+The integral is evaluated by **Gauss-Legendre quadrature** on a fixed node grid (nodes cached — the grid is parameter-independent, so one `lru_cache` serves every call). Puts follow from put-call parity, exact under Heston since the model is arbitrage-free.
+
+**Numerical robustness:** the branch of $d_j$ is chosen so $\operatorname{Re}(d_j) \geq 0$, and the term $1 - g_j e^{d_jT}$ is evaluated as $\log(1 - g e^{dT}) - \log(1 - g)$ to avoid catastrophic cancellation in the deep-OTM wings. Both are verified by an extreme-parameters robustness matrix.
+
+### 11.2 Greeks by Finite Difference with Chain Rule
+
+Because the Heston price is deterministic (no Monte Carlo noise), finite-difference Greeks are clean and stable. Central differences bump each input and reprice. Two Greeks need a chain-rule correction because traders quote them w.r.t. **volatility** $\sigma_0 = \sqrt{v_0}$, not variance:
+
+$$\text{vega} = 2\sqrt{v_0}\,\frac{\partial V}{\partial v_0}, \qquad \text{volga} = 4v_0\frac{\partial^2 V}{\partial v_0^2} + 2\frac{\partial V}{\partial v_0}, \qquad \text{vanna} = 2\sqrt{v_0}\,\frac{\partial^2 V}{\partial S\,\partial v_0}$$
+
+Theta is one-sided (maturity only decreases) and reported per calendar day.
+
+**Efficiency:** the spot and vanna bumps only change $S_0$ / $v_0$ — the characteristic-function set is fixed per $(params, T, r, q)$. Grouping all bumped prices under one CF set reduces 12 Fourier evaluations to 6.
+
+## 12. SVI Volatility Surface
+
+The **raw SVI** parameterization (Gatheral, 2004) describes the implied-volatility smile at a fixed expiry as a function of log-moneyness $k = \ln(K/F)$:
+
+$$w(k) = a + b\left(\rho(k - m) + \sqrt{(k - m)^2 + \sigma^2}\right), \quad \sigma_{imp}(k) = \sqrt{\frac{w(k)}{T}}$$
+
+| Parameter | Role |
+|---|---|
+| $a$ | Overall level of total variance |
+| $b$ | Slope of the wings ($b \geq 0$) |
+| $\rho$ | Skew / asymmetry ($-1 < \rho < 1$) |
+| $m$ | Horizontal offset of the smile minimum |
+| $\sigma$ | Curvature at the minimum ($\sigma > 0$) |
+
+### 12.1 Slice Fitting
+
+Each expiry's $(k, \sigma_{imp})$ observations are fit by **nonlinear least squares** (`scipy.optimize.least_squares`) on total variance $w = \sigma_{imp}^2 T$. Three restarts guard against local minima: the heuristic start estimates $b$ and $\rho$ from the smile wings (the linear-in-$|k|$ asymptote of $w(k)$ has slope $b(1\pm\rho)$, normalized by the *log-moneyness* distance), $a$ from the ATM level, and $m$, $\sigma$ from the minimum location. The fitted $a$ is clamped so $w_{\min} = a + b\sigma\sqrt{1-\rho^2} \geq 0$, keeping the slice arbitrage-free in strike.
+
+### 12.2 Calendar Interpolation and Arbitrage Check
+
+A surface is a set of slices, one per expiry, with total variance interpolated **linearly in $T$ at fixed log-moneyness** (sticky-strike); the nearest slice is used flat beyond the fitted range. A calendar-spread arbitrage exists whenever total variance *decreases* in $T$ at a fixed $k$ — such a surface is rejected at build time by checking $w(k, T_i) \geq w(k, T_{i-1})$ on a 61-point $k$-grid across consecutive expiries.
+
+## 13. Heston Calibration
+
+Fits $(v_0, \kappa, \theta_v, \sigma_v, \rho)$ to observed market option prices.
+
+### 13.1 Objective: Blended Relative + Absolute Error
+
+A pure relative error over-penalizes deep-OTM options (tiny prices make any small absolute misprice a huge percentage), dragging the fit into the wings. PathPricer blends a **relative RMSE** with a **mean-normalized absolute RMSE** so the ATM backbone stays dominant while relative error still shapes the smile:
+
+$$\min_p \left[ 0.5\cdot\sqrt{\frac{1}{n}\sum_i\left(\frac{V_i^{model} - V_i^{mkt}}{V_i^{mkt}}\right)^2} + 0.5\cdot\frac{\sqrt{\frac{1}{n}\sum_i\left(V_i^{model} - V_i^{mkt}\right)^2}}{\overline{V^{mkt}}} \right]$$
+
+subject to the parameter positivity/correlation bounds. The **Feller condition** is a soft penalty (added only when violated, $10\cdot(2\kappa\theta_v - \sigma_v^2)^2$) rather than a hard constraint — the optimizer may trade Feller feasibility for fit quality, mirroring how practitioners treat it as a preference, and the result reports whether it holds.
+
+### 13.2 Multi-Start and Determinism
+
+`L-BFGS-B` runs from a deterministic ATM-implied-vol seed plus $n_{restarts}-1$ spread seeds. Restarts are spread **log-uniformly** ($s \leftarrow s\cdot\exp(U(-0.7, 0.7))$) because the parameters are positive scale variables — a linear spread would under- and over-sample in equal absolute terms. Seeds are reproducible (`np.random.default_rng(20240101 + i)`). Both true convergence and hitting the iteration limit (status 1) are accepted, since the latter often still holds a good local fit.
+
+## 14. Model Validation
+
+Validation scores a calibrated Heston model against the same market quotes it was fitted to, answering "how well does the model reproduce observed prices and vols, and are the market quotes internally consistent?"
+
+| Metric | Definition |
+|---|---|
+| Price relative RMSE | $\sqrt{\frac{1}{n}\sum_i\left(\frac{V_i^{model} - V_i^{mkt}}{V_i^{mkt}}\right)^2}$ |
+| Price MAPE | $\frac{1}{n}\sum_i\left|\frac{V_i^{model} - V_i^{mkt}}{V_i^{mkt}}\right| \times 100\%$ |
+| IV RMSE | $\sqrt{\frac{1}{n}\sum_i\left(\sigma_i^{model} - \sigma_i^{mkt}\right)^2}$, computed only over contracts with resolvable implied vols (NaN-robust) |
+| Market parity violation | Largest |put-call parity RHS − market price| across the chain |
+
+The **model** implied vol is solved from the model price via the Black-Scholes IV solver; the **market** implied vol comes from the market price. **Market put-call parity** is checked by pricing the complement option type under the model and comparing the implied parity value against the observed quote — a large violation flags internally inconsistent market quotes rather than a bad model. Every result carries an `in_sample` flag (true when validation uses the calibration contracts, as here).
+
+---
+
+## 15. Validation Methodology
 
 Validation is a first-class feature — the difference between "a Monte Carlo pricer" and "a validated numerical pricing system."
 
-### 11.1 Price Validation
+### 15.1 Price Validation
 
 - Monte Carlo prices (all estimators) must fall within their own reported 95% confidence interval of the Black-Scholes price at the stated $N$, across a suite of parameter combinations (deep ITM, deep OTM, ATM, short/long expiry, high/low vol).
 - **Coverage check**: Run the full pipeline $M$ times (e.g., $M=200$ independent simulation runs at fixed $N$) and confirm the true (BS) price falls inside the reported 95% CI in approximately 95% of runs (±sampling tolerance). This validates that the confidence interval is calibrated, not merely that the point estimate is close.
 
-### 11.2 Convergence Validation
+### 15.2 Convergence Validation
 
 - Run $\hat{V}$ and $\widehat{SE}$ across a geometric grid of $N$ (e.g., $10^2, 10^3, \ldots, 10^6$).
 - Fit $\log \widehat{SE}$ vs $\log N$ via linear regression; assert slope $\approx -0.5$ within tolerance. This provides empirical confirmation of the $\mathcal{O}(N^{-1/2})$ claim.
 
-### 11.3 Greeks Validation
+### 15.3 Greeks Validation
 
 - Compare finite-difference Monte Carlo Greeks against closed-form Black-Scholes Greeks across the same parameter grid, with explicit relative-error tolerances (Delta/Gamma within 1–2% at $N \geq 10^5$, looser tolerance for Theta/Rho).
 - Cases where finite-difference Greeks are noisier (Gamma, which involves a second difference and amplifies noise) are documented rather than smoothed over — this demonstrates understanding of numerical methods.
 
-### 11.4 Edge Cases
+### 15.4 Edge Cases
 
 Regression tests against known closed-form limits:
 - $T \to 0$: option price $\to$ intrinsic value
@@ -357,13 +464,13 @@ Regression tests against known closed-form limits:
 - Deep OTM: price $\to 0$, Delta $\to 0$
 - **Put-Call Parity**: $C - P = S_0e^{-qT} - Ke^{-rT}$, verified against both BS and MC outputs independently
 
-### 11.5 Statistical Error Metrics
+### 15.5 Statistical Error Metrics
 
 Per-run diagnostics: Standard Error, 95% CI width, Relative Error vs. Black-Scholes. Black-Scholes is treated as ground truth for European vanilla payoffs (valid only because BS is exact for this payoff class). RMSE is reserved for the multi-run coverage check, not a single-run diagnostic.
 
 ---
 
-## 12. Why Monte Carlo for a Problem Black-Scholes Already Solves
+## 16. Why Monte Carlo for a Problem Black-Scholes Already Solves
 
 **The honest answer:**
 
@@ -375,11 +482,11 @@ For vanilla European options under GBM, Monte Carlo is **strictly worse** than B
 
 ---
 
-## 13. Assumptions and Limitations
+## 17. Assumptions and Limitations
 
 | Assumption | Reality | How PathPricer Handles It |
 |---|---|---|
-| Constant volatility | Implied vol varies by strike/expiry (volatility smile/skew) | Single $\sigma$ input (historical or manual); smile modeling (SABR/local vol) identified as future work |
+| Constant volatility | Implied vol varies by strike/expiry (volatility smile/skew) | Single $\sigma$ input for the GBM engine; the quant workspace fits Heston (§11) and SVI (§12) models to the smile directly |
 | GBM / log-normal returns | Real returns exhibit fat tails and negative skew (crash risk) | GBM used; jump-diffusion (Merton) named as the standard extension |
 | Constant risk-free rate | Rates have term structure and evolve stochastically | Flat $r$ input; bond curve integration identified as the natural extension |
 | Continuous dividend yield | Real dividends are discrete, scheduled cash payments | Continuous $q$ approximation from trailing yield; discrete dividend modeling identified as a known gap |
@@ -389,15 +496,15 @@ For vanilla European options under GBM, Monte Carlo is **strictly worse** than B
 
 ---
 
-## 14. Historical Volatility Estimation
+## 18. Historical Volatility Estimation
 
-### 14.1 Close-to-Close Estimator (Annualized)
+### 18.1 Close-to-Close Estimator (Annualized)
 
 $$\hat{\sigma} = \sqrt{252}\cdot\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(r_i - \bar{r}\right)^2}, \quad r_i = \ln\frac{P_i}{P_{i-1}}$$
 
 Log returns are used (not simple returns) because log returns are additive over time and are the theoretically consistent choice given GBM assumes log-normal prices.
 
-### 14.2 Windows
+### 18.2 Windows
 
 Four trailing windows are reported: 20-day, 60-day, 126-day, and 252-day realized volatility. Displaying multiple windows together is a designed feature: regime stability vs. instability is visible from how much the estimates disagree across windows.
 
@@ -405,25 +512,25 @@ Four trailing windows are reported: 20-day, 60-day, 126-day, and 252-day realize
 
 ---
 
-## 15. Random Number Generation and Reproducibility
+## 19. Random Number Generation and Reproducibility
 
-### 15.1 Generator
+### 19.1 Generator
 
 NumPy's `Generator` API with the PCG64 bit generator (`np.random.default_rng(seed)`), not legacy `RandomState`/Mersenne Twister.
 
 **Why PCG64/Generator (NumPy 1.17+):** Better statistical properties, cleaner seeding and streaming model, and no global mutable state. Using legacy global RNG state is a correctness hazard in a stateless, concurrently-served backend — global mutable state shared across requests is a bug. `default_rng(seed)` creates an isolated, request-scoped generator instance.
 
-### 15.2 Reproducibility Contract
+### 19.2 Reproducibility Contract
 
 Given identical inputs (ticker snapshot, strike, expiry, vol, rate, number of paths, variance-reduction method, and seed), the pricing run is **byte-for-byte reproducible**. A shared link re-executes the identical simulation and gets the identical answer.
 
-### 15.3 Antithetic Pairing Constraint
+### 19.3 Antithetic Pairing Constraint
 
 Antithetic variates reuse the same base draws — this is *not* implemented as two independent seeded runs, which would silently break the antithetic pairing guarantee.
 
 ---
 
-## 16. Design Decisions FAQ
+## 20. Design Decisions FAQ
 
 A quick-reference summary of architectural and numerical choices made in this project — for anyone reading the code or evaluating its design.
 
@@ -441,3 +548,8 @@ A quick-reference summary of architectural and numerical choices made in this pr
 | Why does P&L attribution include a residual term? | The Taylor expansion is exact only for infinitesimal moves. The residual captures cross-Greeks (Vanna, Volga), higher-order terms, and other unmodeled effects. |
 | Why vectorise the risk grid instead of looping over grid cells? | 625 cell-level Python loops would dominate runtime. A single NumPy broadcast operation evaluates all points at C speed. |
 | Why RQMC (Sobol) instead of standard Monte Carlo? | For smooth integrands, RQMC converges at $\mathcal{O}(N^{-1})$ vs standard MC's $\mathcal{O}(N^{-1/2})$ — halving error requires 2× paths instead of 4×. The confidence interval is a heuristic, not a strict 95% statement. |
+| Why Fourier inversion for Heston pricing? | The Heston density has no closed form, but its characteristic function does — Fourier inversion prices in milliseconds with deterministic accuracy, avoiding Monte Carlo noise in the Greeks. |
+| Why report Volga/Vanna w.r.t. $\sqrt{v_0}$ not $v_0$? | Traders quote the volatility $\sigma_0 = \sqrt{v_0}$, not the variance. The chain rule $4v_0\,\partial^2V/\partial v_0^2 + 2\,\partial V/\partial v_0$ converts variance-space bumps to the quoted convention. |
+| Why blend relative and absolute RMSE in calibration? | Pure relative error over-penalizes deep-OTM quotes (tiny prices, huge percentages) and drags the fit into the wings; the blend keeps the ATM backbone dominant while relative error still shapes the smile. |
+| Why Feller as a soft penalty, not a hard constraint? | Hard-constraining Feller forces infeasible optimizer restarts; a soft penalty lets the fit trade feasibility against quality and reports the outcome — mirroring practitioner treatment of Feller as a preference. |
+| Why reject surfaces with calendar arbitrage at build time? | Total variance decreasing in $T$ at a fixed moneyness admits a riskless calendar-spread arbitrage, so the surface would be unusable for pricing. Rejecting it keeps every returned surface economically sane. |
