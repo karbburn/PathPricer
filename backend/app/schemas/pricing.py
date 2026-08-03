@@ -352,6 +352,56 @@ class RiskGridResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Implied rate / dividend schemas (market data quality probes)
+# ---------------------------------------------------------------------------
+
+
+class ImpliedParityRequest(BaseModel):
+    """Request for an implied rate/dividend extraction from an options chain."""
+
+    ticker: str
+    market: MarketRegionType = "US"
+    spot_override: float | None = None
+    expiry_date: date | None = None
+    risk_free_rate: float = 0.05
+    dividend_yield: float | None = None
+
+
+class ImpliedRateResponse(BaseModel):
+    """Risk-free rate implied by an ATM call/put parity pair."""
+
+    ticker: str
+    market: str
+    resolved_symbol: str
+    spot: float
+    strike: float
+    ttm: float
+    call_price: float
+    put_price: float
+    implied_rate: float
+    reference_rate: float
+    divergence: float
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ImpliedDividendResponse(BaseModel):
+    """Dividend yield implied by an ATM call/put parity pair, vs the market quote."""
+
+    ticker: str
+    market: str
+    resolved_symbol: str
+    spot: float
+    strike: float
+    ttm: float
+    call_price: float
+    put_price: float
+    implied_dividend: float
+    market_dividend: float | None
+    divergence: float | None
+    warnings: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
 # Options Chain schemas
 # ---------------------------------------------------------------------------
 

@@ -24,6 +24,9 @@ import {
   VolSurfaceResponse,
   HestonCalibrationResponse,
   ModelValidationResponse,
+  ImpliedParityRequest,
+  ImpliedRateResponse,
+  ImpliedDividendResponse,
 } from "./types";
 
 const BASE_URL =
@@ -234,6 +237,20 @@ export async function postModelValidate(
   signal?: AbortSignal
 ): Promise<ModelValidationResponse> {
   return postJson<ModelValidationResponse>(`${BASE_URL}/quant/model-validate`, request, signal);
+}
+
+export async function postImpliedRate(
+  request: ImpliedParityRequest,
+  signal?: AbortSignal
+): Promise<ImpliedRateResponse> {
+  return postJson<ImpliedRateResponse>(`${BASE_URL}/market/implied-rate`, request, signal);
+}
+
+export async function postImpliedDividend(
+  request: ImpliedParityRequest,
+  signal?: AbortSignal
+): Promise<ImpliedDividendResponse> {
+  return postJson<ImpliedDividendResponse>(`${BASE_URL}/market/implied-dividend`, request, signal);
 }
 
 

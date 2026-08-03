@@ -302,6 +302,49 @@ export interface HistoryResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Implied rate / dividend (market data quality probes)
+// ---------------------------------------------------------------------------
+
+export interface ImpliedParityRequest {
+  ticker: string;
+  market: MarketRegion;
+  spot_override?: number | null;
+  expiry_date?: string | null;
+  risk_free_rate: number;
+  dividend_yield?: number | null;
+}
+
+export interface ImpliedRateResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  spot: number;
+  strike: number;
+  ttm: number;
+  call_price: number;
+  put_price: number;
+  implied_rate: number;
+  reference_rate: number;
+  divergence: number;
+  warnings: string[];
+}
+
+export interface ImpliedDividendResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  spot: number;
+  strike: number;
+  ttm: number;
+  call_price: number;
+  put_price: number;
+  implied_dividend: number;
+  market_dividend: number | null;
+  divergence: number | null;
+  warnings: string[];
+}
+
+// ---------------------------------------------------------------------------
 // Quantitative model types (SVI surface, Heston calibration, validation)
 // ---------------------------------------------------------------------------
 

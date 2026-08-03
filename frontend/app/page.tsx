@@ -13,6 +13,7 @@ import {
   computeAtmStrike,
 } from "@/lib/formatters";
 import { TickerInput } from "@/app/components/TickerInput";
+import { ImpliedRateCard } from "@/app/components/ImpliedRateCard";
 
 const PRESET_TICKERS: Array<{ ticker: string; market: MarketRegion; name: string }> = [
   { ticker: "AAPL", market: "US", name: "Apple Inc." },
@@ -335,7 +336,7 @@ export default function MarketOverviewPage() {
           </div>
 
           {/* Secondary Financial Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6">
               <span className="text-xs font-bold text-[#8b949e] uppercase tracking-wider block mb-2">
                 Dividend Yield (q)
@@ -362,6 +363,13 @@ export default function MarketOverviewPage() {
                 {quote.currency}
               </span>
             </div>
+
+            <ImpliedRateCard
+              ticker={quote.ticker}
+              market={quote.market as MarketRegion}
+              spot={quote.spot_price}
+              dividendYield={quote.dividend_yield}
+            />
           </div>
         </div>
       )}
