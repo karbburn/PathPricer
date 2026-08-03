@@ -86,19 +86,18 @@ def finite_difference_greeks(
     rng_base = make_rng(seed)
     base_Z = rng_base.standard_normal(n)
 
-    # Base price scenario with CRN (needed for adaptive bump sizing)
-    price_base = estimate_standard(
-        S0, K, T, r, q, sigma, opt_type, n_simulations=n, rng=make_rng(seed), base_Z=base_Z
-    ).price
-
-    # Adaptive bump sizes: relative bump with a floor proportional to base price.
-    # For deep OTM options where base price is near zero, the floor prevents
-    # bumps that are too small relative to MC noise.
-    price_floor = max(abs(price_base), 1e-6)
-    h_S = max(bump_frac * S0, price_floor * 0.1)
+    # Compute absolute bump sizes: relative bump with a small absolute floor
+    # so tiny parameter values (near-zero T, r, sigma) don't produce
+    # vanishing bumps where finite differences lose precision.
+    h_S = max(bump_frac * S0, 1e-4)
     h_sigma = max(bump_frac * sigma, 1e-4)
     h_T = max(bump_frac * T, 1e-5)
     h_r = max(bump_frac * abs(r) if r != 0 else bump_frac, 1e-4)
+
+    # Base price scenario with CRN
+    price_base = estimate_standard(
+        S0, K, T, r, q, sigma, opt_type, n_simulations=n, rng=make_rng(seed), base_Z=base_Z
+    ).price
 
     # Spot price S0 bumps for Delta and Gamma
     price_S_up = estimate_standard(
