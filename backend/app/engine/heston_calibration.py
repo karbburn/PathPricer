@@ -24,6 +24,14 @@ Approach:
     A multi-start scheme (default 3 restarts) mitigates the risk of converging
     to a poor local minimum, and a deterministic start based on ATM implied
     vol anchors the first attempt.
+
+Known limitations (v1):
+    - Identifiability: Heston parameters (especially kappa vs theta_v) can
+      be weakly identified from a limited strike/expiry set. The reported
+      parameter values should not be interpreted as structural estimates.
+    - No surface-wide regularization; each expiry is calibrated independently.
+    - The optimizer may converge to a local minimum when the initial ATM
+      anchor is far from the true implied vol surface.
 """
 
 from __future__ import annotations

@@ -41,6 +41,16 @@ Re(d) >= 0, which is the well-conditioned branch.
 Integration is Gauss-Legendre quadrature over a bounded range; the integrand
 is smooth and decays for large u, so this is fast and deterministic (no
 Monte Carlo noise), which makes finite-difference Greeks clean.
+
+Known limitations (v1):
+    - European options only; no early exercise (American/Bermudan).
+    - The CF can produce non-finite values for extreme parameters (large
+      sigma_v, large |rho|, very short T). The integrand is zeroed out
+      where the CF overflows; this is safe because the contribution to
+      the price integral is negligible.
+    - Quadrature accuracy depends on the integration limit; very deep OTM
+      options or very long maturities may need a wider range than the
+      default HESTON_INTEGRATION_LIMIT.
 """
 
 from __future__ import annotations

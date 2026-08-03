@@ -14,6 +14,15 @@ The report contains:
 
 This is the numeric backbone for the model-validation screen: a scatter of
 model vs market prices/vols and a residuals table.
+
+Known limitations (v1):
+    - In-sample only: validates against the same contracts used for
+      calibration. Out-of-sample validation (holdout or cross-validation)
+      is needed to assess true model generalization.
+    - No smile-arbitrage check beyond put-call parity; the model may
+      violate butterfly bounds even when Feller holds.
+    - Implied-vol RMSE is computed from the model price via Brent root-
+      finding; convergence tolerance affects the reported IV residual.
 """
 
 from __future__ import annotations

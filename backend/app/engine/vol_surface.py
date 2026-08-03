@@ -25,6 +25,15 @@ Use:
     fit_svi(log_moneyness, implied_vol, ttm) -> SVIParams   (one slice)
     build_surface(spot, rate, dividend_yield, slices) -> SVISurface
     surface.implied_vol(strike, ttm) -> float                (any point)
+
+Known limitations (v1):
+    - Raw SVI only (no SSVI/JSSI): no joint calibration across expiries.
+    - Strike extrapolation is flat beyond the calibrated moneyness range;
+      linear extrapolation would be more realistic for deep wings.
+    - Calendar-arb check is a necessary condition only; butterfly-arb
+      violations in strike are not detected.
+    - At least 5 calibration points per slice are required; fewer causes
+      the optimizer to fail silently.
 """
 
 from __future__ import annotations
