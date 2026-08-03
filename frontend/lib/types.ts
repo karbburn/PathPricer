@@ -390,6 +390,23 @@ export interface VolSurfaceResponse {
   warnings: string[];
 }
 
+export interface TermStructurePoint {
+  expiry: string;
+  ttm: number;
+  atm_vol: number;
+}
+
+export interface TermStructureResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  spot: number;
+  rate: number;
+  dividend_yield: number;
+  points: TermStructurePoint[];
+  warnings: string[];
+}
+
 export interface HestonParams {
   v0: number;
   kappa: number;

@@ -22,6 +22,7 @@ import {
   HistoryResponse,
   QuantSurfaceRequest,
   VolSurfaceResponse,
+  TermStructureResponse,
   HestonCalibrationResponse,
   ModelValidationResponse,
   ImpliedParityRequest,
@@ -227,6 +228,13 @@ export async function postVolSurface(
   signal?: AbortSignal
 ): Promise<VolSurfaceResponse> {
   return postJson<VolSurfaceResponse>(`${BASE_URL}/quant/vol-surface`, request, signal);
+}
+
+export async function postVolTermStructure(
+  request: QuantSurfaceRequest,
+  signal?: AbortSignal
+): Promise<TermStructureResponse> {
+  return postJson<TermStructureResponse>(`${BASE_URL}/quant/vol-term-structure`, request, signal);
 }
 
 export async function postHestonCalibrate(

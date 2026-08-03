@@ -8,6 +8,7 @@ import { ConvergenceChart } from "./ConvergenceChart";
 import { ComparisonChart } from "./ComparisonChart";
 import { RiskGridHeatmap } from "./RiskGridHeatmap";
 import { VolSurfaceChart } from "./VolSurfaceChart";
+import { VolTermStructureChart } from "./VolTermStructureChart";
 import { HestonCalibrationChart } from "./HestonCalibrationChart";
 import { ModelValidationChart } from "./ModelValidationChart";
 import { exportChartSvgToPng } from "@/lib/export-helpers";
@@ -19,7 +20,7 @@ interface ChartTabContainerProps {
   fullResult: PricingFullResponse | null;
 }
 
-type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid" | "vol_surface" | "heston_calibration" | "model_validation";
+type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid" | "vol_surface" | "vol_term_structure" | "heston_calibration" | "model_validation";
 
 export function ChartTabContainer({ request, fullResult }: ChartTabContainerProps) {
   const [activeTab, setActiveTab] = useState<ChartTab>("paths");
@@ -74,6 +75,19 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12c2-4 5-6 8-6s6 2 8 6"/><path d="M3 17c2-3 5-4 8-4s6 1 8 4"/></svg>
             Vol Surface
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("vol_term_structure")}
+            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+              activeTab === "vol_term_structure"
+                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
+                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
+            }`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="20" x2="21" y2="20"/><line x1="3" y1="20" x2="7" y2="10"/><line x1="7" y1="10" x2="12" y2="15"/><line x1="12" y1="15" x2="16" y2="6"/><line x1="16" y1="6" x2="21" y2="20"/></svg>
+            Vol Term Structure
           </button>
 
           <button
@@ -172,6 +186,7 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
         {activeTab === "paths" && <PathsChart request={request} currencySymbol={currencySymbol} />}
         {activeTab === "risk_grid" && <RiskGridHeatmap request={request} />}
         {activeTab === "vol_surface" && <VolSurfaceChart request={request} />}
+        {activeTab === "vol_term_structure" && <VolTermStructureChart request={request} />}
         {activeTab === "heston_calibration" && <HestonCalibrationChart request={request} />}
         {activeTab === "model_validation" && <ModelValidationChart request={request} />}
 

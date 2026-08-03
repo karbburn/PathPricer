@@ -33,6 +33,8 @@ from ..schemas.quantitative import (
     SVIParamsSchema,
     SVISlice,
     SurfacePoint,
+    TermStructurePoint,
+    TermStructureResponse,
     ValidationContractView,
     VolSurfaceResponse,
 )
@@ -451,6 +453,57 @@ def quant_vol_surface(
         return resp
     except MarketDataError as err:
         return _error_response(err)
+
+
+@router.post(
+    "/vol-term-structure",
+    response_model=TermStructureResponse,
+    responses={404: {"model": ErrorResponse}},
+)
+def quant_vol_term_structure(
+    req: QuantSurfaceRequest,
+    market_data: MarketDataService = Depends(get_market_data_service),
+) -> TermStructureResponse | JSONResponse:
+    """ATM implied volatility across expiries — the volatility term structure.
+
+    Reuses the SVI surface builder but fits all available expiries (up to the
+    max), then extracts the at-the-money (k=0) implied vol at each one.
+    """
+    # Bump the expiry cap so we see the whole curve, not just the first few.
+    req.max_expiries = 6
+    try:
+        resp, warnings = _build_vol_surface(market_data, req)
+    except MarketDataError as err:
+        return _error_response(err)
+    if resp is None:
+        return _error_response(
+            MarketDataError(
+                message="No SVI slices could be fitted from the options chain.",
+                ticker=req.ticker,
+                fallback_available=False,
+            )
+        )
+
+    points = []
+    for slice_ in resp.slices:
+        p = slice_.svi_params
+        k = 0.0
+        w = p.a + p.b * (p.rho * (k - p.m) + math.sqrt((k - p.m) ** 2 + p.sigma**2))
+        atm = math.sqrt(max(w, 0.0) / max(slice_.ttm, 1e-12))
+        points.append(
+            TermStructurePoint(expiry=slice_.expiry, ttm=slice_.ttm, atm_vol=atm)
+        )
+
+    return TermStructureResponse(
+        ticker=resp.ticker,
+        market=resp.market,
+        resolved_symbol=resp.resolved_symbol,
+        spot=resp.spot,
+        rate=resp.rate,
+        dividend_yield=resp.dividend_yield,
+        points=points,
+        warnings=warnings,
+    )
 
 
 @router.post(

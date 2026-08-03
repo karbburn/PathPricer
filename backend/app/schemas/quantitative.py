@@ -75,6 +75,32 @@ class VolSurfaceResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Volatility term structure
+# ---------------------------------------------------------------------------
+
+
+class TermStructurePoint(BaseModel):
+    """ATM implied volatility at one expiry."""
+
+    expiry: str
+    ttm: float
+    atm_vol: float
+
+
+class TermStructureResponse(BaseModel):
+    """ATM implied volatility across expiries — the volatility term structure."""
+
+    ticker: str
+    market: str
+    resolved_symbol: str
+    spot: float
+    rate: float
+    dividend_yield: float
+    points: list[TermStructurePoint]
+    warnings: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
 # Heston calibration
 # ---------------------------------------------------------------------------
 
