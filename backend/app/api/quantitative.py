@@ -494,14 +494,6 @@ def quant_greeks_surface(
         return _error_response(err)
     except ValueError as exc:
         return _error_response_value(exc)
-    if resp is None:
-        return _error_response(
-            MarketDataError(
-                message="No SVI slices could be fitted from the options chain.",
-                ticker=req.ticker,
-                fallback_available=False,
-            )
-        )
 
     try:
         surface = _engine_surface_from_response(resp)
@@ -573,14 +565,6 @@ def quant_vol_term_structure(
         return _error_response(err)
     except ValueError as exc:
         return _error_response_value(exc)
-    if resp is None:
-        return _error_response(
-            MarketDataError(
-                message="No SVI slices could be fitted from the options chain.",
-                ticker=req.ticker,
-                fallback_available=False,
-            )
-        )
 
     points = []
     for slice_ in resp.slices:
