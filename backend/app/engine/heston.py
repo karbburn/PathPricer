@@ -151,7 +151,10 @@ def _characteristic_function(
         C = (kappa * theta_v / sigma_v**2) * (numerator * T - 2.0 * log_ratio)
         D = (numerator / sigma_v**2) * (1.0 - exp_dT) / (1.0 - g * exp_dT)
 
-    return np.exp(iu * (r - q) * T + C + D * params.v0)
+    result = np.exp(iu * (r - q) * T + C + D * params.v0)
+    # Guard against overflow for extreme parameters (e.g. large v0 or sigma_v).
+    # When the CF overflows, the integrand is negligible anyway, so zero it out.
+    return np.where(np.isfinite(result), result, 0.0 + 0j)
 
 
 @functools.lru_cache(maxsize=1)

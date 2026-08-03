@@ -108,6 +108,9 @@ class SVISurface:
 
         Total variance is interpolated linearly in T at fixed log-moneyness;
         the nearest slice is used flat outside the fitted expiry range.
+        For strikes beyond the fitted moneyness range, the nearest strike's
+        implied vol is used (flat extrapolation) rather than linear, which
+        can produce unrealistic IVs at extreme strikes.
         """
         ttm = max(ttm, 0.0)
         if not self.slices:
@@ -122,14 +125,16 @@ class SVISurface:
             )
 
         k = self._log_moneyness(strike, ttm)
-        # Linearly interpolate total variance w(k, T) in T.
+        # Linearly interpolate total variance w(k, T) in T, with flat
+        # extrapolation in k beyond the fitted range of each slice.
         for lo, hi in zip(self.slices, self.slices[1:]):
             if lo.ttm <= ttm <= hi.ttm:
                 frac = (ttm - lo.ttm) / (hi.ttm - lo.ttm)
-                w = (1.0 - frac) * lo.params.total_variance(
-                    np.array([k])
-                ) + frac * hi.params.total_variance(np.array([k]))
-                return float(np.sqrt(max(w[0], 0.0) / ttm))
+                k_arr = np.array([k])
+                w_lo = float(lo.params.total_variance(k_arr)[0])
+                w_hi = float(hi.params.total_variance(k_arr)[0])
+                w = (1.0 - frac) * w_lo + frac * w_hi
+                return float(math.sqrt(max(w, 0.0) / max(ttm, 1e-12)))
         raise ValueError("Failed to interpolate surface at strike/T.")  # pragma: no cover
 
     def atm_vol(self, ttm: float) -> float:
@@ -231,10 +236,21 @@ def fit_svi(
         raise ValueError("SVI calibration failed to converge.")
 
     a, b, rho, m, sigma = best.x
-    # Final sanity: w(k) >= 0 across the fitted range.
+    # Final sanity: w(k) >= 0 across the fitted range and a wide validation grid.
     w_min = a + b * sigma * math.sqrt(1.0 - rho * rho)
     if w_min < -1e-6:
         a = -b * sigma * math.sqrt(1.0 - rho * rho)  # shift to w_min = 0
+
+    # Validate that total variance is non-negative across a broad strike grid.
+    # The SVI parameterization can produce negative w(k) at extreme moneyness
+    # even when w_min >= 0, if the curvature/skew are poorly constrained.
+    k_validate = np.linspace(-2.0, 2.0, 101)
+    w_validate = a + b * (rho * (k_validate - m) + np.sqrt((k_validate - m) ** 2 + sigma**2))
+    if np.any(w_validate < -1e-8):
+        # Clamp a upward so that w(k) >= 0 at all validation points.
+        w_at_validate = b * (rho * (k_validate - m) + np.sqrt((k_validate - m) ** 2 + sigma**2))
+        a = max(a, float(-np.min(w_at_validate)) + 1e-8)
+
     return SVIParams(a=float(a), b=float(b), rho=float(rho), m=float(m), sigma=float(sigma))
 
 

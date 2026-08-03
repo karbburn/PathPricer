@@ -97,25 +97,23 @@ def _model_prices(
 def _objective(
     x: np.ndarray, S0: float, r: float, q: float, contracts: list[CalibrationContract]
 ) -> float:
-    """Blended relative + absolute RMSE, plus a Feller soft penalty.
+    """Pure relative RMSE objective plus a Feller soft penalty.
 
-    A pure relative error over-penalizes deep-OTM options (whose tiny prices
-    make any small absolute misprice a huge percentage), pulling the fit toward
-    the wings. Blending in the mean-normalized absolute error keeps the ATM
-    backbone dominant while still letting relative error shape the smile.
+    Relative RMSE is scale-invariant: a $0.01 error on a $0.10 deep-OTM
+    option contributes equally to a $1.00 error on a $10.00 ATM option.
+    This keeps the fit focused on percentage accuracy across the smile
+    rather than being dominated by the most expensive contracts.
     """
     mkt = _market_prices(contracts)
     model = _model_prices(x, S0, r, q, contracts)
     diff = model - mkt
     rel_rmse = float(np.sqrt(np.mean((diff / mkt) ** 2)))
-    abs_rmse = float(np.sqrt(np.mean(diff**2))) / float(np.mean(mkt))
-    rmse = 0.5 * rel_rmse + 0.5 * abs_rmse
 
     v0, kappa, theta_v, sigma_v, rho = x
     # Feller: 2 kappa theta_v - sigma_v^2 >= 0. Penalty only when violated.
     feller_gap = 2.0 * kappa * theta_v - sigma_v**2
     penalty = 0.0 if feller_gap >= 0 else 10.0 * feller_gap**2
-    return rmse + penalty
+    return rel_rmse + penalty
 
 
 def _initial_params(
