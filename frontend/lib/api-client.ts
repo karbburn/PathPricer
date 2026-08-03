@@ -29,6 +29,8 @@ import {
   ImpliedDividendResponse,
   StrategyRequest,
   StrategyResponse,
+  StressTestRequest,
+  StressTestResponse,
 } from "./types";
 
 const BASE_URL =
@@ -260,6 +262,13 @@ export async function postStrategy(
   signal?: AbortSignal
 ): Promise<StrategyResponse> {
   return postJson<StrategyResponse>(`${BASE_URL}/price/strategy`, request, signal);
+}
+
+export async function postStressTest(
+  request: StressTestRequest,
+  signal?: AbortSignal
+): Promise<StressTestResponse> {
+  return postJson<StressTestResponse>(`${BASE_URL}/price/stress-test`, request, signal);
 }
 
 

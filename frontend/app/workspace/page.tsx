@@ -10,7 +10,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/app/comp
 import { ShortcutsHelp } from "@/app/components/ShortcutsHelp";
 import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
 import { useDensity } from "@/lib/contexts/DensityContext";
-import { postPriceFull, postImpliedVol, postPnLExplain, ApiError } from "@/lib/api-client";
+import { postPriceFull, postImpliedVol, postPnLExplain, postStressTest, ApiError } from "@/lib/api-client";
 import { getEffectiveInputs, serializeInputs } from "@/lib/url-state";
 import { computePriceBounds, yearsToExpiry } from "@/lib/formatters";
 import {
@@ -22,6 +22,8 @@ import {
   PricingFullResponse,
   PricingPreviewResponse,
   PricingRequest,
+  StressTestRequest,
+  StressTestResponse,
 } from "@/lib/types";
 
 function WorkspaceContent() {
@@ -54,8 +56,11 @@ function WorkspaceContent() {
     d_days: 3,
     d_rate: 0.0025,
   });
+  const [pnlSubTab, setPnLSubTab] = useState<"shift" | "stress">("shift");
   const [pnlExplainResult, setPnLExplainResult] = useState<PnLExplainResponse | null>(null);
   const [isCalculatingPnL, setIsCalculatingPnL] = useState<boolean>(false);
+  const [stressTestResult, setStressTestResult] = useState<StressTestResponse | null>(null);
+  const [isRunningStressTest, setIsRunningStressTest] = useState<boolean>(false);
 
   const [previewResult, setPreviewResult] =
     useState<PricingPreviewResponse | null>(null);
@@ -106,10 +111,14 @@ function WorkspaceContent() {
       handleRunFullSimulation(inputs);
     } else if (workspaceMode === "implied_vol" && !isSolvingIv) {
       handleSolveImpliedVol();
-    } else if (workspaceMode === "pnl_explain" && !isCalculatingPnL) {
-      handleCalculatePnLExplain();
+    } else if (workspaceMode === "pnl_explain" && !isCalculatingPnL && !isRunningStressTest) {
+      if (pnlSubTab === "stress") {
+        handleRunStressTest();
+      } else {
+        handleCalculatePnLExplain();
+      }
     }
-  }, [workspaceMode, isFullSimulating, isSolvingIv, isCalculatingPnL, inputs, marketPrice, pnlShift]);
+  }, [workspaceMode, isFullSimulating, isSolvingIv, isCalculatingPnL, isRunningStressTest, inputs, marketPrice, pnlShift, pnlSubTab]);
 
   useKeyboardShortcuts({
     onRunSimulation: handleRunShortcut,
@@ -219,13 +228,48 @@ function WorkspaceContent() {
     }
   };
 
+  // Scenario Stress Test Handler
+  const handleRunStressTest = async () => {
+    setIsRunningStressTest(true);
+    setError(null);
+
+    try {
+      const req: StressTestRequest = {
+        ticker: inputs.ticker,
+        market: inputs.market,
+        spot_override: inputs.spot_override,
+        strike: inputs.strike,
+        expiry_date: inputs.expiry_date,
+        option_type: inputs.option_type,
+        volatility: inputs.volatility,
+        risk_free_rate: inputs.risk_free_rate,
+        dividend_yield: inputs.dividend_yield,
+      };
+      const data = await postStressTest(req);
+      setStressTestResult(data);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err);
+      } else {
+        setError(
+          new ApiError(500, {
+            error: "stress_test_failed",
+            message: "Scenario stress test failed.",
+          })
+        );
+      }
+    } finally {
+      setIsRunningStressTest(false);
+    }
+  };
+
   return (
     <div className="max-w-[1600px] mx-auto px-4 py-4">
       {/* Workspace Header */}
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#21262d]">
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-bold text-white tracking-tight uppercase font-mono">
-            {workspaceMode === "implied_vol" ? "IV Solver" : workspaceMode === "pnl_explain" ? "P&L Explain" : "Pricing"}
+            {workspaceMode === "implied_vol" ? "IV Solver" : workspaceMode === "pnl_explain" ? (pnlSubTab === "stress" ? "Scenario Stress Test" : "P&L Explain") : "Pricing"}
           </h1>
           {inputs.ticker && (
             <span className="text-[10px] font-mono text-[#8b949e] bg-[#21262d]/60 px-2 py-0.5 rounded border border-[#30363d]">
@@ -279,6 +323,10 @@ function WorkspaceContent() {
                 onPnLShiftChange={setPnLShift}
                 onCalculatePnLExplain={handleCalculatePnLExplain}
                 isCalculatingPnL={isCalculatingPnL}
+                pnlSubTab={pnlSubTab}
+                onPnLSubTabChange={setPnLSubTab}
+                onRunStressTest={handleRunStressTest}
+                isRunningStressTest={isRunningStressTest}
                 priceBounds={priceBounds}
               />
             </div>
@@ -299,6 +347,9 @@ function WorkspaceContent() {
                 isSolvingIv={isSolvingIv}
                 pnlExplainResult={pnlExplainResult}
                 isCalculatingPnL={isCalculatingPnL}
+                pnlSubTab={pnlSubTab}
+                stressTestResult={stressTestResult}
+                isRunningStressTest={isRunningStressTest}
               />
               {workspaceMode === "pricing" && (
                 <ExportControls fullResult={fullResult} request={inputs} />
@@ -343,6 +394,10 @@ function WorkspaceContent() {
                 onPnLShiftChange={setPnLShift}
                 onCalculatePnLExplain={handleCalculatePnLExplain}
                 isCalculatingPnL={isCalculatingPnL}
+                pnlSubTab={pnlSubTab}
+                onPnLSubTabChange={setPnLSubTab}
+                onRunStressTest={handleRunStressTest}
+                isRunningStressTest={isRunningStressTest}
                 priceBounds={priceBounds}
               />
             </div>
@@ -367,6 +422,9 @@ function WorkspaceContent() {
                 isSolvingIv={isSolvingIv}
                 pnlExplainResult={pnlExplainResult}
                 isCalculatingPnL={isCalculatingPnL}
+                pnlSubTab={pnlSubTab}
+                stressTestResult={stressTestResult}
+                isRunningStressTest={isRunningStressTest}
               />
               {workspaceMode === "pricing" && (
                 <ExportControls fullResult={fullResult} request={inputs} />

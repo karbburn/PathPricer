@@ -3,7 +3,7 @@
 import React from "react";
 import { PreviewBadge, PrecisionTier } from "./PreviewBadge";
 import { ApiError } from "@/lib/api-client";
-import { PricingPreviewResponse, PricingFullResponse, BSGreeks, MarketRegion, ImpliedVolResponse, PnLExplainResponse } from "@/lib/types";
+import { PricingPreviewResponse, PricingFullResponse, BSGreeks, MarketRegion, ImpliedVolResponse, PnLExplainResponse, StressTestResponse } from "@/lib/types";
 import { useDensity } from "@/lib/contexts/DensityContext";
 import { formatPercent, formatPrice, marketCurrencySymbol } from "@/lib/formatters";
 
@@ -21,6 +21,9 @@ interface ResultsPanelProps {
   isSolvingIv?: boolean;
   pnlExplainResult?: PnLExplainResponse | null;
   isCalculatingPnL?: boolean;
+  pnlSubTab?: "shift" | "stress";
+  stressTestResult?: StressTestResponse | null;
+  isRunningStressTest?: boolean;
 }
 
 // Validation tolerances for FD Greeks comparison
@@ -46,6 +49,9 @@ export function ResultsPanel({
   isSolvingIv = false,
   pnlExplainResult,
   isCalculatingPnL = false,
+  pnlSubTab = "shift",
+  stressTestResult,
+  isRunningStressTest = false,
 }: ResultsPanelProps) {
   const { density } = useDensity();
   const compact = density === "compact";
@@ -209,6 +215,105 @@ export function ResultsPanel({
 
   // P&L Explain Mode Results Render
   if (workspaceMode === "pnl_explain") {
+    if (pnlSubTab === "stress") {
+      if (isRunningStressTest) {
+        return (
+          <div className="bg-[#161b22] border border-[#58a6ff]/60 rounded-xl p-8 text-center space-y-4">
+            <div className="flex justify-center gap-2">
+              <div className="h-3 w-3 rounded-full bg-[#58a6ff] animate-bounce" style={{ animationDelay: "0ms" }} />
+              <div className="h-3 w-3 rounded-full bg-[#58a6ff] animate-bounce" style={{ animationDelay: "150ms" }} />
+              <div className="h-3 w-3 rounded-full bg-[#58a6ff] animate-bounce" style={{ animationDelay: "300ms" }} />
+            </div>
+            <p className="text-sm text-[#79c0ff] font-semibold">
+              Repricing under stress scenarios...
+            </p>
+          </div>
+        );
+      }
+
+      if (!stressTestResult) {
+        return (
+          <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-8 text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-[#0d1117]/60 border border-[#21262d] text-[#58a6ff] flex items-center justify-center mx-auto">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </div>
+            <h3 className="text-lg font-bold text-white">Scenario Stress Test</h3>
+            <p className="text-sm text-[#8b949e] max-w-md mx-auto">
+              Switch to the Multi-Scenario tab and click &quot;Run Scenario Stress Test&quot;
+              to reprice this option under 6 named market stress scenarios.
+            </p>
+          </div>
+        );
+      }
+
+      const sorted = [...stressTestResult.scenarios].sort((a, b) => a.pnl - b.pnl);
+      const maxAbs = Math.max(...stressTestResult.scenarios.map((s) => Math.abs(s.pnl)), 1e-9);
+
+      return (
+        <div className="card bg-[#161b22] border border-[#58a6ff]/40 rounded-xl overflow-hidden shadow-xl space-y-6 p-6">
+          <div className="flex items-center justify-between border-b border-[#21262d] pb-4">
+            <div>
+              <h2 className="text-xl font-extrabold text-white tracking-tight">
+                Scenario Stress Test Output
+              </h2>
+              <p className="text-xs text-[#8b949e] mt-0.5">
+                Base price {currencySymbol}{formatPrice(stressTestResult.base_price, 4)} at spot {stressTestResult.base_spot.toFixed(2)}
+              </p>
+            </div>
+            <span className="px-3 py-1 bg-[#0d1117] border border-[#30363d] text-[#f85149] text-xs font-mono font-bold rounded-full">
+              {stressTestResult.scenarios.length} scenarios
+            </span>
+          </div>
+
+          {/* Risk summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
+              <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">Worst Scenario</span>
+              <span className="text-sm font-mono font-bold text-[#f85149]">{stressTestResult.worst_scenario ?? "—"}</span>
+            </div>
+            <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
+              <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">Worst Loss</span>
+              <span className="text-sm font-mono font-bold text-[#f85149]">
+                {stressTestResult.worst_loss !== null ? `${currencySymbol}${formatPrice(stressTestResult.worst_loss, 4)}` : "—"}
+              </span>
+            </div>
+            <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
+              <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">Unrealized Risk</span>
+              <span className="text-sm font-mono font-bold text-[#d29922]">{formatPercent(stressTestResult.unrealized_risk, 1)} of base</span>
+            </div>
+          </div>
+
+          {/* Scenario P&L bars */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#58a6ff]">
+              Scenario P&amp;L Impact
+            </h3>
+            {sorted.map((s) => {
+              const width = Math.max(4, (Math.abs(s.pnl) / maxAbs) * 100);
+              return (
+                <div key={s.name}>
+                  <div className="flex items-center justify-between text-xs font-mono mb-1">
+                    <span className="text-white font-semibold">{s.name}</span>
+                    <span className={`font-bold ${s.pnl >= 0 ? "text-[#3fb950]" : "text-[#f85149]"}`}>
+                      {s.pnl >= 0 ? "+" : ""}{currencySymbol}{formatPrice(s.pnl, 4)}
+                      <span className="text-[#8b949e] font-normal"> ({formatPercent(s.pnl_pct, 2)})</span>
+                    </span>
+                  </div>
+                  <div className="h-2 bg-[#0d1117] rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${s.pnl >= 0 ? "bg-[#3fb950]" : "bg-[#f85149]"}`}
+                      style={{ width: `${width}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-[#8b949e] font-mono mt-0.5">{s.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
     if (isCalculatingPnL) {
       return (
         <div className="bg-[#161b22] border border-[#58a6ff]/60 rounded-xl p-8 text-center space-y-4">

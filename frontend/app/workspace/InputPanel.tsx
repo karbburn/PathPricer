@@ -34,6 +34,10 @@ interface InputPanelProps {
   onPnLShiftChange?: (shift: PnLShift) => void;
   onCalculatePnLExplain?: () => void;
   isCalculatingPnL?: boolean;
+  pnlSubTab?: "shift" | "stress";
+  onPnLSubTabChange?: (tab: "shift" | "stress") => void;
+  onRunStressTest?: () => void;
+  isRunningStressTest?: boolean;
   priceBounds?: { lower: number; upper: number } | null;
 }
 
@@ -55,6 +59,10 @@ export function InputPanel({
   onPnLShiftChange,
   onCalculatePnLExplain,
   isCalculatingPnL = false,
+  pnlSubTab = "shift",
+  onPnLSubTabChange,
+  onRunStressTest,
+  isRunningStressTest = false,
   priceBounds = null,
 }: InputPanelProps) {
   const [inputs, setInputs] = useState<PricingRequest>(initialInputs);
@@ -628,7 +636,27 @@ export function InputPanel({
             Hypothetical Scenario Shifts
           </label>
 
-          {/* Spot Shift (dS) */}
+          {/* Sub-tab: Single Shift vs Multi-Scenario */}
+          <div className="flex rounded-lg overflow-hidden border border-[#30363d]">
+            {(["shift", "stress"] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => onPnLSubTabChange && onPnLSubTabChange(tab)}
+                className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 ${
+                  pnlSubTab === tab
+                    ? "bg-[#58a6ff]/15 text-[#58a6ff] border-b-2 border-[#58a6ff]"
+                    : "text-[#8b949e] hover:text-white"
+                }`}
+              >
+                {tab === "shift" ? "Single Shift" : "Multi-Scenario"}
+              </button>
+            ))}
+          </div>
+
+          {pnlSubTab === "shift" ? (
+            <>
+              {/* Spot Shift (dS) */}
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="text-xs text-[#8b949e]">
@@ -755,6 +783,26 @@ export function InputPanel({
               className="w-full accent-[#58a6ff] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             />
           </div>
+            </>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-xs text-[#8b949e] font-mono leading-relaxed">
+                Reprice under 6 named stress scenarios (2008 Crisis, COVID Crash,
+                Rate Hike, Vol Crush, Slow Drift Down, Flash Crash) and see P&amp;L
+                impact plus the largest single-scenario drawdown.
+              </p>
+              <button
+                type="button"
+                disabled={isRunningStressTest}
+                onClick={onRunStressTest}
+                className="w-full bg-[#1f6feb] hover:bg-[#388bfd] text-white font-bold text-sm py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
+              >
+                <span>
+                  {isRunningStressTest ? "Running Stress Test..." : "▶ Run Scenario Stress Test"}
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -772,11 +820,11 @@ export function InputPanel({
         ) : workspaceMode === "pnl_explain" ? (
           <button
             type="button"
-            disabled={isCalculatingPnL}
-            onClick={onCalculatePnLExplain}
+            disabled={isCalculatingPnL || isRunningStressTest}
+            onClick={pnlSubTab === "stress" ? onRunStressTest : onCalculatePnLExplain}
             className="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-bold text-sm py-3.5 px-4 rounded-lg shadow-lg shadow-[#0d1117]/40 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
-            <span>{isCalculatingPnL ? "Calculating P&L Attribution..." : <><svg className="inline w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg> Explain P&L Attribution</>}</span>
+            <span>{isCalculatingPnL || isRunningStressTest ? "Calculating..." : pnlSubTab === "stress" ? "▶ Run Scenario Stress Test" : "Explain P&L Attribution"}</span>
           </button>
         ) : (
           <>

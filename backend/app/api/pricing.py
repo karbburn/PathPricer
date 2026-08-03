@@ -25,7 +25,7 @@ from ..core.config import (
     PREVIEW_MAX_N,
 )
 from ..core.rng import make_rng
-from ..engine import black_scholes, implied_vol, monte_carlo, pnl_explain, risk_grid, strategy
+from ..engine import black_scholes, implied_vol, monte_carlo, pnl_explain, risk_grid, strategy, stress_test
 from ..engine.greeks import finite_difference_greeks
 from ..schemas.pricing import (
     BSFullResult,
@@ -50,6 +50,9 @@ from ..schemas.pricing import (
     StrategyLegResultSchema,
     StrategyRequest,
     StrategyResponse,
+    StressScenarioResultSchema,
+    StressTestRequest,
+    StressTestResponse,
 )
 
 router = APIRouter(prefix="/price", tags=["pricing"])
@@ -614,6 +617,81 @@ def price_strategy_endpoint(req: StrategyRequest) -> StrategyResponse | JSONResp
             )
             for l in res.legs
         ],
+    )
+
+
+@router.post(
+    "/stress-test",
+    response_model=StressTestResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def price_stress_test(req: StressTestRequest) -> StressTestResponse | JSONResponse:
+    """Reprice an option under named stress scenarios and report P&L impact."""
+    common_err = _validate_common(req)
+    if common_err is not None:
+        return JSONResponse(status_code=400, content=common_err.model_dump())
+
+    if req.volatility <= 0:
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error="invalid_volatility",
+                message="Volatility must be positive.",
+                field="volatility",
+            ).model_dump(),
+        )
+
+    T = _compute_T(req.expiry_date)
+    S0 = req.spot_override if req.spot_override is not None else 100.0
+    r = req.risk_free_rate
+    q = _carry_yield(req)
+
+    scenarios = None
+    if req.scenarios is not None:
+        scenarios = [
+            stress_test.StressScenario(
+                name=s.name,
+                description=s.description,
+                d_spot=s.d_spot,
+                d_spot_pct=s.d_spot_pct,
+                d_vol=s.d_vol,
+                d_days=s.d_days,
+                d_rate=s.d_rate,
+            )
+            for s in req.scenarios
+        ]
+
+    res = stress_test.run_stress_test(
+        S0=S0,
+        K=req.strike,
+        T=T,
+        r=r,
+        q=q,
+        sigma=req.volatility,
+        option_type=req.option_type,
+        scenarios=scenarios,
+    )
+
+    return StressTestResponse(
+        base_price=res.base_price,
+        base_spot=res.base_spot,
+        scenarios=[
+            StressScenarioResultSchema(
+                name=s.name,
+                description=s.description,
+                spot=s.spot,
+                volatility=s.volatility,
+                price=s.price,
+                pnl=s.pnl,
+                pnl_pct=s.pnl_pct,
+            )
+            for s in res.scenarios
+        ],
+        worst_loss=res.worst_loss,
+        worst_scenario=res.worst_scenario,
+        best_gain=res.best_gain,
+        best_scenario=res.best_scenario,
+        unrealized_risk=res.unrealized_risk,
     )
 
 

@@ -500,3 +500,47 @@ export interface StrategyResponse {
   legs: StrategyLegResult[];
 }
 
+export interface StressScenario {
+  name: string;
+  description: string;
+  d_spot: number;
+  d_spot_pct: number;
+  d_vol: number;
+  d_days: number;
+  d_rate: number;
+}
+
+export interface StressTestRequest {
+  ticker: string;
+  market: MarketRegion;
+  spot_override?: number | null;
+  strike: number;
+  expiry_date: string;
+  option_type: OptionType;
+  volatility: number;
+  risk_free_rate: number;
+  dividend_yield?: number | null;
+  scenarios?: StressScenario[] | null;
+}
+
+export interface StressScenarioResult {
+  name: string;
+  description: string;
+  spot: number;
+  volatility: number;
+  price: number;
+  pnl: number;
+  pnl_pct: number;
+}
+
+export interface StressTestResponse {
+  base_price: number;
+  base_spot: number;
+  scenarios: StressScenarioResult[];
+  worst_loss: number | null;
+  worst_scenario: string | null;
+  best_gain: number | null;
+  best_scenario: string | null;
+  unrealized_risk: number;
+}
+

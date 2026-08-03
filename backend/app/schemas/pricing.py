@@ -461,6 +461,63 @@ class StrategyResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Scenario / Stress-testing schemas
+# ---------------------------------------------------------------------------
+
+
+class StressScenarioSchema(BaseModel):
+    """Named stress scenario with coordinate shifts."""
+
+    name: str
+    description: str
+    d_spot: float = 0.0
+    d_spot_pct: float = 0.0
+    d_vol: float = 0.0
+    d_days: float = 0.0
+    d_rate: float = 0.0
+
+
+class StressTestRequest(BaseModel):
+    """Request schema for stress-testing a single option."""
+
+    ticker: str
+    market: MarketRegionType
+    spot_override: float | None = None
+    strike: float = Field(..., gt=0)
+    expiry_date: date
+    option_type: Literal["call", "put"]
+    volatility: float = Field(..., gt=0)
+    risk_free_rate: float
+    dividend_yield: float | None = None
+    scenarios: list[StressScenarioSchema] | None = None
+
+
+class StressScenarioResultSchema(BaseModel):
+    """P&L impact of one stress scenario."""
+
+    name: str
+    description: str
+    spot: float
+    volatility: float
+    price: float
+    pnl: float
+    pnl_pct: float
+
+
+class StressTestResponse(BaseModel):
+    """Response schema for stress-testing an option."""
+
+    base_price: float
+    base_spot: float
+    scenarios: list[StressScenarioResultSchema]
+    worst_loss: float | None
+    worst_scenario: str | None
+    best_gain: float | None
+    best_scenario: str | None
+    unrealized_risk: float
+
+
+# ---------------------------------------------------------------------------
 # Options Chain schemas
 # ---------------------------------------------------------------------------
 
