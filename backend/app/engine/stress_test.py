@@ -46,17 +46,21 @@ class StressTestResult:
     base_price: float
     base_spot: float
     scenarios: list[ScenarioResult]
-    worst_loss: float | None
+    worst_pnl: float | None
     worst_scenario: str | None
-    best_gain: float | None
+    best_pnl: float | None
     best_scenario: str | None
 
     @property
     def unrealized_risk(self) -> float:
-        """Largest single-scenario absolute loss, as a fraction of base price."""
-        if self.worst_loss is None or self.base_price == 0:
+        """Largest single-scenario loss as a fraction of base price.
+
+        Zero when the worst scenario is still a gain, so the metric only
+        measures actual downside.
+        """
+        if self.worst_pnl is None or self.base_price == 0:
             return 0.0
-        return abs(self.worst_loss) / self.base_price
+        return max(0.0, -self.worst_pnl) / self.base_price
 
 
 NAMED_SCENARIOS: list[StressScenario] = [
@@ -161,8 +165,8 @@ def run_stress_test(
         base_price=base_price,
         base_spot=S0,
         scenarios=scenario_results,
-        worst_loss=worst.pnl,
+        worst_pnl=worst.pnl,
         worst_scenario=worst.name,
-        best_gain=best.pnl,
+        best_pnl=best.pnl,
         best_scenario=best.name,
     )

@@ -687,9 +687,9 @@ def price_stress_test(req: StressTestRequest) -> StressTestResponse | JSONRespon
             )
             for s in res.scenarios
         ],
-        worst_loss=res.worst_loss,
+        worst_pnl=res.worst_pnl,
         worst_scenario=res.worst_scenario,
-        best_gain=res.best_gain,
+        best_pnl=res.best_pnl,
         best_scenario=res.best_scenario,
         unrealized_risk=res.unrealized_risk,
     )

@@ -272,9 +272,9 @@ export function ResultsPanel({
               <span className="text-sm font-mono font-bold text-[#f85149]">{stressTestResult.worst_scenario ?? "—"}</span>
             </div>
             <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">
-              <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">Worst Loss</span>
+              <span className="text-[10px] uppercase font-bold text-[#8b949e] block mb-1">Worst P&L</span>
               <span className="text-sm font-mono font-bold text-[#f85149]">
-                {stressTestResult.worst_loss !== null ? `${currencySymbol}${formatPrice(stressTestResult.worst_loss, 4)}` : "—"}
+                {stressTestResult.worst_pnl !== null ? `${currencySymbol}${formatPrice(stressTestResult.worst_pnl, 4)}` : "—"}
               </span>
             </div>
             <div className="bg-[#0d1117]/80 border border-[#21262d] p-3 rounded-lg">

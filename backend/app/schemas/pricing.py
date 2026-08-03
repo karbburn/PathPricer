@@ -510,9 +510,9 @@ class StressTestResponse(BaseModel):
     base_price: float
     base_spot: float
     scenarios: list[StressScenarioResultSchema]
-    worst_loss: float | None
+    worst_pnl: float | None
     worst_scenario: str | None
-    best_gain: float | None
+    best_pnl: float | None
     best_scenario: str | None
     unrealized_risk: float
 

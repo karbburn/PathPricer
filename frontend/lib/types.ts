@@ -589,9 +589,9 @@ export interface StressTestResponse {
   base_price: number;
   base_spot: number;
   scenarios: StressScenarioResult[];
-  worst_loss: number | null;
+  worst_pnl: number | null;
   worst_scenario: string | null;
-  best_gain: number | null;
+  best_pnl: number | null;
   best_scenario: string | null;
   unrealized_risk: number;
 }

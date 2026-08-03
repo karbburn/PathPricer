@@ -15,10 +15,10 @@ def _run_tests() -> None:
     assert len(res.scenarios) == len(NAMED_SCENARIOS)
     names = {s.name for s in res.scenarios}
     assert "2008 Crisis" in names and "Vol Crush" in names
-    # Worst loss is negative; best gain is positive or zero.
-    assert res.worst_loss is not None and res.worst_loss < 0
+    # Worst pnl is negative; best pnl is positive or zero.
+    assert res.worst_pnl is not None and res.worst_pnl < 0
     assert res.worst_scenario in names
-    assert res.best_gain is not None
+    assert res.best_pnl is not None
     # Every scenario's price must equal BS at that shifted coordinate.
     from ..engine import black_scholes
 
@@ -42,12 +42,13 @@ def _run_tests() -> None:
     assert len(res2.scenarios) == 1
     assert res2.scenarios[0].name == "Flat"
     assert abs(res2.scenarios[0].pnl) < 1e-9, "no-op scenario must have zero P&L"
+    assert res2.unrealized_risk == 0.0, "no downside means zero risk metric"
 
     # Put option reacts inversely: 2008 crisis is a big gain.
     put_res = run_stress_test(
         S0=100.0, K=100.0, T=0.5, r=0.05, q=0.0, sigma=0.25, option_type="put"
     )
-    assert put_res.best_gain is not None and put_res.best_gain > 0
+    assert put_res.best_pnl is not None and put_res.best_pnl > 0
 
     print("All stress-test engine self-checks passed.")
 
