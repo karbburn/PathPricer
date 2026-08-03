@@ -37,7 +37,7 @@ class PricingRequestSchema(BaseModel):
     variance_reduction: Literal[
         "standard", "antithetic", "control_variate", "antithetic_cv", "quasi_monte_carlo", "all"
     ] = "all"
-    convergence_grid: list[int] | None = None
+    convergence_grid: list[int] | None = Field(default=None, max_length=40)
 
 
 # ---------------------------------------------------------------------------
@@ -489,7 +489,7 @@ class StressTestRequest(BaseModel):
     volatility: float = Field(..., gt=0)
     risk_free_rate: float
     dividend_yield: float | None = None
-    scenarios: list[StressScenarioSchema] | None = None
+    scenarios: list[StressScenarioSchema] | None = Field(default=None, max_length=50)
 
 
 class StressScenarioResultSchema(BaseModel):
