@@ -15,6 +15,8 @@ import {
   PnLExplainResponse,
   RiskGridRequest,
   RiskGridResponse,
+  GreeksSurfaceRequest,
+  GreeksSurfaceResponse,
   ErrorResponse,
   MarketQuoteResponse,
   MarketRegion,
@@ -185,6 +187,20 @@ export async function postRiskGrid(
     signal,
   });
   return handleResponse<RiskGridResponse>(response);
+}
+
+export async function postGreeksSurface(
+  request: GreeksSurfaceRequest,
+  signal?: AbortSignal
+): Promise<GreeksSurfaceResponse> {
+  const url = `${BASE_URL}/quant/greeks-surface`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+    signal,
+  });
+  return handleResponse<GreeksSurfaceResponse>(response);
 }
 
 export async function getOptionsChain(

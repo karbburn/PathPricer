@@ -252,6 +252,38 @@ export interface RiskGridResponse {
   axis_y: RiskGridAxis;
 }
 
+export type GreeksMetric = "price" | "delta" | "gamma" | "vega" | "theta" | "rho";
+
+export interface GreeksSurfaceRequest {
+  ticker: string;
+  market: MarketRegion;
+  spot_override?: number | null;
+  risk_free_rate: number;
+  dividend_yield?: number | null;
+  expiries?: string[] | null;
+  max_expiries?: number;
+  metric: GreeksMetric;
+  option_type: OptionType;
+  num_strikes?: number;
+  strike_min_pct?: number;
+  strike_max_pct?: number;
+}
+
+export interface GreeksSurfaceResponse {
+  ticker: string;
+  market: string;
+  resolved_symbol: string;
+  spot: number;
+  rate: number;
+  dividend_yield: number;
+  metric: string;
+  option_type: string;
+  x_values: number[];
+  y_values: number[];
+  grid: number[][];
+  warnings: string[];
+}
+
 // ---------------------------------------------------------------------------
 // Options Chain types
 // ---------------------------------------------------------------------------

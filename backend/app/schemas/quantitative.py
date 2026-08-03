@@ -7,6 +7,8 @@ charts: Vol Surface, Heston Calibration, and Model Validation.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 _PROTECTED: dict = {"protected_namespaces": ()}
@@ -100,6 +102,38 @@ class TermStructureResponse(BaseModel):
     rate: float
     dividend_yield: float
     points: list[TermStructurePoint]
+    warnings: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# Greeks surface
+# ---------------------------------------------------------------------------
+
+
+class GreeksSurfaceRequest(QuantSurfaceRequest):
+    """Evaluate a Greek across a strike x expiry grid at market SVI vols."""
+
+    metric: Literal["price", "delta", "gamma", "vega", "theta", "rho"] = "delta"
+    option_type: Literal["call", "put"] = "call"
+    num_strikes: int = Field(default=25, ge=2, le=100)
+    strike_min_pct: float = Field(default=0.7, gt=0, lt=1.0)
+    strike_max_pct: float = Field(default=1.3, gt=1.0)
+
+
+class GreeksSurfaceResponse(BaseModel):
+    """A Greek/price evaluated across the surface's strike x expiry grid."""
+
+    ticker: str
+    market: str
+    resolved_symbol: str
+    spot: float
+    rate: float
+    dividend_yield: float
+    metric: str
+    option_type: str
+    x_values: list[float]
+    y_values: list[float]
+    grid: list[list[float]]
     warnings: list[str] = Field(default_factory=list)
 
 

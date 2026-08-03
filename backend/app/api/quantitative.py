@@ -20,6 +20,7 @@ from fastapi.responses import JSONResponse
 
 from ..core.dependencies import get_market_data_service
 from ..engine.butterfly_arb import check_surface_butterfly_arb
+from ..engine.greeks_surface import compute_greeks_surface
 from ..engine.heston_calibration import CalibrationContract, calibrate_heston
 from ..engine.implied_vol import solve_implied_volatility
 from ..engine.model_validation import validate_model_fit
@@ -27,6 +28,8 @@ from ..engine.vol_surface import SVIExpiry, build_surface, fit_svi
 from ..providers.market_data import MarketDataError, MarketDataService
 from ..schemas.quantitative import (
     CalibrationContractView,
+    GreeksSurfaceRequest,
+    GreeksSurfaceResponse,
     HestonCalibrationResponse,
     HestonParamsSchema,
     ModelValidationResponse,
@@ -450,6 +453,80 @@ def _error_response_value(err: ValueError) -> JSONResponse:
             message=str(err),
             fallback_available=False,
         ).model_dump(),
+    )
+
+
+def _engine_surface_from_response(resp: VolSurfaceResponse):
+    """Rebuild an engine SVISurface from a fitted VolSurfaceResponse."""
+    from ..engine.vol_surface import SVIParams as EngineSVIParams
+
+    slices = [
+        SVIExpiry(
+            ttm=s.ttm,
+            params=EngineSVIParams(
+                a=s.svi_params.a, b=s.svi_params.b, rho=s.svi_params.rho,
+                m=s.svi_params.m, sigma=s.svi_params.sigma,
+            ),
+        )
+        for s in resp.slices
+    ]
+    return build_surface(resp.spot, resp.rate, resp.dividend_yield, slices)
+
+
+@router.post(
+    "/greeks-surface",
+    response_model=GreeksSurfaceResponse,
+    responses={404: {"model": ErrorResponse}},
+)
+def quant_greeks_surface(
+    req: GreeksSurfaceRequest,
+    market_data: MarketDataService = Depends(get_market_data_service),
+) -> GreeksSurfaceResponse | JSONResponse:
+    """Evaluate a chosen Greek across strikes x expiries at market SVI vols.
+
+    Unlike the flat-vol risk grid, every cell is priced at the fitted SVI
+    surface's implied volatility, so the surface shows how the smile and skew
+    shape option risk across the whole strike/expiry domain.
+    """
+    try:
+        resp, warnings = _build_vol_surface(market_data, req)
+    except MarketDataError as err:
+        return _error_response(err)
+    if resp is None:
+        return _error_response(
+            MarketDataError(
+                message="No SVI slices could be fitted from the options chain.",
+                ticker=req.ticker,
+                fallback_available=False,
+            )
+        )
+
+    try:
+        surface = _engine_surface_from_response(resp)
+        result = compute_greeks_surface(
+            surface,
+            metric=req.metric,
+            num_strikes=req.num_strikes,
+            strike_min_pct=req.strike_min_pct,
+            strike_max_pct=req.strike_max_pct,
+            option_type=req.option_type,
+        )
+    except ValueError as exc:
+        return _error_response_value(exc)
+
+    return GreeksSurfaceResponse(
+        ticker=resp.ticker,
+        market=resp.market,
+        resolved_symbol=resp.resolved_symbol,
+        spot=resp.spot,
+        rate=resp.rate,
+        dividend_yield=resp.dividend_yield,
+        metric=result.metric,
+        option_type=req.option_type,
+        x_values=result.x_values,
+        y_values=result.y_values,
+        grid=result.grid,
+        warnings=warnings,
     )
 
 
