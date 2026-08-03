@@ -587,7 +587,12 @@ def quant_vol_term_structure(
         p = slice_.svi_params
         k = 0.0
         w = p.a + p.b * (p.rho * (k - p.m) + math.sqrt((k - p.m) ** 2 + p.sigma**2))
-        atm = math.sqrt(max(w, 0.0) / max(slice_.ttm, 1e-12))
+        if not math.isfinite(w) or w <= 0.0:
+            warnings.append(
+                f"Expiry {slice_.expiry}: fitted SVI has non-positive ATM variance, skipped."
+            )
+            continue
+        atm = math.sqrt(w / slice_.ttm)
         points.append(
             TermStructurePoint(expiry=slice_.expiry, ttm=slice_.ttm, atm_vol=atm)
         )
