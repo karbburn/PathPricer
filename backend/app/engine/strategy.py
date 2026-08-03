@@ -115,9 +115,12 @@ def _find_breakevens(spots: list[float], payoffs: list[float]) -> list[float]:
     out: list[float] = []
     for i in range(1, len(spots)):
         p0, p1 = payoffs[i - 1], payoffs[i]
+        # A crossing between segments, or a payoff that lands exactly on zero.
         if (p0 > 0 >= p1) or (p0 < 0 <= p1):
             t = p0 / (p0 - p1)
             out.append(spots[i - 1] + t * (spots[i] - spots[i - 1]))
+        elif p0 == 0 and p1 != 0:
+            out.append(spots[i - 1])
     return out
 
 
