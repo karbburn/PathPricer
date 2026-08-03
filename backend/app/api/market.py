@@ -10,10 +10,12 @@ from fastapi import APIRouter, Depends, Query
 from ..core.config import DAYS_PER_YEAR
 from ..core.dependencies import get_market_data_service
 from ..engine.implied_rate import extract_implied_rate
+from ..engine.implied_dividend import extract_implied_dividend
 from ..providers.market_data import MarketDataError, MarketDataService
 from ..schemas.pricing import (
     ErrorResponse,
     HistoryResponse,
+    ImpliedDividendResponse,
     ImpliedParityRequest,
     ImpliedRateResponse,
     MarketQuoteResponse,
@@ -191,6 +193,92 @@ def compute_implied_rate(
         reference_rate=reference_rate,
         divergence=implied_rate - reference_rate,
         warnings=warnings,
+    )
+
+
+@router.post(
+    "/implied-dividend",
+    response_model=ImpliedDividendResponse,
+    responses={404: {"model": ErrorResponse}},
+)
+def compute_implied_dividend(
+    req: ImpliedParityRequest,
+    market_data: MarketDataService = Depends(get_market_data_service),
+) -> ImpliedDividendResponse | ErrorResponse:
+    """Extract the dividend yield implied by an ATM call/put parity pair.
+
+    Given a trusted rate, parity recovers the dividend the market is pricing
+    in. A large gap versus the reported yield flags mis-priced dividends or
+    inconsistent quotes.
+    """
+    from fastapi.responses import JSONResponse
+
+    try:
+        quote = market_data.get_quote(req.ticker, req.market)
+        chain = market_data.get_options_chain(req.ticker, req.market)
+    except MarketDataError as err:
+        return JSONResponse(
+            status_code=404,
+            content=ErrorResponse(
+                error="options_not_available",
+                message=err.message,
+                fallback_available=err.fallback_available,
+            ).model_dump(),
+        )
+
+    expiry = req.expiry_date or chain.get("selected_expiry")
+    if expiry is None or expiry not in (chain.get("expiries") or []):
+        expiry = (chain.get("expiries") or [None])[0]
+    if expiry is None:
+        return JSONResponse(
+            status_code=404,
+            content=ErrorResponse(
+                error="options_not_available",
+                message="No option expiries found for ticker.",
+                fallback_available=False,
+            ).model_dump(),
+        )
+
+    spot = req.spot_override if req.spot_override and req.spot_override > 0 else quote.spot_price
+    pair = _atm_parity_pair(chain, spot, expiry)
+    if pair is None:
+        return JSONResponse(
+            status_code=404,
+            content=ErrorResponse(
+                error="options_not_available",
+                message="No matched call/put quotes found at a shared strike.",
+                fallback_available=False,
+            ).model_dump(),
+        )
+
+    strike, call_mid, put_mid, ttm = pair
+    r = req.risk_free_rate
+    try:
+        implied_dividend = extract_implied_dividend(call_mid, put_mid, spot, strike, ttm, r)
+    except ValueError as err:
+        return JSONResponse(
+            status_code=422,
+            content=ErrorResponse(
+                error="parity_inconsistent",
+                message=str(err),
+                fallback_available=False,
+            ).model_dump(),
+        )
+
+    market_div = quote.dividend_yield if quote.dividend_yield and quote.dividend_yield > 0 else None
+    return ImpliedDividendResponse(
+        ticker=req.ticker.upper(),
+        market=req.market.upper(),
+        resolved_symbol=chain.get("resolved_symbol") or req.ticker.upper(),
+        spot=spot,
+        strike=strike,
+        ttm=ttm,
+        call_price=call_mid,
+        put_price=put_mid,
+        implied_dividend=implied_dividend,
+        market_dividend=market_div,
+        divergence=(implied_dividend - market_div) if market_div is not None else None,
+        warnings=[],
     )
 
 

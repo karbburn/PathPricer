@@ -13,7 +13,7 @@ import {
   computeAtmStrike,
 } from "@/lib/formatters";
 import { TickerInput } from "@/app/components/TickerInput";
-import { ImpliedRateCard } from "@/app/components/ImpliedRateCard";
+import { ParityQualityCard } from "@/app/components/ParityQualityCard";
 
 const PRESET_TICKERS: Array<{ ticker: string; market: MarketRegion; name: string }> = [
   { ticker: "AAPL", market: "US", name: "Apple Inc." },
@@ -364,7 +364,7 @@ export default function MarketOverviewPage() {
               </span>
             </div>
 
-            <ImpliedRateCard
+            <ParityQualityCard
               ticker={quote.ticker}
               market={quote.market as MarketRegion}
               spot={quote.spot_price}
