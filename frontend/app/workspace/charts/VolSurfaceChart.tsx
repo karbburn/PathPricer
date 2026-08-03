@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import { PricingRequest, QuantSurfaceRequest, VolSurfaceResponse } from "@/lib/types";
 import { postVolSurface, ApiError } from "@/lib/api-client";
-import { formatPercent } from "@/lib/formatters";
+import { formatPercent, formatPrice } from "@/lib/formatters";
 import { QuantChartShell } from "./QuantChartShell";
 
 interface VolSurfaceChartProps {
@@ -104,8 +104,24 @@ const [maxExpiries, setMaxExpiries] = useState(3);
                 <div className="text-xs font-mono text-[#e2e8f0] font-bold">
                   Expiry {slice.expiry} · T = {slice.ttm.toFixed(3)}y
                 </div>
-                <div className="text-[10px] font-mono text-[#8b949e]">
-                  SVI: a={slice.svi_params.a.toFixed(4)} b={slice.svi_params.b.toFixed(4)} ρ={slice.svi_params.rho.toFixed(4)} m={slice.svi_params.m.toFixed(4)} σ={slice.svi_params.sigma.toFixed(4)}
+                <div className="flex items-center gap-2">
+                  {slice.butterfly_arb_free != null && (
+                    <span
+                      title={slice.butterfly_arb_free
+                        ? "Call prices convex in strike — risk-neutral density non-negative everywhere"
+                        : `Butterfly arbitrage: min butterfly value ${formatPrice(slice.min_butterfly ?? 0, 4)} at strike ${formatPrice(slice.worst_strike ?? 0, 2)}`}
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                        slice.butterfly_arb_free
+                          ? "bg-green-950/40 border-green-800 text-green-400"
+                          : "bg-red-950/40 border-red-800 text-red-400"
+                      }`}
+                    >
+                      {slice.butterfly_arb_free ? "✓ Arb-free" : "✗ Butterfly arb"}
+                    </span>
+                  )}
+                  <span className="text-[10px] font-mono text-[#8b949e]">
+                    SVI: a={slice.svi_params.a.toFixed(4)} b={slice.svi_params.b.toFixed(4)} ρ={slice.svi_params.rho.toFixed(4)} m={slice.svi_params.m.toFixed(4)} σ={slice.svi_params.sigma.toFixed(4)}
+                  </span>
                 </div>
               </div>
               <div className="h-[220px] w-full chart-container">

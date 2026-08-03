@@ -19,6 +19,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from ..core.dependencies import get_market_data_service
+from ..engine.butterfly_arb import check_surface_butterfly_arb
 from ..engine.heston_calibration import CalibrationContract, calibrate_heston
 from ..engine.implied_vol import solve_implied_volatility
 from ..engine.model_validation import validate_model_fit
@@ -181,6 +182,7 @@ def _build_vol_surface(
     resolved = base.get("resolved_symbol") or req.ticker.upper()
 
     slices: list[SVISlice] = []
+    engine_slices: list[SVIExpiry] = []
     for expiry in expiries[: req.max_expiries]:
         chain = _fetch_chain(service, req.ticker, req.market, expiry) or base
         T = _ttm_from_expiry(expiry)
@@ -233,6 +235,7 @@ def _build_vol_surface(
                 points=points,
             )
         )
+        engine_slices.append(SVIExpiry(ttm=T, params=params))
 
     if not slices:
         raise MarketDataError(
@@ -240,6 +243,18 @@ def _build_vol_surface(
             ticker=req.ticker,
             fallback_available=False,
         )
+
+    # Butterfly (strike) arbitrage check on each fitted slice: call prices must
+    # be convex in strike (risk-neutral density non-negative everywhere).
+    try:
+        surface = build_surface(spot, r, q, engine_slices)
+        arb_results = check_surface_butterfly_arb(surface)
+        for schema_slice, arb in zip(slices, arb_results):
+            schema_slice.butterfly_arb_free = arb.arb_free
+            schema_slice.min_butterfly = round(arb.min_butterfly, 6)
+            schema_slice.worst_strike = round(arb.worst_strike, 2)
+    except ValueError as exc:
+        warnings.append(f"Butterfly arb check skipped: {exc}")
 
     return (
         VolSurfaceResponse(

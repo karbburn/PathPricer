@@ -59,6 +59,9 @@ class SVISlice(BaseModel):
     ttm: float
     svi_params: SVIParamsSchema
     points: list[SurfacePoint]
+    butterfly_arb_free: bool | None = None
+    min_butterfly: float | None = None
+    worst_strike: float | None = None
 
 
 class VolSurfaceResponse(BaseModel):

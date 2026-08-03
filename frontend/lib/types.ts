@@ -377,6 +377,9 @@ export interface SVISlice {
   ttm: number;
   svi_params: SVIParams;
   points: SurfacePoint[];
+  butterfly_arb_free?: boolean | null;
+  min_butterfly?: number | null;
+  worst_strike?: number | null;
 }
 
 export interface VolSurfaceResponse {
