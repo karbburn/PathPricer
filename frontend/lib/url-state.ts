@@ -73,31 +73,31 @@ export function deserializeParams(
   if (market === "US" || market === "IN" || market === "FX" || market === "CRYPTO") result.market = market as MarketRegion;
 
   const spot = getParam("spot_override") ?? getParam("spot");
-  if (spot !== null && !isNaN(Number(spot))) result.spot_override = Number(spot);
+  if (spot !== null && !isNaN(Number(spot)) && Number(spot) > 0) result.spot_override = Number(spot);
 
   const strike = getParam("strike");
-  if (strike !== null && !isNaN(Number(strike))) result.strike = Number(strike);
+  if (strike !== null && !isNaN(Number(strike)) && Number(strike) > 0) result.strike = Number(strike);
 
   const expiry = getParam("expiry_date") ?? getParam("expiry");
-  if (expiry) result.expiry_date = expiry;
+  if (expiry && /^\d{4}-\d{2}-\d{2}$/.test(expiry)) result.expiry_date = expiry;
 
   const optType = (getParam("option_type") ?? getParam("type"))?.toLowerCase();
   if (optType === "call" || optType === "put") result.option_type = optType as OptionType;
 
   const vol = getParam("volatility") ?? getParam("vol");
-  if (vol !== null && !isNaN(Number(vol))) result.volatility = Number(vol);
+  if (vol !== null && !isNaN(Number(vol)) && Number(vol) > 0 && Number(vol) <= 5.0) result.volatility = Number(vol);
 
   const rate = getParam("risk_free_rate") ?? getParam("rate");
-  if (rate !== null && !isNaN(Number(rate))) result.risk_free_rate = Number(rate);
+  if (rate !== null && !isNaN(Number(rate)) && Number(rate) >= -1.0 && Number(rate) <= 1.0) result.risk_free_rate = Number(rate);
 
   const div = getParam("dividend_yield") ?? getParam("div");
-  if (div !== null && !isNaN(Number(div))) result.dividend_yield = Number(div);
+  if (div !== null && !isNaN(Number(div)) && Number(div) >= 0 && Number(div) <= 1.0) result.dividend_yield = Number(div);
 
   const n = getParam("n_simulations") ?? getParam("n");
-  if (n !== null && !isNaN(Number(n))) result.n_simulations = Number(n);
+  if (n !== null && !isNaN(Number(n)) && Number(n) >= 1000 && Number(n) <= 2000000) result.n_simulations = Number(n);
 
   const seed = getParam("seed");
-  if (seed !== null && !isNaN(Number(seed))) result.seed = Number(seed);
+  if (seed !== null && !isNaN(Number(seed)) && Number(seed) >= 0) result.seed = Number(seed);
 
   const vr = getParam("variance_reduction") ?? getParam("vr");
   if (
