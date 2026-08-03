@@ -402,6 +402,65 @@ class ImpliedDividendResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Strategy Builder schemas
+# ---------------------------------------------------------------------------
+
+
+class StrategyLegSchema(BaseModel):
+    """One leg of a multi-leg option strategy."""
+
+    option_type: Literal["call", "put", "stock"]
+    strike: float | None = Field(None, gt=0)
+    expiry_date: date
+    quantity: float = Field(..., ge=-100, le=100)
+    volatility: float = Field(..., gt=0)
+    risk_free_rate: float
+    dividend_yield: float = 0.0
+
+
+class StrategyRequest(BaseModel):
+    """Request schema for multi-leg strategy pricing."""
+
+    spot: float = Field(..., gt=0)
+    legs: list[StrategyLegSchema] = Field(..., min_length=1, max_length=10)
+
+
+class StrategyLegResultSchema(BaseModel):
+    """Priced single leg (per-contract, unsigned)."""
+
+    leg_index: int
+    option_type: str
+    strike: float | None
+    expiry_date: str
+    quantity: float
+    ttm: float
+    price: float
+    delta: float
+    gamma: float
+    vega: float
+    theta: float
+    rho: float
+
+
+class StrategyResponse(BaseModel):
+    """Response schema for multi-leg strategy pricing."""
+
+    net_premium: float
+    net_delta: float
+    net_gamma: float
+    net_vega: float
+    net_theta: float
+    net_rho: float
+    payoff_spots: list[float]
+    payoff_values: list[float]
+    breakevens: list[float]
+    max_profit: float | None
+    max_loss: float | None
+    is_credit: bool
+    legs: list[StrategyLegResultSchema]
+
+
+# ---------------------------------------------------------------------------
 # Options Chain schemas
 # ---------------------------------------------------------------------------
 

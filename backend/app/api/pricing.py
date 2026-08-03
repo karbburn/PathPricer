@@ -25,7 +25,7 @@ from ..core.config import (
     PREVIEW_MAX_N,
 )
 from ..core.rng import make_rng
-from ..engine import black_scholes, implied_vol, monte_carlo, pnl_explain, risk_grid
+from ..engine import black_scholes, implied_vol, monte_carlo, pnl_explain, risk_grid, strategy
 from ..engine.greeks import finite_difference_greeks
 from ..schemas.pricing import (
     BSFullResult,
@@ -47,6 +47,9 @@ from ..schemas.pricing import (
     PricingRequestSchema,
     RiskGridRequest,
     RiskGridResponse,
+    StrategyLegResultSchema,
+    StrategyRequest,
+    StrategyResponse,
 )
 
 router = APIRouter(prefix="/price", tags=["pricing"])
@@ -534,6 +537,83 @@ def compute_risk_grid_endpoint(req: RiskGridRequest) -> RiskGridResponse | JSONR
         metric=res.metric,
         axis_x=res.axis_x,
         axis_y=res.axis_y,
+    )
+
+
+@router.post(
+    "/strategy",
+    response_model=StrategyResponse,
+    responses={400: {"model": ErrorResponse}},
+)
+def price_strategy_endpoint(req: StrategyRequest) -> StrategyResponse | JSONResponse:
+    """Price a multi-leg option strategy: per-leg prices, net Greeks, payoff curve, breakevens."""
+    from datetime import date as _date
+
+    for leg in req.legs:
+        if leg.expiry_date <= _date.today():
+            return JSONResponse(
+                status_code=400,
+                content=ErrorResponse(
+                    error="invalid_expiry",
+                    message="Expiry date must be in the future.",
+                    field="expiry_date",
+                ).model_dump(),
+            )
+        if leg.option_type in ("call", "put") and leg.strike is None:
+            return JSONResponse(
+                status_code=400,
+                content=ErrorResponse(
+                    error="invalid_strike",
+                    message="Call/put legs require a strike.",
+                    field="strike",
+                ).model_dump(),
+            )
+
+    legs = [
+        strategy.StrategyLeg(
+            option_type=leg.option_type,
+            strike=leg.strike,
+            expiry_date=leg.expiry_date.isoformat(),
+            quantity=leg.quantity,
+            volatility=leg.volatility,
+            risk_free_rate=leg.risk_free_rate,
+            dividend_yield=leg.dividend_yield,
+        )
+        for leg in req.legs
+    ]
+
+    res = strategy.price_strategy(legs=legs, spot=req.spot)
+
+    return StrategyResponse(
+        net_premium=res.net_premium,
+        net_delta=res.net_delta,
+        net_gamma=res.net_gamma,
+        net_vega=res.net_vega,
+        net_theta=res.net_theta,
+        net_rho=res.net_rho,
+        payoff_spots=res.payoff_spots,
+        payoff_values=res.payoff_values,
+        breakevens=res.breakevens,
+        max_profit=res.max_profit,
+        max_loss=res.max_loss,
+        is_credit=res.is_credit,
+        legs=[
+            StrategyLegResultSchema(
+                leg_index=l.leg_index,
+                option_type=l.option_type,
+                strike=l.strike,
+                expiry_date=l.expiry_date,
+                quantity=l.quantity,
+                ttm=l.ttm,
+                price=l.price,
+                delta=l.delta,
+                gamma=l.gamma,
+                vega=l.vega,
+                theta=l.theta,
+                rho=l.rho,
+            )
+            for l in res.legs
+        ],
     )
 
 

@@ -27,6 +27,8 @@ import {
   ImpliedParityRequest,
   ImpliedRateResponse,
   ImpliedDividendResponse,
+  StrategyRequest,
+  StrategyResponse,
 } from "./types";
 
 const BASE_URL =
@@ -251,6 +253,13 @@ export async function postImpliedDividend(
   signal?: AbortSignal
 ): Promise<ImpliedDividendResponse> {
   return postJson<ImpliedDividendResponse>(`${BASE_URL}/market/implied-dividend`, request, signal);
+}
+
+export async function postStrategy(
+  request: StrategyRequest,
+  signal?: AbortSignal
+): Promise<StrategyResponse> {
+  return postJson<StrategyResponse>(`${BASE_URL}/price/strategy`, request, signal);
 }
 
 

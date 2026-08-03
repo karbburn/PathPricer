@@ -452,3 +452,51 @@ export interface ModelValidationResponse {
   warnings: string[];
 }
 
+export type StrategyOptionType = "call" | "put" | "stock";
+
+export interface StrategyLeg {
+  option_type: StrategyOptionType;
+  strike?: number | null;
+  expiry_date: string;
+  quantity: number;
+  volatility: number;
+  risk_free_rate: number;
+  dividend_yield: number;
+}
+
+export interface StrategyLegResult {
+  leg_index: number;
+  option_type: string;
+  strike: number | null;
+  expiry_date: string;
+  quantity: number;
+  ttm: number;
+  price: number;
+  delta: number;
+  gamma: number;
+  vega: number;
+  theta: number;
+  rho: number;
+}
+
+export interface StrategyRequest {
+  spot: number;
+  legs: StrategyLeg[];
+}
+
+export interface StrategyResponse {
+  net_premium: number;
+  net_delta: number;
+  net_gamma: number;
+  net_vega: number;
+  net_theta: number;
+  net_rho: number;
+  payoff_spots: number[];
+  payoff_values: number[];
+  breakevens: number[];
+  max_profit: number | null;
+  max_loss: number | null;
+  is_credit: boolean;
+  legs: StrategyLegResult[];
+}
+

@@ -45,6 +45,7 @@ export function Header() {
         <nav className="hidden sm:flex items-center gap-1 text-xs font-medium">
           {navLink("/", "Markets")}
           {navLink("/workspace", "Workspace")}
+          {navLink("/workspace/strategy", "Strategies")}
           {navLink("/validation", "Validate")}
           {navLink("/docs", "Docs")}
           <div className="ml-2 flex items-center gap-1.5">
@@ -90,6 +91,9 @@ export function Header() {
           </Link>
           <Link href="/workspace" onClick={() => setMobileOpen(false)} className="block px-3 py-3 min-h-[44px] flex items-center text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
             Workspace
+          </Link>
+          <Link href="/workspace/strategy" onClick={() => setMobileOpen(false)} className="block px-3 py-3 min-h-[44px] flex items-center text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
+            Strategies
           </Link>
           <Link href="/validation" onClick={() => setMobileOpen(false)} className="block px-3 py-3 min-h-[44px] flex items-center text-sm rounded text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]">
             Validate
