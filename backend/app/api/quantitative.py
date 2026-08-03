@@ -492,6 +492,8 @@ def quant_greeks_surface(
         resp, warnings = _build_vol_surface(market_data, req)
     except MarketDataError as err:
         return _error_response(err)
+    except ValueError as exc:
+        return _error_response_value(exc)
     if resp is None:
         return _error_response(
             MarketDataError(
@@ -545,6 +547,8 @@ def quant_vol_surface(
         return resp
     except MarketDataError as err:
         return _error_response(err)
+    except ValueError as exc:
+        return _error_response_value(exc)
 
 
 @router.post(
@@ -567,6 +571,8 @@ def quant_vol_term_structure(
         resp, warnings = _build_vol_surface(market_data, req)
     except MarketDataError as err:
         return _error_response(err)
+    except ValueError as exc:
+        return _error_response_value(exc)
     if resp is None:
         return _error_response(
             MarketDataError(
