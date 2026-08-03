@@ -166,7 +166,6 @@ def compute_implied_rate(
         )
 
     strike, call_mid, put_mid, ttm = pair
-    warnings: list[str] = []
     try:
         implied_rate = extract_implied_rate(call_mid, put_mid, spot, strike, ttm, q)
     except ValueError as err:
@@ -180,6 +179,13 @@ def compute_implied_rate(
         )
 
     reference_rate = req.risk_free_rate
+    warnings: list[str] = []
+    divergence = implied_rate - reference_rate
+    if abs(divergence) > 0.05:
+        warnings.append(
+            f"Implied rate diverges from reference by {divergence*100:+.1f} bps; "
+            "parity may be unreliable for deep ITM or stale quotes."
+        )
     return ImpliedRateResponse(
         ticker=req.ticker.upper(),
         market=req.market.upper(),
@@ -191,7 +197,7 @@ def compute_implied_rate(
         put_price=put_mid,
         implied_rate=implied_rate,
         reference_rate=reference_rate,
-        divergence=implied_rate - reference_rate,
+        divergence=divergence,
         warnings=warnings,
     )
 
@@ -266,6 +272,13 @@ def compute_implied_dividend(
         )
 
     market_div = quote.dividend_yield if quote.dividend_yield and quote.dividend_yield > 0 else None
+    divergence = (implied_dividend - market_div) if market_div is not None else None
+    warnings: list[str] = []
+    if divergence is not None and abs(divergence) > 0.02:
+        warnings.append(
+            f"Implied dividend diverges from market quote by {divergence*100:+.1f} pp; "
+            "parity may be unreliable for deep ITM or stale quotes."
+        )
     return ImpliedDividendResponse(
         ticker=req.ticker.upper(),
         market=req.market.upper(),
@@ -277,8 +290,8 @@ def compute_implied_dividend(
         put_price=put_mid,
         implied_dividend=implied_dividend,
         market_dividend=market_div,
-        divergence=(implied_dividend - market_div) if market_div is not None else None,
-        warnings=[],
+        divergence=divergence,
+        warnings=warnings,
     )
 
 
