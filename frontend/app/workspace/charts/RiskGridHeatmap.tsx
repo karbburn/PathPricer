@@ -134,6 +134,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
 
   // Color interpolator (Slate -> Indigo -> Teal -> Amber -> Rose/Emerald)
   const getCellColor = (val: number) => {
+    if (!Number.isFinite(val)) return "#3b4252"; // invalid cell -> neutral grey
     const norm = Math.max(0, Math.min(1, (val - minVal) / (maxVal - minVal)));
     // Interpolate between dark slate (0%) and vibrant teal/amber (100%)
     const hue = (1 - norm) * 240; // 240 (blue) down to 0 (red) or 160 (emerald) to 40 (amber)

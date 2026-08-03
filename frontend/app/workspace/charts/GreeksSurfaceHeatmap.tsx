@@ -86,6 +86,7 @@ export function GreeksSurfaceHeatmap({ request }: GreeksSurfaceHeatmapProps) {
   }, [data]);
 
   const getCellColor = (val: number) => {
+    if (!Number.isFinite(val)) return "#3b4252"; // invalid cell -> neutral grey
     const norm = Math.max(0, Math.min(1, (val - minVal) / (maxVal - minVal)));
     const hue = (1 - norm) * 240;
     const lightness = 25 + norm * 35;
