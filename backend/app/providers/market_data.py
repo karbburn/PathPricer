@@ -237,22 +237,23 @@ class MarketDataService:
             return quote
 
     def get_options_chain(self, ticker: str, market: str, expiry: str | None = None) -> dict:
-        """Fetch options chain for a ticker. US equities only.
+        """Fetch options chain for a ticker (US and Indian equities).
 
         Args:
             ticker: Stock ticker string.
-            market: Must be 'US'.
+            market: Market region ('US' or 'IN').
             expiry: Optional expiry date string (YYYY-MM-DD). If None, returns available expiries.
 
         Returns:
             dict with 'expiries' list and 'chain' (calls/puts DataFrames as dicts).
 
         Raises:
-            MarketDataError: If market is not US or ticker has no options.
+            MarketDataError: If ticker has no options or market is unsupported.
         """
-        if market.strip().upper() != "US":
+        clean_market = market.strip().upper()
+        if clean_market not in ("US", "IN"):
             raise MarketDataError(
-                message="Options chains are only available for US-listed equities.",
+                message=f"Options chains are not available for market '{clean_market}'.",
                 ticker=ticker,
                 fallback_available=False,
             )

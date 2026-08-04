@@ -1,7 +1,7 @@
 """Market data API endpoints.
 
 GET /market/quote    — fetches market data + historical volatility for a ticker.
-GET /market/options  — fetches options chain (US equities only).
+GET /market/options  — fetches options chain (US and Indian equities).
 GET /market/history  — fetches historical OHLCV data.
 """
 
@@ -302,11 +302,11 @@ def compute_implied_dividend(
 )
 def get_options_chain(
     ticker: str = Query(..., description="Stock ticker symbol"),
-    market: str = Query("US", description="Market region (US only)"),
+    market: str = Query("US", description="Market region (US, IN)"),
     expiry: str | None = Query(None, description="Expiry date (YYYY-MM-DD). Defaults to nearest."),
     market_data: MarketDataService = Depends(get_market_data_service),
 ) -> OptionsChainResponse | ErrorResponse:
-    """Fetch options chain for a US-listed equity."""
+    """Fetch options chain for a US or Indian-listed equity."""
     from fastapi.responses import JSONResponse
 
     try:
