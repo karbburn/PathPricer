@@ -181,9 +181,9 @@ def compute_implied_rate(
     reference_rate = req.risk_free_rate
     warnings: list[str] = []
     divergence = implied_rate - reference_rate
-    if abs(divergence) > 0.05:
+    if abs(divergence) > 0.01:
         warnings.append(
-            f"Implied rate diverges from reference by {divergence*100:+.1f} bps; "
+            f"Implied rate diverges from reference by {divergence*10000:+.0f} bps; "
             "parity may be unreliable for deep ITM or stale quotes."
         )
     return ImpliedRateResponse(
@@ -274,7 +274,7 @@ def compute_implied_dividend(
     market_div = quote.dividend_yield if quote.dividend_yield and quote.dividend_yield > 0 else None
     divergence = (implied_dividend - market_div) if market_div is not None else None
     warnings: list[str] = []
-    if divergence is not None and abs(divergence) > 0.02:
+    if divergence is not None and abs(divergence) > 0.01:
         warnings.append(
             f"Implied dividend diverges from market quote by {divergence*100:+.1f} pp; "
             "parity may be unreliable for deep ITM or stale quotes."
