@@ -271,8 +271,8 @@ export function InputPanel({
           Underlying Asset
         </label>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-2 flex gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <div className="sm:col-span-3 flex gap-2">
             <TickerInput
               value={inputs.ticker}
               onChange={(val) => updateField("ticker", val)}
@@ -300,7 +300,7 @@ export function InputPanel({
                     : "text-[#8b949e] hover:text-white"
                 }`}
               >
-                {m === "US" ? "US" : m === "IN" ? "IN (.NS)" : m === "FX" ? "FX" : "CRYPTO"}
+                {m}
               </button>
             ))}
           </div>

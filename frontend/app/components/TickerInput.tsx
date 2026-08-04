@@ -123,12 +123,12 @@ export function TickerInput({
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder || MARKET_PLACEHOLDERS[market]}
-        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none focus:border-[#58a6ff] transition-colors ${market === "IN" ? "pr-20" : ""} ${inputClassName}`}
+        className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none focus:border-[#58a6ff] transition-colors ${inputClassName}`}
       />
 
       {market === "IN" && (
-        <span className="absolute right-3 top-2.5 text-xs text-[#8b949e] font-mono pointer-events-none">
-          Auto-appends .NS
+        <span className="absolute -bottom-4 right-1 text-[10px] text-[#8b949e] font-mono pointer-events-none">
+          .NS auto-appended
         </span>
       )}
 
