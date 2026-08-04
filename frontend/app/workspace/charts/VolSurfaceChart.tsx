@@ -136,7 +136,12 @@ const [maxExpiries, setMaxExpiries] = useState(3);
                       formatter={(val: unknown, name: unknown) => [formatPercent(Number(val)), name === "market_iv" ? "Market IV" : "Fitted IV"]}
                     />
                     <Legend wrapperStyle={{ fontSize: 10, fontFamily: "monospace" }} />
-                    <Scatter name="Market IV" dataKey="market_iv" fill="#58a6ff" isAnimationActive={false} />
+                    <Scatter
+                      name="Market IV"
+                      data={chartData.map((p) => ({ x: p.strike, y: p.market_iv }))}
+                      fill="#58a6ff"
+                      isAnimationActive={false}
+                    />
                     <Line name="Fitted IV" dataKey="fitted_iv" stroke="#3fb950" dot={false} strokeWidth={2} isAnimationActive={false} />
                   </ComposedChart>
                 </ResponsiveContainer>
