@@ -57,6 +57,8 @@ _MAX_RELATIVE_SPREAD = 0.5
 # Chain-fetch cache TTL: chains are large and change slowly; reuse the last
 # fetch for a short window so calibration + validation share consistent data.
 _CHAIN_CACHE_TTL = 30.0
+# ponytail: cap so a flood of tickers can't grow the cache without bound.
+_CHAIN_CACHE_MAX = 64
 _chain_cache: dict[tuple, tuple[float, dict]] = {}
 
 
@@ -120,6 +122,9 @@ def _fetch_chain(
     except Exception:
         return None
     _chain_cache[key] = (now, chain)
+    if len(_chain_cache) > _CHAIN_CACHE_MAX:
+        stale = min(_chain_cache, key=lambda k: _chain_cache[k][0])
+        _chain_cache.pop(stale, None)
     return chain
 
 
