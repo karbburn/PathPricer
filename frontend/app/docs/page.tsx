@@ -712,7 +712,7 @@ export default function DocsPage() {
           <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
             <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Breakevens</div>
             <p className="text-xs text-[#8b949e] leading-relaxed">
-              The spot levels where net P&L = 0, found by linear interpolation across the payoff grid's zero crossings.
+              The spot levels where net P&L = 0, found by linear interpolation across the net P&L's zero crossings (where payoff = net premium).
             </p>
           </div>
           <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">

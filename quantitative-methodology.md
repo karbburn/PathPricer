@@ -598,7 +598,7 @@ The net premium is the quantity-weighted sum of leg values — a positive net pr
 
 At expiration the payoff is piecewise-linear in spot, with kinks at every strike. PathPricer evaluates it over a spot grid spanning all strikes (padded to catch every breakeven) and reports net P&L at each point: $\text{P\&L}(S_T) = \text{payoff}(S_T) - \text{net premium}$.
 
-**Breakevens** are the spot levels where this net P&L is zero, found by linear interpolation between adjacent grid points where the payoff crosses zero.
+**Breakevens** are the spot levels where this net P&L is zero, found by linear interpolation between adjacent grid points where the net P&L crosses zero (i.e. where payoff = net premium).
 
 ### 21.3 Max Profit / Max Loss From the Piecewise-Linear Structure
 
@@ -623,15 +623,15 @@ Stress testing answers "what happens to my position if the market moves in a spe
 
 A scenario is a coordinate shift applied to the base parameters:
 
-$$S' = \max(\epsilon, S_0 + \Delta S_{abs} + \Delta S_{pct}\cdot S_0), \qquad \sigma' = \max(\text{MIN\_SIGMA}, \sigma + \Delta\sigma), \qquad T' = \max(\text{MIN\_T}, T - \Delta T_{days}), \qquad r' = r + \Delta r$$
+$$S' = \max(10^{-6},\; S_0 + \Delta S_{abs} + \Delta S_{pct}\cdot S_0), \qquad \sigma' = \max(\text{MIN\_SIGMA},\; \sigma + \Delta\sigma), \qquad T' = \max(\text{MIN\_T},\; T - \Delta T_{days}/365), \qquad r' = r + \Delta r$$
 
-Named scenarios encode recognizable history — e.g. *2008 Crisis* ($-40\%$ spot, $+20$ vol pts, $+100$ bp rates), *COVID Crash*, *Vol Crush*, *Flash Crash* — while the underlying repricing is the same parameterized machinery for each. Floors keep the scenario physically valid (non-negative spot, positive vol/time).
+Named scenarios encode recognizable history — e.g. *2008 Crisis* ($-40\%$ spot, $+20$ vol pts, $+100$ bp rates), *COVID Crash*, *Vol Crush*, *Flash Crash* — while the underlying repricing is the same parameterized machinery for each. Floors keep the scenario physically valid (positive spot, positive vol/time).
 
 ### 22.2 Output and Interpretation
 
-For each scenario the engine reports the shifted spot/vol, the repriced option value, and both the absolute and percentage P&L versus base. It then selects the worst and best scenarios and computes an **unrealized-risk** metric — the largest single-scenario loss as a fraction of the base price (zero when even the worst scenario is a gain):
+For each scenario the engine reports the shifted spot and vol, the repriced option value, the absolute P&L ($\text{price}_{\text{new}} - \text{base price}$), and the percentage P&L ($\text{pnl} / \text{base price}$). It then selects the worst and best scenarios and computes an **unrealized-risk** metric — the largest single-scenario loss as a fraction of the base price (zero when even the worst scenario is a gain):
 
-$$\text{unrealized risk} = \max\left(0, \frac{-\text{worst P\&L}}{\text{base price}}\right)$$
+$$\text{unrealized risk} = \frac{\max(0,\; -\text{worst pnl})}{\text{base price}}$$
 
 Relative to P&L attribution (§9), which *decomposes* one observed move into Greek contributions, stress testing *imposes* many hypothetical moves and reads off the outcomes — the forward-looking complement to the backward-looking attribution.
 

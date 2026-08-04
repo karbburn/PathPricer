@@ -239,7 +239,7 @@ cd frontend && npm run build        # TypeScript + production build
 
 ## Why This Matters
 
-For a quant interviewing desk: P&L attribution and implied volatility solving are daily workflows, not academic exercises. The ability to combine analytical, simulation, and numerical methods (pricing, Greeks, root-finding) in one coherent application demonstrates the skills that differentiate a mathematics background from a trading-floor background.
+For a quant interviewing desk: P&L attribution and implied volatility solving are daily workflows, not academic exercises. This project implements those workflows end-to-end — analytical pricing, Monte Carlo simulation, root-finding, Greeks, calibration — in a single coherent application.
 
 For a general audience: Options are everywhere in finance — from employee stock grants to pension fund hedging. This application makes the pricing mechanics visible and interactive, showing how professional trading desks evaluate risk and value financial instruments.
 
