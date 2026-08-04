@@ -126,3 +126,27 @@ export function getEffectiveInputs(
     ...parsed,
   };
 }
+
+/**
+ * Validate a PricingRequest against the backend's constraints.
+ * Returns a human-readable error message, or null when valid.
+ */
+export function validatePricingRequest(inputs: PricingRequest): string | null {
+  if (!inputs.ticker.trim()) return "Enter a ticker symbol.";
+  if (!Number.isFinite(inputs.strike) || inputs.strike <= 0) return "Strike must be a positive number.";
+  if (inputs.spot_override !== null && inputs.spot_override !== undefined && !Number.isFinite(inputs.spot_override)) {
+    return "Spot price must be a number.";
+  }
+  if (inputs.spot_override !== null && inputs.spot_override !== undefined && inputs.spot_override <= 0) {
+    return "Spot price must be positive.";
+  }
+  if (!Number.isFinite(inputs.volatility) || inputs.volatility <= 0) return "Volatility must be positive.";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(inputs.expiry_date)) return "Expiry must be a valid YYYY-MM-DD date.";
+  if (!Number.isInteger(inputs.n_simulations) || inputs.n_simulations < 1) {
+    return "Simulation count must be a positive integer.";
+  }
+  if (inputs.seed !== null && inputs.seed !== undefined && (!Number.isInteger(inputs.seed) || inputs.seed < 0)) {
+    return "Random seed must be a non-negative integer.";
+  }
+  return null;
+}

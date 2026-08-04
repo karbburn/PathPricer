@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { postPricePreview, getMarketQuote, ApiError } from "@/lib/api-client";
 import { useDebounce } from "@/lib/hooks/useDebounce";
-import { serializeInputs } from "@/lib/url-state";
+import { serializeInputs, validatePricingRequest } from "@/lib/url-state";
 import { useDensity } from "@/lib/contexts/DensityContext";
 import {
   MarketRegion,
@@ -169,6 +169,14 @@ export function InputPanel({
       ...debouncedInputs,
       n_simulations: Math.min(debouncedInputs.n_simulations, 10000),
     };
+
+    // Client-side validation: don't round-trip invalid inputs to the backend.
+    const validationError = validatePricingRequest(previewPayload);
+    if (validationError) {
+      onMicroStateChange("error");
+      onPreviewError(new ApiError(400, { error: "invalid_input", message: validationError }));
+      return;
+    }
 
     postPricePreview(previewPayload, controller.signal)
       .then((data) => {

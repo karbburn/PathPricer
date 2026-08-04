@@ -11,7 +11,7 @@ import { ShortcutsHelp } from "@/app/components/ShortcutsHelp";
 import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
 import { useDensity } from "@/lib/contexts/DensityContext";
 import { postPriceFull, postImpliedVol, postPnLExplain, postStressTest, ApiError } from "@/lib/api-client";
-import { getEffectiveInputs, serializeInputs } from "@/lib/url-state";
+import { getEffectiveInputs, serializeInputs, validatePricingRequest } from "@/lib/url-state";
 import { computePriceBounds, yearsToExpiry } from "@/lib/formatters";
 import {
   ImpliedVolRequest,
@@ -128,6 +128,12 @@ function WorkspaceContent() {
 
   // Full Simulation Trigger Handler — Never automatic, requires user action
   const handleRunFullSimulation = async (targetInputs: PricingRequest) => {
+    const validationError = validatePricingRequest(targetInputs);
+    if (validationError) {
+      setError(new ApiError(400, { error: "invalid_input", message: validationError }));
+      return;
+    }
+
     setIsFullSimulating(true);
     setError(null);
 
