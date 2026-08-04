@@ -30,7 +30,7 @@ export interface PricingRequest {
 
 export interface MarketQuoteResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot_price: number;
   daily_return: number;
@@ -271,7 +271,7 @@ export interface GreeksSurfaceRequest {
 
 export interface GreeksSurfaceResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot: number;
   rate: number;
@@ -303,7 +303,7 @@ export interface OptionContract {
 
 export interface OptionsChainResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   underlying_price: number | null;
   expiries: string[];
@@ -327,7 +327,7 @@ export interface OhlcvBar {
 
 export interface HistoryResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   currency: string;
   interval: string;
   bars: OhlcvBar[];
@@ -348,7 +348,7 @@ export interface ImpliedParityRequest {
 
 export interface ImpliedRateResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot: number;
   strike: number;
@@ -363,7 +363,7 @@ export interface ImpliedRateResponse {
 
 export interface ImpliedDividendResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot: number;
   strike: number;
@@ -416,7 +416,7 @@ export interface SVISlice {
 
 export interface VolSurfaceResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot: number;
   rate: number;
@@ -433,7 +433,7 @@ export interface TermStructurePoint {
 
 export interface TermStructureResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot: number;
   rate: number;
@@ -461,7 +461,7 @@ export interface CalibrationContractView {
 
 export interface HestonCalibrationResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot: number;
   rate: number;
@@ -488,7 +488,7 @@ export interface ValidationContractView {
 
 export interface ModelValidationResponse {
   ticker: string;
-  market: string;
+  market: MarketRegion;
   resolved_symbol: string;
   spot: number;
   rate: number;

@@ -9,6 +9,8 @@
  * Format currency or price to clean fixed decimal representation without raw float noise.
  * Default precision is 2 decimals (e.g., 1275.90), or 4 decimals for option prices/Greeks.
  */
+import { MarketRegion } from "./types";
+
 export function formatPrice(val: number | null | undefined, decimals: number = 2): string {
   if (val === null || val === undefined || isNaN(val)) return "—";
   return val.toLocaleString("en-US", {
@@ -71,7 +73,7 @@ export function currencySymbolFor(code: string): string {
   return CURRENCY_SYMBOLS[code.toUpperCase()] ?? `${code} `;
 }
 
-export function marketCurrencySymbol(market: string, ticker: string): string {
+export function marketCurrencySymbol(market: MarketRegion, ticker: string): string {
   if (market === "FX") {
     const base = /^([A-Za-z]{6})/.exec(ticker)?.[1]?.toUpperCase();
     if (base) return currencySymbolFor(base.slice(3));

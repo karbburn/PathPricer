@@ -366,7 +366,7 @@ export default function MarketOverviewPage() {
 
             <ParityQualityCard
               ticker={quote.ticker}
-              market={quote.market as MarketRegion}
+              market={quote.market}
               spot={quote.spot_price}
               dividendYield={quote.dividend_yield}
             />
