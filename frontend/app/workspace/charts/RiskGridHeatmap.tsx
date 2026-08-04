@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   PricingRequest,
   RiskGridAxis,
@@ -62,6 +62,21 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
     i: number;
     j: number;
   } | null>(null);
+
+  // Re-derive axis ranges when the underlying request parameters change.
+  useEffect(() => {
+    if (preset === "spot_vol") {
+      setXMin(Math.round(spotBase * 0.8));
+      setXMax(Math.round(spotBase * 1.2));
+      setYMin(Math.max(0.02, Math.round((volBase * 0.5) * 100) / 100));
+      setYMax(Math.round((volBase * 1.5) * 100) / 100);
+    } else if (preset === "strike_expiry") {
+      setXMin(Math.round(strikeBase * 0.8));
+      setXMax(Math.round(strikeBase * 1.2));
+      setYMin(0.1);
+      setYMax(2.0);
+    }
+  }, [preset, spotBase, strikeBase, volBase]);
 
   // Update presets
   const handlePresetChange = (newPreset: PresetMode) => {

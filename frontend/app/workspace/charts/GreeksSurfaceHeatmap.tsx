@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   GreeksMetric,
   GreeksSurfaceRequest,
@@ -39,6 +39,12 @@ export function GreeksSurfaceHeatmap({ request }: GreeksSurfaceHeatmapProps) {
     i: number;
     j: number;
   } | null>(null);
+
+  // Clear stale surface data when the underlying request parameters change.
+  useEffect(() => {
+    setData(null);
+    setError(null);
+  }, [request.ticker, request.market, request.spot_override, request.risk_free_rate, request.dividend_yield]);
 
   const fetchGrid = useCallback(async () => {
     setIsLoading(true);
