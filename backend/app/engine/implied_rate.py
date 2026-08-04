@@ -58,4 +58,12 @@ def extract_implied_rate(
             "Put-call parity implies a non-positive discounted strike; "
             "quotes are inconsistent (C - P >= S e^{-qT})."
         )
-    return -math.log(discounted_strike / strike) / ttm
+    rate = -math.log(discounted_strike / strike) / ttm
+
+    # Self-check: the extracted rate must reproduce the observed spread.
+    recomputed_spread = discounted_spot - strike * math.exp(-rate * ttm)
+    if not math.isclose(recomputed_spread, call_price - put_price, rel_tol=1e-9, abs_tol=1e-9):
+        raise ValueError(
+            "Self-check failed: extracted rate does not reproduce the call-put spread."
+        )
+    return rate

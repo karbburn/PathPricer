@@ -58,4 +58,12 @@ def extract_implied_dividend(
             "Put-call parity implies a non-positive discounted spot; "
             "quotes are inconsistent (P - C >= K e^{-rT})."
         )
-    return -math.log(discounted_spot / spot) / ttm
+    dividend = -math.log(discounted_spot / spot) / ttm
+
+    # Self-check: the extracted dividend must reproduce the observed spread.
+    recomputed_spread = spot * math.exp(-dividend * ttm) - discounted_strike
+    if not math.isclose(recomputed_spread, call_price - put_price, rel_tol=1e-9, abs_tol=1e-9):
+        raise ValueError(
+            "Self-check failed: extracted dividend does not reproduce the call-put spread."
+        )
+    return dividend
