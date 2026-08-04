@@ -20,6 +20,9 @@ const toc = [
   { id: "validation", label: "14. Model Validation" },
   { id: "assumptions", label: "15. Assumptions" },
   { id: "design", label: "16. Design FAQ" },
+  { id: "strategy", label: "17. Strategy Engine" },
+  { id: "stress", label: "18. Stress Testing" },
+  { id: "parity", label: "19. Parity Probes" },
 ];
 
 function SectionCard({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) {
@@ -549,6 +552,16 @@ export default function DocsPage() {
         <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
           A surface is a set of slices with total variance interpolated <strong>linearly in <InlineMath math="T" /> at fixed log-moneyness</strong> (sticky-strike). A <strong>calendar-arbitrage check</strong> rejects any surface where total variance decreases with time to maturity at a fixed moneyness — such a surface would admit a riskless calendar-spread arbitrage.
         </p>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          A second guard checks <strong>butterfly (strike) arbitrage</strong>: call prices must be convex in strike, equivalently the implied risk-neutral density must be non-negative. On a discrete strike grid this is{" "}
+          <InlineMath math="C(K-d) - 2C(K) + C(K+d) \geq 0" />. Each fitted slice reports an <InlineMath math="\text{arb\_free}" /> flag plus the strike of the worst violation, so the chart can badge exactly where a surface breaks.
+        </p>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          The same fit yields the <strong>ATM volatility term structure</strong> — the at-the-money implied vol at every expiry{" "}
+          <InlineMath math="\sigma_{ATM}(T) = \sqrt{w(0)/T}" /> — and a <strong>Greeks surface</strong>: any Greek priced across strikes × expiries where each cell uses the SVI implied vol for its own strike, so the surface reflects the smile rather than a flat vol.
+        </p>
       </SectionCard>
 
       {/* ════════════════════════════════════════════════════════════ 13. Calibration */}
@@ -666,6 +679,9 @@ export default function DocsPage() {
                 ["Why Volga w.r.t. √v₀, not v₀?", "Traders quote volatility; chain rule 4v₀·V″ + 2·V′ converts variance bumps"],
                 ["Why blend relative + absolute RMSE in calibration?", "Pure relative over-penalizes deep-OTM; the blend keeps ATM dominant while the smile stays shaped"],
                 ["Why reject calendar arbitrage at build?", "Total variance decreasing in T admits a riskless spread; rejecting keeps surfaces economically sane"],
+                ["Why not verify an implied rate by recomputing parity?", "It is a tautology — the parameter is defined as the parity-solver; it reproduces the spread by construction and never fails"],
+                ["Why analytic max profit/loss for strategies?", "Expiration payoff is piecewise-linear; extrema are exact at kinks/tails, and unbounded (∞) is reported correctly"],
+                ["Why are parity probes ATM-only?", "ATM quotes are the most liquid and least corrupted by deep-OTM noise — the cleanest rate/dividend signal"],
               ].map(([q, a]) => (
                 <tr key={q}>
                   <td className="p-2.5 font-bold text-white">{q}</td>
@@ -675,6 +691,84 @@ export default function DocsPage() {
             </tbody>
           </table>
         </div>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 17. Strategy */}
+      <SectionCard id="strategy" title="17. Multi-Leg Strategy Engine">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          A strategy is a portfolio of 1–10 <strong>signed</strong> legs — a long has positive quantity, a short negative. Each option leg is priced by closed-form Black-Scholes; stock legs are valued at the forward-carried price{" "}
+          <InlineMath math="Se^{-qT}" /> with <InlineMath math="\Delta = 1" />.
+        </p>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Portfolio Greeks are quantity-weighted sums of the per-leg Greeks. The <strong>net premium</strong> is the signed sum of leg values: positive = debit (we pay to enter), negative = credit (we were paid).
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="\Delta_{net} = \sum_i q_i \Delta_i, \quad \text{P\&L}(S_T) = \underbrace{\text{payoff}(S_T)}_{\text{piecewise-linear in spot}} - \text{net premium}" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Breakevens</div>
+            <p className="text-xs text-[#8b949e] leading-relaxed">
+              The spot levels where net P&L = 0, found by linear interpolation across the payoff grid's zero crossings.
+            </p>
+          </div>
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Max Profit / Loss</div>
+            <p className="text-xs text-[#8b949e] leading-relaxed">
+              Exact: the payoff is piecewise-linear, so extrema live at strike kinks and the tails. Unbounded (∞) is reported when the high-tail slope is nonzero — a finite grid scan would misstate this.
+            </p>
+          </div>
+        </div>
+
+        <Callout title="Presets" accent="green">
+          Ten presets cover the classic structures — long/short straddles, strangles, bull/bear spreads, iron condor, iron butterfly, call butterfly, covered call, protective put — each with a distinct risk/reward shape visible on the payoff diagram.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 18. Stress */}
+      <SectionCard id="stress" title="18. Scenario Stress Testing">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Reprices an option under named market scenarios — <strong>2008 Crisis</strong> (−40% spot, +20 vol pts, +100 bp rates), <strong>COVID Crash</strong>, <strong>Vol Crush</strong>, <strong>Flash Crash</strong> — each defined as coordinate shifts in spot, vol, rate, and elapsed time:
+        </p>
+
+        <div className="bg-[#0d1117] px-4 py-3 rounded border border-[#21262d] mb-4 overflow-x-auto">
+          <BlockMath math="S' = \max(\epsilon, S_0 + \Delta S_{abs} + \Delta S_{pct}\cdot S_0), \quad \sigma' = \max(\text{MIN\_SIGMA}, \sigma + \Delta\sigma)" />
+        </div>
+
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Every scenario reports its repriced option value plus absolute and percentage P&L versus the base price. The engine selects the worst/best scenarios and computes an <strong>unrealized-risk</strong> metric — the largest single-scenario loss as a fraction of the base price.
+        </p>
+
+        <Callout title="Stress vs. P&L Explain" accent="blue">
+          P&L attribution (§9) decomposes one observed move into Greek contributions. Stress testing imposes many hypothetical moves and reads off the outcomes — the forward-looking complement to the backward-looking attribution.
+        </Callout>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 19. Parity */}
+      <SectionCard id="parity" title="19. Put-Call Parity Data-Quality Probes">
+        <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
+          Put-call parity is the no-arbitrage identity <InlineMath math="C - P = S_0 e^{-qT} - K e^{-rT}" />. The probes run it <strong>in reverse</strong>: given market prices, what rate or dividend is the market implicitly assuming? Consistent quotes land near consensus values; a large divergence flags stale mids, crossed markets, or mis-priced dividends.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Implied Rate</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="r = -\frac{1}{T}\ln\left(\frac{S_0 e^{-qT} - C + P}{K}\right)" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">Guarded: non-positive discounted strike ⇒ quotes inconsistent ⇒ parity_inconsistent error</div>
+          </div>
+          <div className="bg-[#0d1117] p-4 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Implied Dividend</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="q = -\frac{1}{T}\ln\left(\frac{K e^{-rT} + C - P}{S_0}\right)" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">Given a trusted rate, recovers the dividend the market is pricing in</div>
+          </div>
+        </div>
+
+        <Callout title="Why the extracted value is never re-verified against parity" accent="red">
+          Plugging the recovered <InlineMath math="r" /> or <InlineMath math="q" /> back into parity is a <strong>tautology</strong> — the parameter is defined as the value that makes the identity hold, so recomputation reproduces the spread by construction and can never fail. The real checks are the positivity guard and the divergence versus a reference rate/dividend. The probes are ATM-only because ATM quotes are the most liquid and least corrupted by deep-OTM noise.
+        </Callout>
       </SectionCard>
 
       {/* ── Footer ── */}

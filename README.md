@@ -62,6 +62,30 @@ $$\text{PnL} = \Delta \cdot \Delta S + \frac{1}{2}\Gamma (\Delta S)^2 + \mathcal
 
 The residual exists because the Taylor expansion is exact only for infinitesimal moves. For finite scenario shifts, it measures how much the Greeks-plus-Gamma approximation diverges from the actual repriced P&L.
 
+### Multi-Leg Strategy Builder
+
+Prices a portfolio of 1–10 option and stock legs under Black-Scholes and aggregates their Greeks into portfolio-level risk. A leg is a *signed* contract — positive quantity is long, negative is short — and stock legs use the forward-carried value $Se^{-qT}$ with $\Delta = 1$. The result includes:
+
+- **Per-leg pricing** — price and all five Greeks for every contract
+- **Net portfolio Greeks** — quantity-weighted sums (net Delta, Gamma, Vega, Theta, Rho)
+- **Expiration payoff diagram** — net P&L across a spot grid with linearly interpolated **breakeven points**
+- **Max profit / max loss** — computed exactly from the piecewise-linear payoff (kinks live at strikes; unbounded tails reported as $\infty$)
+
+Built-in presets cover the classic structure set — long/short straddles, strangles, bull/bear spreads, iron condor, iron butterfly, call butterfly, covered call, protective put.
+
+### Scenario Stress Test
+
+Reprices an option under a set of named market scenarios — 2008 Crisis (−40% spot, +20 vol pts, +100 bp rates), COVID Crash, Rate Hike, Vol Crush, Slow Drift, Flash Crash — each defined as coordinate shifts in spot, vol, rate, and elapsed time. Reports the P&L impact and percentage change of every scenario against the base price, plus the worst- and best-case scenarios and an **unrealized-risk** metric (largest single-scenario loss as a fraction of base price). This is the "what breaks if the market does X" view every desk runs before committing capital.
+
+### Put-Call Parity Data-Quality Probes
+
+Inverts the parity relation $C - P = S_0e^{-qT} - Ke^{-rT}$ to check whether live market quotes are internally consistent:
+
+- **Implied rate** — given the ATM call/put mid prices, spot, strike, and a dividend assumption, solve for the rate $r$ the market is pricing in
+- **Implied dividend** — given a trusted rate, solve for the dividend yield $q$ the market implies
+
+When quotes are consistent, these land near consensus values; a large divergence flags stale mids, crossed markets, or mis-priced dividends. The home page surfaces this as a **Parity Data Quality** card (works only for US equity chains), and the parity math is reused in the SVI/Heston validation paths.
+
 ### 2D Risk Grid
 
 Computes a $25 \times 25$ surface grid (625 points) across dual parameter axes (Spot $\times$ Vol, Strike $\times$ Expiry). Every cell is evaluated as a single broadcast array operation — **no nested Python loops** — by taking advantage of NumPy broadcasting:
@@ -86,7 +110,7 @@ Builds a **Gatheral raw SVI** implied-volatility surface from live option chains
 
 $$w(k) = a + b\left(\rho(k - m) + \sqrt{(k - m)^2 + \sigma^2}\right), \quad k = \ln(K/F)$$
 
-with each slice fit by nonlinear least squares (three restarts) and total variance interpolated linearly in $T$ at fixed log-moneyness. A calendar-arbitrage check rejects surfaces where total variance decreases with time to maturity.
+with each slice fit by nonlinear least squares (three restarts) and total variance interpolated linearly in $T$ at fixed log-moneyness. Two arbitrage checks guard the surface: a **calendar-arbitrage check** rejects surfaces where total variance decreases with time to maturity, and a **butterfly (strike) arbitrage check** verifies call prices are convex in strike (equivalently, the implied risk-neutral density is non-negative) on every fitted slice. An ATM volatility **term structure** is extracted from the same fit — the smile's ATM backbone across expiries.
 
 ### Heston Calibration
 
@@ -124,15 +148,18 @@ The frontend **never computes a price, Greek, or diagnostic** — it only reques
 ```
 PathPricer/
 ├── backend/              # FastAPI (Python 3.12, NumPy, SciPy)
-│   ├── engine/           # black_scholes, monte_carlo, greeks,
-│   │                     # implied_vol, pnl_explain, risk_grid, volatility,
-│   │                     # heston, heston_calibration, vol_surface, model_validation
-│   ├── api/              # REST routers
+│   ├── engine/           # black_scholes, monte_carlo, greeks, implied_vol,
+│   │                     # pnl_explain, risk_grid, strategy, stress_test,
+│   │                     # heston, heston_calibration, vol_surface,
+│   │                     # greeks_surface, butterfly_arb, model_validation,
+│   │                     # implied_rate, implied_dividend, volatility
+│   ├── api/              # REST routers (pricing, market, quant, report, validation)
 │   ├── core/             # Config, RNG factory, rate providers
 │   ├── schemas/          # Pydantic models (preview/full structurally distinct)
 │   └── report/           # ReportLab PDF generator
 ├── frontend/             # Next.js 16, React 19, TypeScript, Tailwind CSS
 │   ├── workspace/        # InputPanel, ResultsPanel, Charts (Recharts)
+│   ├── workspace/strategy/  # Multi-leg Strategy Builder + payoff chart
 │   └── components/       # Shared UI, MobileNav, Keyboard shortcuts
 └── tests/                # pytest cases + engine self-checks
 ```
@@ -171,13 +198,21 @@ Open [http://localhost:3000](http://localhost:3000). API documentation at [http:
 |---|---|---|
 | `/api/v1/price/preview` | `POST` | Fast preview ($N \leq 10$k, $<50$ms) — single BS + MC estimate |
 | `/api/v1/price/full` | `POST` | Full simulation — 5 estimators, Greeks, convergence, PDF-ready |
-| `/api/v1/price/implied-volatility` | `POST` | Solve $\sigma$ from market price (Newton-Raphson / Brent) |
+| `/api/v1/price/implied-vol` | `POST` | Solve $\sigma$ from market price (Newton-Raphson / Brent) |
 | `/api/v1/price/pnl-explain` | `POST` | Decompose P&L into Greek contributions |
 | `/api/v1/price/risk-grid` | `POST` | $25 \times 25$ surface across 2 parameter axes |
+| `/api/v1/price/strategy` | `POST` | Multi-leg strategy pricing, portfolio Greeks, payoff/breakevens |
+| `/api/v1/price/stress-test` | `POST` | Reprice under named market scenarios; worst-case loss |
 | `/api/v1/market/quote` | `GET` | Live market quote, historical vol, dividend yield |
+| `/api/v1/market/options` | `GET` | Options chain (US equities) |
+| `/api/v1/market/history` | `GET` | Historical OHLCV bars |
+| `/api/v1/market/implied-rate` | `POST` | Parity-probe: risk-free rate implied by ATM call/put pair |
+| `/api/v1/market/implied-dividend` | `POST` | Parity-probe: dividend yield implied by ATM call/put pair |
 | `/api/v1/report/pdf` | `POST` | Downloadable PDF research report |
 | `/api/v1/validation/summary` | `GET` | CI validation artifact |
 | `/api/v1/quant/vol-surface` | `POST` | Fit SVI implied-vol surface to market options chain |
+| `/api/v1/quant/vol-term-structure` | `POST` | ATM implied vol across expiries (from the SVI fit) |
+| `/api/v1/quant/greeks-surface` | `POST` | A chosen Greek across strikes × expiries on the SVI surface |
 | `/api/v1/quant/heston-calibrate` | `POST` | Calibrate Heston params to market option prices |
 | `/api/v1/quant/model-validate` | `POST` | Validate calibrated Heston model vs market chain |
 
@@ -187,9 +222,9 @@ Open [http://localhost:3000](http://localhost:3000). API documentation at [http:
 
 The test suite covers:
 - **pytest API smoke tests** across the pricing, quant (vol-surface, Heston calibration, model validation) and market endpoints
-- **Engine self-checks** (`python -m app.engine.test_*`): closed-form benchmark prices, finite-difference volga cross-check, parameter-recovery calibration, SVI parameter recovery, and good-fit/mis-specified model validation
+- **Engine self-checks** (`python -m app.engine.test_*`): closed-form benchmark prices, finite-difference volga cross-check, parameter-recovery calibration, SVI parameter recovery, butterfly-arb detection, put-call parity extraction, and good-fit/mis-specified model validation
 - **Edge case coverage**: zero/negative volatility, past expiry, invalid option types, large $N$, deep ITM/OTM, extreme Heston parameters
-- **Put-call parity**: residual verification as a structural consistency check
+- **Put-call parity**: residual verification as a structural consistency check, plus implied-rate/implied-dividend recovery from parity
 - **Convergence slope**: empirical $n^{-1/2}$ regression on Monte Carlo standard error
 - **CI coverage**: stub for statistical coverage verification
 - **Preview vs. full distinctness**: schema-level enforcement check

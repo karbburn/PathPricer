@@ -26,6 +26,9 @@ A comprehensive technical reference for every mathematical model, numerical meth
 18. [Historical Volatility Estimation](#18-historical-volatility-estimation)
 19. [Random Number Generation and Reproducibility](#19-random-number-generation-and-reproducibility)
 20. [Design Decisions FAQ](#20-design-decisions-faq)
+21. [Multi-Leg Strategy Pricing](#21-multi-leg-strategy-pricing)
+22. [Scenario Stress Testing](#22-scenario-stress-testing)
+23. [Put-Call Parity Data-Quality Probes](#23-put-call-parity-data-quality-probes)
 
 ---
 
@@ -405,6 +408,26 @@ Each expiry's $(k, \sigma_{imp})$ observations are fit by **nonlinear least squa
 
 A surface is a set of slices, one per expiry, with total variance interpolated **linearly in $T$ at fixed log-moneyness** (sticky-strike); the nearest slice is used flat beyond the fitted range. A calendar-spread arbitrage exists whenever total variance *decreases* in $T$ at a fixed $k$ — such a surface is rejected at build time by checking $w(k, T_i) \geq w(k, T_{i-1})$ on a 61-point $k$-grid across consecutive expiries.
 
+### 12.3 Butterfly (Strike) Arbitrage Check
+
+Two conditions must both hold for a surface to be free of static arbitrage: **calendar** (no decrease in total variance with $T$, §12.2) and **butterfly** (call prices convex in strike). A butterfly arbitrage exists wherever the implied risk-neutral density is negative. From Breeden-Litzenberger, the density is proportional to the second strike derivative of the call price:
+
+$$f(K) = e^{rT}\,\frac{\partial^2 C}{\partial K^2} \geq 0$$
+
+On a discrete grid this is checked as $C(K-d) - 2C(K) + C(K+d) \geq 0$ for equally spaced strikes. Because $f_j$ from the fitted SVI is available in closed form, each slice's $C(K)$ can be evaluated by Black-Scholes at per-grid-point implied vols. A slice fails if its minimum butterfly value is below a small negative tolerance. Every fitted slice reports an `arb_free` flag plus the strike of the worst violation, so the frontend can badge exactly where a surface breaks — this closes the "butterfly-arb not detected" limitation of earlier versions.
+
+### 12.4 ATM Volatility Term Structure
+
+The same fitted slices give the volatility term structure: the at-the-money ($k=0$) implied vol at each expiry,
+
+$$\sigma_{ATM}(T_j) = \sqrt{\frac{w_j(0)}{T_j}} = \sqrt{\frac{a_j + b_j\left(-\rho_j m_j + \sqrt{m_j^2 + \sigma_j^2}\right)}{T_j}}$$
+
+extracted across all fitted expiries. This is the smile's ATM backbone over time and the direct input to a vol-trading view of the term structure.
+
+### 12.5 Greeks Across the Surface
+
+A chosen Greek (or price) can be evaluated on a strike $\times$ time-to-maturity grid where **each cell prices at the SVI implied vol for its own strike/expiry** — so the surface reflects the smile/skew rather than a flat vol. Strikes span a band around spot (default $\pm 30\%$); expiries are the fitted slices. All strikes within one expiry are evaluated in a single vectorized Black-Scholes call, keeping the whole grid a handful of array operations rather than per-cell loops.
+
 ## 13. Heston Calibration
 
 Fits $(v_0, \kappa, \theta_v, \sigma_v, \rho)$ to observed market option prices.
@@ -553,3 +576,95 @@ A quick-reference summary of architectural and numerical choices made in this pr
 | Why blend relative and absolute RMSE in calibration? | Pure relative error over-penalizes deep-OTM quotes (tiny prices, huge percentages) and drags the fit into the wings; the blend keeps the ATM backbone dominant while relative error still shapes the smile. |
 | Why Feller as a soft penalty, not a hard constraint? | Hard-constraining Feller forces infeasible optimizer restarts; a soft penalty lets the fit trade feasibility against quality and reports the outcome — mirroring practitioner treatment of Feller as a preference. |
 | Why reject surfaces with calendar arbitrage at build time? | Total variance decreasing in $T$ at a fixed moneyness admits a riskless calendar-spread arbitrage, so the surface would be unusable for pricing. Rejecting it keeps every returned surface economically sane. |
+| Why not "verify" an implied rate/dividend by recomputing parity? | Recomputing parity from the recovered parameter is a tautology — it reproduces the spread by construction and can never fail. The meaningful checks are the positivity guard and the divergence vs. a reference. |
+| Why compute strategy max profit/loss analytically instead of scanning the payoff grid? | The expiration payoff is piecewise-linear, so extrema live exactly at strike kinks and the tails. Analytic extrema are exact and correctly report unbounded (∞) outcomes, which a finite grid scan would misstate. |
+| Why are the parity probes ATM-only? | ATM quotes are the most liquid and reliable, and least corrupted by deep-OTM noise — the cleanest signal for a rate/dividend estimate. |
+
+---
+
+## 21. Multi-Leg Strategy Pricing
+
+A strategy is a portfolio of 1–10 legs, each a signed contract: a vanilla European call/put (priced by Black-Scholes) or a stock position (valued at its forward-carried price $Se^{-qT}$). Positive quantity is long, negative is short.
+
+### 21.1 Per-Leg Pricing and Portfolio Greeks
+
+Each option leg is priced with the closed-form BSM engine and its five Greeks. The **per-leg** price and Greeks are reported unsigned (an option's delta is positive even when sold); it is the **portfolio-level** Greeks that weight by signed contract quantity:
+
+$$\Delta_{net} = \sum_i q_i \Delta_i, \qquad \Gamma_{net} = \sum_i q_i \Gamma_i, \qquad \text{etc.}$$
+
+The net premium is the quantity-weighted sum of leg values — a positive net premium is a debit (we pay to enter), a negative one is a credit (we are paid, i.e. sold premium).
+
+### 21.2 Expiration Payoff Diagram and Breakevens
+
+At expiration the payoff is piecewise-linear in spot, with kinks at every strike. PathPricer evaluates it over a spot grid spanning all strikes (padded to catch every breakeven) and reports net P&L at each point: $\text{P\&L}(S_T) = \text{payoff}(S_T) - \text{net premium}$.
+
+**Breakevens** are the spot levels where this net P&L is zero, found by linear interpolation between adjacent grid points where the payoff crosses zero.
+
+### 21.3 Max Profit / Max Loss From the Piecewise-Linear Structure
+
+Because the expiration payoff is piecewise-linear, its global extrema live at the strike kinks or in the tails — no grid search is needed:
+
+- **Low tail** $(S_T \to 0)$: always finite — puts cap at quantity-weighted strike.
+- **High tail** $(S_T \to \infty)$: finite only when the total call+stock slope is zero; otherwise unbounded profit (positive slope) or unbounded loss (negative slope).
+
+Max profit is unbounded when the high-tail slope is positive (e.g. a long call); max loss is unbounded when it is negative. Otherwise both are exact maxima/minima over the finite candidate set (strike kinks plus tail values). This exact handling avoids the common error of reporting a spurious finite max when a strategy is actually open-ended.
+
+### 21.4 Presets
+
+The frontend ships ten presets built from these primitives — long/short straddles, strangles, bull call / bear put spreads, iron condor, iron butterfly, call butterfly, covered call, and protective put — each demonstrating a different risk/reward shape students should be able to read off the payoff diagram.
+
+---
+
+## 22. Scenario Stress Testing
+
+Stress testing answers "what happens to my position if the market moves in a specific, named way?" The engine reprices a single option under each scenario using closed-form Black-Scholes and compares every result to the base price.
+
+### 22.1 Scenario Definition
+
+A scenario is a coordinate shift applied to the base parameters:
+
+$$S' = \max(\epsilon, S_0 + \Delta S_{abs} + \Delta S_{pct}\cdot S_0), \qquad \sigma' = \max(\text{MIN\_SIGMA}, \sigma + \Delta\sigma), \qquad T' = \max(\text{MIN\_T}, T - \Delta T_{days}), \qquad r' = r + \Delta r$$
+
+Named scenarios encode recognizable history — e.g. *2008 Crisis* ($-40\%$ spot, $+20$ vol pts, $+100$ bp rates), *COVID Crash*, *Vol Crush*, *Flash Crash* — while the underlying repricing is the same parameterized machinery for each. Floors keep the scenario physically valid (non-negative spot, positive vol/time).
+
+### 22.2 Output and Interpretation
+
+For each scenario the engine reports the shifted spot/vol, the repriced option value, and both the absolute and percentage P&L versus base. It then selects the worst and best scenarios and computes an **unrealized-risk** metric — the largest single-scenario loss as a fraction of the base price (zero when even the worst scenario is a gain):
+
+$$\text{unrealized risk} = \max\left(0, \frac{-\text{worst P\&L}}{\text{base price}}\right)$$
+
+Relative to P&L attribution (§9), which *decomposes* one observed move into Greek contributions, stress testing *imposes* many hypothetical moves and reads off the outcomes — the forward-looking complement to the backward-looking attribution.
+
+---
+
+## 23. Put-Call Parity Data-Quality Probes
+
+Put-call parity is a no-arbitrage identity linking a call and a put at the same strike:
+
+$$C - P = S_0e^{-qT} - Ke^{-rT}$$
+
+If we trust one side, the relation tells us the value of the other. The data-quality probes run this in reverse: **given market prices, what rate or dividend does the market appear to be assuming?** When the quotes are internally consistent, the extracted parameter lands near a consensus value; a large divergence is a red flag on the quotes (stale mids, crossed markets, mis-priced dividends).
+
+### 23.1 Implied Risk-Free Rate
+
+Given the call price, put price, spot, strike, dividend yield, and time-to-maturity, solve parity for the rate:
+
+$$r = -\frac{1}{T}\ln\left(\frac{S_0e^{-qT} - C + P}{K}\right) = -\frac{1}{T}\ln\left(\frac{\text{discounted spot} - C + P}{K}\right)$$
+
+**Validity guard:** the numerator, the discounted-strike proxy, must be strictly positive. A non-positive value means $C - P \geq S_0e^{-qT}$ — the quotes are inconsistent/inverted far beyond any plausible single rate — so the extraction raises a `parity_inconsistent` error rather than returning a meaningless number.
+
+### 23.2 Implied Dividend Yield
+
+The companion probe: given a trusted rate, solve for the dividend the parity relation implies:
+
+$$q = -\frac{1}{T}\ln\left(\frac{Ke^{-rT} + C - P}{S_0}\right)$$
+
+with the symmetric guard that the implied discounted spot must be positive.
+
+### 23.3 Why These Must NOT Be "Verified" by Recomputing Parity
+
+It is tempting to "validate" an extraction by plugging the recovered $r$ or $q$ back into parity to confirm it reproduces $C - P$. This is a **tautology**: $r$ is *defined* as the value that makes the identity hold, so recomputation reproduces the spread to machine precision by construction. It can never fail and verifies nothing. The real checks are (a) the positivity guard above, which genuinely catches inconsistent quotes, and (b) the comparison of the extracted value against a reference (consensus rate, reported dividend yield), reported as a **divergence** and a human-readable warning. Earlier versions shipped the tautological self-check; it was removed in review because it could not catch any real error.
+
+### 23.4 ATM Pair Selection
+
+The probes operate on a single call/put pair at the strike **nearest spot** (the ATM pair). Mids are used when a valid bid/ask exists, otherwise last price. This is deliberately an ATM-only probe: ATM quotes are the most liquid, most reliable, and least contaminated by the deep-wings noise that would corrupt a rate or dividend estimate.
