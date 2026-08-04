@@ -47,8 +47,9 @@ export function ParityQualityCard({ ticker, market, spot, dividendYield }: Parit
         if (!cancelled) setState({ rate, dividend, loading: false, unavailable: false });
       })
       .catch((err) => {
-        if (!cancelled && err instanceof ApiError)
-          setState({ rate: null, dividend: null, loading: false, unavailable: true });
+        if (cancelled) return;
+        if (!(err instanceof ApiError)) console.error("Parity quality check failed:", err);
+        setState({ rate: null, dividend: null, loading: false, unavailable: true });
       });
     return () => {
       cancelled = true;
