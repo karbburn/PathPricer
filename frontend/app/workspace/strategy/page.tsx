@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { postStrategy, ApiError } from "@/lib/api-client";
 import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
 import {
@@ -8,8 +9,9 @@ import {
   StrategyLegResult,
   StrategyResponse,
 } from "@/lib/types";
-import { StrategyPayoffChart } from "./StrategyPayoffChart";
 import { STRATEGY_PRESETS } from "./presets";
+
+const StrategyPayoffChart = dynamic(() => import("./StrategyPayoffChart").then(m => m.StrategyPayoffChart), { ssr: false });
 
 function defaultExpiry(): string {
   const d = new Date();

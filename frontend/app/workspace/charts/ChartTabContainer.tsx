@@ -1,20 +1,30 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { PathsChart } from "./PathsChart";
-import { TerminalDistributionChart } from "./TerminalDistributionChart";
-import { PayoffDiagram } from "./PayoffDiagram";
-import { ConvergenceChart } from "./ConvergenceChart";
-import { ComparisonChart } from "./ComparisonChart";
-import { RiskGridHeatmap } from "./RiskGridHeatmap";
-import { VolSurfaceChart } from "./VolSurfaceChart";
-import { GreeksSurfaceHeatmap } from "./GreeksSurfaceHeatmap";
-import { VolTermStructureChart } from "./VolTermStructureChart";
-import { HestonCalibrationChart } from "./HestonCalibrationChart";
-import { ModelValidationChart } from "./ModelValidationChart";
+import dynamic from "next/dynamic";
 import { exportChartSvgToPng } from "@/lib/export-helpers";
 import { PricingFullResponse, PricingRequest } from "@/lib/types";
 import { marketCurrencySymbol } from "@/lib/formatters";
+
+const PathsChart = dynamic(() => import("./PathsChart").then(m => m.PathsChart), { ssr: false });
+const RiskGridHeatmap = dynamic(() => import("./RiskGridHeatmap").then(m => m.RiskGridHeatmap), { ssr: false });
+const VolSurfaceChart = dynamic(() => import("./VolSurfaceChart").then(m => m.VolSurfaceChart), { ssr: false });
+const GreeksSurfaceHeatmap = dynamic(() => import("./GreeksSurfaceHeatmap").then(m => m.GreeksSurfaceHeatmap), { ssr: false });
+const VolTermStructureChart = dynamic(() => import("./VolTermStructureChart").then(m => m.VolTermStructureChart), { ssr: false });
+const HestonCalibrationChart = dynamic(() => import("./HestonCalibrationChart").then(m => m.HestonCalibrationChart), { ssr: false });
+const ModelValidationChart = dynamic(() => import("./ModelValidationChart").then(m => m.ModelValidationChart), { ssr: false });
+const TerminalDistributionChart = dynamic(() => import("./TerminalDistributionChart").then(m => m.TerminalDistributionChart), { ssr: false });
+const PayoffDiagram = dynamic(() => import("./PayoffDiagram").then(m => m.PayoffDiagram), { ssr: false });
+const ConvergenceChart = dynamic(() => import("./ConvergenceChart").then(m => m.ConvergenceChart), { ssr: false });
+const ComparisonChart = dynamic(() => import("./ComparisonChart").then(m => m.ComparisonChart), { ssr: false });
+
+function ChartLoader() {
+  return (
+    <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-8 text-center text-[#8b949e] font-mono text-sm">
+      Loading chart…
+    </div>
+  );
+}
 
 interface ChartTabContainerProps {
   request: PricingRequest;
