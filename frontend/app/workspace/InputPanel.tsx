@@ -271,8 +271,8 @@ export function InputPanel({
           Underlying Asset
         </label>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <div className="sm:col-span-3 flex gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+          <div className="lg:col-span-3 flex gap-2">
             <TickerInput
               value={inputs.ticker}
               onChange={(val) => updateField("ticker", val)}
@@ -284,7 +284,7 @@ export function InputPanel({
               disabled={fetchingMarket}
               className="bg-[#30363d] hover:bg-[#3a424b] text-white text-xs px-3 py-2.5 sm:py-2 min-h-[44px] sm:min-h-0 rounded font-semibold transition-colors disabled:opacity-50 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
             >
-              {fetchingMarket ? "Syncing..." : "Sync Market"}
+              {fetchingMarket ? "Syncing..." : "Sync"}
             </button>
           </div>
 
