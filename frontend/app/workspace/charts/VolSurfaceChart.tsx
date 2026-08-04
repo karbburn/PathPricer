@@ -133,7 +133,7 @@ const [maxExpiries, setMaxExpiries] = useState(3);
                     <Tooltip
                       contentStyle={{ backgroundColor: "#0d1117", borderColor: "#21262d", fontSize: "12px", fontFamily: "monospace", color: "#e2e8f0" }}
                       labelFormatter={(v) => `Strike ${Number(v).toFixed(2)}`}
-                      formatter={(val: unknown, name: unknown) => [formatPercent(Number(val)), name === "market_iv" ? "Market IV" : "Fitted IV"]}
+                      formatter={(val: unknown, name: unknown) => [formatPercent(Number(val)), String(name)]}
                     />
                     <Legend wrapperStyle={{ fontSize: 10, fontFamily: "monospace" }} />
                     <Scatter
