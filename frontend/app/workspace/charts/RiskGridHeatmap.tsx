@@ -77,6 +77,8 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
       setYMin(0.1);
       setYMax(2.0);
     }
+    setGridData(null);
+    setError(null);
   }, [preset, spotBase, strikeBase, volBase]);
 
   // Update presets
