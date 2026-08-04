@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { postStrategy, ApiError } from "@/lib/api-client";
+import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
 import {
   StrategyLeg,
   StrategyLegResult,
@@ -100,6 +101,12 @@ function WorkspaceStrategyContent() {
       setLoading(false);
     }
   };
+
+  useKeyboardShortcuts({
+    onRunSimulation: () => {
+      if (!loading) runStrategy();
+    },
+  });
 
   const legResultFor = (i: number): StrategyLegResult | undefined => result?.legs.find((l) => l.leg_index === i);
 
