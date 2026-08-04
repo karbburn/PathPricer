@@ -23,6 +23,34 @@ interface ChartTabContainerProps {
 
 type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid" | "vol_surface" | "greeks_surface" | "vol_term_structure" | "heston_calibration" | "model_validation";
 
+const TAB_LABELS: Record<ChartTab, { label: string; shortLabel?: string }> = {
+  paths: { label: "Asset Paths" },
+  risk_grid: { label: "Risk Grid Heatmap" },
+  vol_surface: { label: "Vol Surface" },
+  greeks_surface: { label: "Greeks Surface" },
+  vol_term_structure: { label: "Vol Term Structure" },
+  heston_calibration: { label: "Heston Calib" },
+  model_validation: { label: "Model Valid" },
+  distribution: { label: "Terminal Distribution", shortLabel: "Terminal Dist" },
+  payoff: { label: "Payoff Diagram" },
+  convergence: { label: "Empirical Convergence" },
+  comparison: { label: "MC vs BS" },
+};
+
+const TAB_ICONS: Record<ChartTab, React.ReactNode> = {
+  paths: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  risk_grid: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+  vol_surface: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12c2-4 5-6 8-6s6 2 8 6"/><path d="M3 17c2-3 5-4 8-4s6 1 8 4"/></svg>,
+  greeks_surface: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+  vol_term_structure: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="20" x2="21" y2="20"/><line x1="3" y1="20" x2="7" y2="10"/><line x1="7" y1="10" x2="12" y2="15"/><line x1="12" y1="15" x2="16" y2="6"/><line x1="16" y1="6" x2="21" y2="20"/></svg>,
+  heston_calibration: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><path d="M8 20h12"/></svg>,
+  model_validation: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>,
+  distribution: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="12" width="3" height="9"/><rect x="14" y="7" width="3" height="14"/></svg>,
+  payoff: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+  convergence: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+  comparison: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8 7 4 3 0 7"/><polyline points="16 17 20 21 24 17"/><circle cx="4" cy="3" r="1"/><circle cx="20" cy="21" r="1"/></svg>,
+};
+
 export function ChartTabContainer({ request, fullResult }: ChartTabContainerProps) {
   const [activeTab, setActiveTab] = useState<ChartTab>("paths");
   const chartRef = useRef<HTMLDivElement | null>(null);
@@ -37,151 +65,42 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
   return (
     <div className="space-y-4">
       {/* Tab Navigation Header with PNG Export Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#0d1117] p-1.5 rounded-lg border border-[#21262d]">
+      <div
+        role="tablist"
+        aria-label="Charts"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#0d1117] p-1.5 rounded-lg border border-[#21262d]"
+      >
         <div className="flex items-center gap-1.5 overflow-x-auto">
-          <button
-            type="button"
-            onClick={() => setActiveTab("paths")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "paths"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            Asset Paths
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("risk_grid")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "risk_grid"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Risk Grid Heatmap
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("vol_surface")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "vol_surface"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12c2-4 5-6 8-6s6 2 8 6"/><path d="M3 17c2-3 5-4 8-4s6 1 8 4"/></svg>
-            Vol Surface
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("greeks_surface")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "greeks_surface"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Greeks Surface
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("vol_term_structure")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "vol_term_structure"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="20" x2="21" y2="20"/><line x1="3" y1="20" x2="7" y2="10"/><line x1="7" y1="10" x2="12" y2="15"/><line x1="12" y1="15" x2="16" y2="6"/><line x1="16" y1="6" x2="21" y2="20"/></svg>
-            Vol Term Structure
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("heston_calibration")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "heston_calibration"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><path d="M8 20h12"/></svg>
-            Heston Calib
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("model_validation")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "model_validation"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            Model Valid
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("distribution")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "distribution"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="12" width="3" height="9"/><rect x="14" y="7" width="3" height="14"/></svg>
-            <span className="hidden sm:inline">Terminal Distribution</span>
-            <span className="sm:hidden">Terminal Dist</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("payoff")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "payoff"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-            Payoff Diagram
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("convergence")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "convergence"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            Empirical Convergence
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("comparison")}
-            className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
-              activeTab === "comparison"
-                ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
-                : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8 7 4 3 0 7"/><polyline points="16 17 20 21 24 17"/><circle cx="4" cy="3" r="1"/><circle cx="20" cy="21" r="1"/></svg>
-            MC vs BS
-          </button>
+          {(Object.keys(TAB_LABELS) as ChartTab[]).map((tab) => {
+            const active = activeTab === tab;
+            const { label, shortLabel } = TAB_LABELS[tab];
+            return (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                aria-controls={`chart-panel-${tab}`}
+                id={`chart-tab-${tab}`}
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-mono font-bold rounded transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
+                  active
+                    ? "bg-[#58a6ff]/20 text-[#58a6ff] shadow border border-[#58a6ff]/40"
+                    : "text-[#8b949e] hover:text-white hover:bg-[#161b22]"
+                }`}
+              >
+                {TAB_ICONS[tab]}
+                {shortLabel ? (
+                  <>
+                    <span className="hidden sm:inline">{label}</span>
+                    <span className="sm:hidden">{shortLabel}</span>
+                  </>
+                ) : (
+                  label
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Per-Chart PNG Export Button */}
@@ -196,7 +115,12 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
       </div>
 
       {/* Tab Panels */}
-      <div ref={chartRef}>
+      <div
+        ref={chartRef}
+        role="tabpanel"
+        id={`chart-panel-${activeTab}`}
+        aria-labelledby={`chart-tab-${activeTab}`}
+      >
         {activeTab === "paths" && <PathsChart request={request} currencySymbol={currencySymbol} />}
         {activeTab === "risk_grid" && <RiskGridHeatmap request={request} />}
         {activeTab === "vol_surface" && <VolSurfaceChart request={request} />}
