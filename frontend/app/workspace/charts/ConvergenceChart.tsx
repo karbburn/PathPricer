@@ -137,7 +137,7 @@ export function ConvergenceChart({ fullResult }: ConvergenceChartProps) {
         <button
           type="button"
           onClick={handleResetZoom}
-          className="text-xs font-mono text-[#58a6ff] hover:text-[#79c0ff] border border-[#21262d] rounded px-2 py-1 transition-colors"
+          className="text-xs font-mono text-[#58a6ff] hover:text-[#79c0ff] border border-[#21262d] rounded px-2 py-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
         >
           Reset zoom
         </button>

@@ -140,23 +140,23 @@ function WorkspaceStrategyContent() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelCls}>Spot</label>
-                <input className={inputCls} type="number" value={spot} onChange={(e) => setSpot(e.target.value)} />
+                <input className={inputCls} type="number" value={spot} onChange={(e) => setSpot(e.target.value)} aria-label="Spot price" />
               </div>
               <div>
                 <label className={labelCls}>Expiry</label>
-                <input className={inputCls} type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
+                <input className={inputCls} type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} aria-label="Expiry date" />
               </div>
               <div>
                 <label className={labelCls}>Volatility</label>
-                <input className={inputCls} type="number" step="0.01" value={volatility} onChange={(e) => setVolatility(e.target.value)} />
+                <input className={inputCls} type="number" step="0.01" value={volatility} onChange={(e) => setVolatility(e.target.value)} aria-label="Volatility" />
               </div>
               <div>
                 <label className={labelCls}>Rate (r)</label>
-                <input className={inputCls} type="number" step="0.001" value={riskFreeRate} onChange={(e) => setRiskFreeRate(e.target.value)} />
+                <input className={inputCls} type="number" step="0.001" value={riskFreeRate} onChange={(e) => setRiskFreeRate(e.target.value)} aria-label="Risk-free rate" />
               </div>
               <div>
                 <label className={labelCls}>Dividend (q)</label>
-                <input className={inputCls} type="number" step="0.001" value={dividendYield} onChange={(e) => setDividendYield(e.target.value)} />
+                <input className={inputCls} type="number" step="0.001" value={dividendYield} onChange={(e) => setDividendYield(e.target.value)} aria-label="Dividend yield" />
               </div>
             </div>
           </div>
@@ -176,6 +176,7 @@ function WorkspaceStrategyContent() {
                         className={inputCls}
                         value={l.option_type}
                         onChange={(e) => updateLeg(i, { option_type: e.target.value as EditableLeg["option_type"] })}
+                        aria-label="Leg option type"
                       >
                         <option value="call">Call</option>
                         <option value="put">Put</option>
@@ -183,7 +184,7 @@ function WorkspaceStrategyContent() {
                       </select>
                        <button
                          onClick={() => setLegs((prev) => prev.filter((_, idx) => idx !== i))}
-                         className="text-[#f85149] text-xs font-mono px-2 min-h-[44px] sm:min-h-0 flex items-center justify-center hover:bg-[#21262d] rounded"
+                         className="text-[#f85149] text-xs font-mono px-2 min-h-[44px] sm:min-h-0 flex items-center justify-center hover:bg-[#21262d] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                          aria-label="Remove leg"
                        >
                         ✕
@@ -198,6 +199,7 @@ function WorkspaceStrategyContent() {
                           disabled={l.option_type === "stock"}
                           value={l.strike}
                           onChange={(e) => updateLeg(i, { strike: e.target.value })}
+                          aria-label="Leg strike"
                         />
                       </div>
                       <div>
@@ -207,6 +209,7 @@ function WorkspaceStrategyContent() {
                           type="number"
                           value={l.quantity}
                           onChange={(e) => updateLeg(i, { quantity: e.target.value })}
+                          aria-label="Leg quantity"
                         />
                       </div>
                     </div>
@@ -222,13 +225,13 @@ function WorkspaceStrategyContent() {
             <div className="flex gap-2">
                <button
                  onClick={() => legs.length < 10 && setLegs((prev) => [...prev, blankLeg()])}
-                 className="flex-1 bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-2 min-h-[44px] sm:min-h-0 rounded border border-[#30363d] transition-colors"
+                 className="flex-1 bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-2 min-h-[44px] sm:min-h-0 rounded border border-[#30363d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                >
                 + Add leg
               </button>
                <button
                  onClick={() => setLegs([blankLeg()])}
-                 className="bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-2 min-h-[44px] sm:min-h-0 px-3 rounded border border-[#30363d] transition-colors"
+                 className="bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-2 min-h-[44px] sm:min-h-0 px-3 rounded border border-[#30363d] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                >
                 Reset
               </button>
@@ -242,7 +245,7 @@ function WorkspaceStrategyContent() {
                <button
                  key={p.name}
                  onClick={() => applyPreset(i)}
-                 className="text-left bg-[#0d1117] border border-[#21262d] hover:border-[#58a6ff] hover:bg-[#21262d]/40 rounded px-2.5 py-2 min-h-[44px] sm:min-h-0 transition-colors"
+                 className="text-left bg-[#0d1117] border border-[#21262d] hover:border-[#58a6ff] hover:bg-[#21262d]/40 rounded px-2.5 py-2 min-h-[44px] sm:min-h-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
                >
                   <span className="text-xs font-mono text-white block">{p.name}</span>
                   <span className="text-[10px] text-[#8b949e] font-mono leading-tight block mt-0.5">{p.description}</span>
@@ -254,7 +257,7 @@ function WorkspaceStrategyContent() {
            <button
              onClick={runStrategy}
              disabled={loading}
-             className="w-full bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-sm font-mono py-3 min-h-[44px] rounded border border-[#238636] transition-colors"
+             className="w-full bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-sm font-mono py-3 min-h-[44px] rounded border border-[#238636] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
            >
             {loading ? "Pricing..." : "▶ Price Strategy"}
           </button>

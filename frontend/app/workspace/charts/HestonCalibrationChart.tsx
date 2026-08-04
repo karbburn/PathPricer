@@ -44,7 +44,7 @@ function ParamsTable({ data }: { data: HestonCalibrationResponse }) {
             : "bg-amber-950/30 border-amber-800/50 text-amber-300"
         }`}
       >
-        <div className="text-[9px] uppercase tracking-wider font-bold">Feller 2κθ&gt;σ²</div>
+        <div className="text-[10px] uppercase tracking-wider font-bold">Feller 2κθ&gt;σ²</div>
         <div className="text-sm font-mono font-bold">{data.feller_condition_holds ? "HOLDS" : "VIOLATED"}</div>
       </div>
     </div>
@@ -129,7 +129,7 @@ export function HestonCalibrationChart({ request }: HestonCalibrationChartProps)
               ["Max Abs Err", formatPrice(data.max_abs_error, 4)],
             ].map(([label, val]) => (
               <div key={label} className="bg-[#0d1117] border border-[#21262d] rounded-lg p-2">
-                <div className="text-[9px] uppercase tracking-wider text-[#8b949e] font-bold">{label}</div>
+          <div className="text-[10px] uppercase tracking-wider text-[#8b949e] font-bold">{label}</div>
                 <div className="text-sm font-mono text-[#3fb950] font-bold">{val}</div>
               </div>
             ))}

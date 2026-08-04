@@ -113,12 +113,12 @@ export function HeatmapGrid(props: HeatmapGridProps) {
 
         {/* Vertical Colorbar */}
         <div className="flex flex-col items-center shrink-0 w-10 select-none">
-          <span className="text-[9px] font-mono text-[#58a6ff] font-bold mb-1">{maxVal.toFixed(2)}</span>
+          <span className="text-[10px] font-mono text-[#58a6ff] font-bold mb-1">{maxVal.toFixed(2)}</span>
           <div className="flex-1 w-3 rounded-full border border-[#21262d] overflow-hidden"
                style={{ background: `linear-gradient(to bottom, hsl(0,80%,60%), hsl(60,80%,50%), hsl(120,80%,45%), hsl(180,80%,35%), hsl(240,80%,25%))` }}>
           </div>
-          <span className="text-[9px] font-mono text-[#8b949e] mt-1">{minVal.toFixed(2)}</span>
-          <span className="text-[8px] font-mono text-[#8b949e] mt-0.5">{metricLabel}</span>
+          <span className="text-[10px] font-mono text-[#8b949e] mt-1">{minVal.toFixed(2)}</span>
+          <span className="text-[10px] font-mono text-[#8b949e] mt-0.5">{metricLabel}</span>
         </div>
       </div>
     </div>

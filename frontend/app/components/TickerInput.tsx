@@ -123,6 +123,7 @@ export function TickerInput({
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder || MARKET_PLACEHOLDERS[market]}
+        aria-label="Ticker symbol"
         className={`w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2.5 text-sm text-white font-mono placeholder:text-[#8b949e] focus:outline-none focus:border-[#58a6ff] transition-colors ${inputClassName}`}
       />
 

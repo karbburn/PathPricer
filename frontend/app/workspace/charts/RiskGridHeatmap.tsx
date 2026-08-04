@@ -172,7 +172,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#21262d] pb-4">
         <div>
           <h3 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
-            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-[#58a6ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 2D Risk Surface Heatmap</span>
+            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-[#58a6ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 2D Risk Surface Heatmap</span>
           </h3>
           <p className="text-xs text-[#8b949e] mt-0.5">
             Vectorized Black-Scholes surface evaluation across 2D parameter grid (25×25)
@@ -184,7 +184,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
           <button
             type="button"
             onClick={() => handlePresetChange("spot_vol")}
-            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               preset === "spot_vol"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
                 : "text-[#8b949e] hover:text-white"
@@ -195,7 +195,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
           <button
             type="button"
             onClick={() => handlePresetChange("strike_expiry")}
-            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               preset === "strike_expiry"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
                 : "text-[#8b949e] hover:text-white"
@@ -206,7 +206,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
           <button
             type="button"
             onClick={() => setPreset("custom")}
-            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
               preset === "custom"
                 ? "bg-[#58a6ff]/20 text-[#58a6ff] font-bold shadow"
                 : "text-[#8b949e] hover:text-white"
@@ -226,6 +226,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
           <select
             value={metric}
             onChange={(e) => setMetric(e.target.value as RiskGridMetric)}
+            aria-label="Target metric"
             className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
           >
             {Object.entries(METRIC_LABELS).map(([k, label]) => (
@@ -245,6 +246,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
               <select
                 value={axisX}
                 onChange={(e) => setAxisX(e.target.value as RiskGridAxis)}
+                aria-label="X-axis parameter"
                 className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
               >
                 {Object.entries(PARAM_LABELS)
@@ -264,6 +266,7 @@ export function RiskGridHeatmap({ request }: RiskGridHeatmapProps) {
               <select
                 value={axisY}
                 onChange={(e) => setAxisY(e.target.value as RiskGridAxis)}
+                aria-label="Y-axis parameter"
                 className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
               >
                 {Object.entries(PARAM_LABELS)

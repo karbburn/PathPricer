@@ -101,7 +101,7 @@ export function ModelValidationChart({ request }: ModelValidationChartProps) {
               ["Parity Violation", formatPrice(data.market_parity_violation, 4)],
             ].map(([label, val]) => (
               <div key={label} className="bg-[#0d1117] border border-[#21262d] rounded-lg p-2">
-                <div className="text-[9px] uppercase tracking-wider text-[#8b949e] font-bold">{label}</div>
+                <div className="text-[10px] uppercase tracking-wider text-[#8b949e] font-bold">{label}</div>
                 <div className="text-sm font-mono text-[#3fb950] font-bold">{val}</div>
               </div>
             ))}

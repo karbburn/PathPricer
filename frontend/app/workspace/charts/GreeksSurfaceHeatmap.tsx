@@ -111,7 +111,7 @@ export function GreeksSurfaceHeatmap({ request }: GreeksSurfaceHeatmapProps) {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#21262d] pb-4">
         <div>
           <h3 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
-            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-[#58a6ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Greeks Surface Heatmap</span>
+            <span className="flex items-center gap-2"><svg className="w-5 h-5 text-[#58a6ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Greeks Surface Heatmap</span>
           </h3>
           <p className="text-xs text-[#8b949e] mt-0.5">
             {data
@@ -136,6 +136,7 @@ export function GreeksSurfaceHeatmap({ request }: GreeksSurfaceHeatmapProps) {
           <select
             value={metric}
             onChange={(e) => setMetric(e.target.value as GreeksMetric)}
+            aria-label="Target Greek metric"
             className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
           >
             {Object.entries(METRIC_LABELS).map(([k, label]) => (
@@ -153,6 +154,7 @@ export function GreeksSurfaceHeatmap({ request }: GreeksSurfaceHeatmapProps) {
           <select
             value={optionType}
             onChange={(e) => setOptionType(e.target.value as OptionType)}
+            aria-label="Option type"
             className="w-full bg-[#161b22] border border-[#30363d] rounded px-3 py-1.5 text-xs font-mono text-white"
           >
             <option value="call">Call</option>

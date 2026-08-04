@@ -29,7 +29,7 @@ export function MobileNav() {
                 active ? "text-[#58a6ff]" : "text-[#8b949e]"
               }`}
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d={tab.icon} />
               </svg>
                <span className="text-[10px] font-semibold">{tab.label}</span>

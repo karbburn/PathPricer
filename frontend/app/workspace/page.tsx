@@ -296,7 +296,7 @@ function WorkspaceContent() {
             <button
               key={tab}
               onClick={() => setMobileTab(tab)}
-              className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider text-center transition-colors ${
+               className={`flex-1 py-2 text-xs font-mono uppercase tracking-wider text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117] ${
                 mobileTab === tab
                   ? "text-white border-b-2 border-[#58a6ff]"
                   : "text-[#8b949e] hover:text-[#8b949e]"

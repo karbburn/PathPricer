@@ -115,7 +115,7 @@ export function ResultsPanel({
       return (
         <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-8 text-center space-y-3">
           <div className="w-12 h-12 rounded-full bg-[#0d1117]/60 border border-[#21262d] text-[#58a6ff] flex items-center justify-center mx-auto">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
           <h3 className="text-lg font-bold text-white">Implied Volatility Solver</h3>
           <p className="text-sm text-[#8b949e] max-w-md mx-auto">
@@ -235,7 +235,7 @@ export function ResultsPanel({
         return (
           <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-8 text-center space-y-3">
             <div className="w-12 h-12 rounded-full bg-[#0d1117]/60 border border-[#21262d] text-[#58a6ff] flex items-center justify-center mx-auto">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
             </div>
             <h3 className="text-lg font-bold text-white">Scenario Stress Test</h3>
             <p className="text-sm text-[#8b949e] max-w-md mx-auto">
@@ -333,7 +333,7 @@ export function ResultsPanel({
       return (
         <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-8 text-center space-y-3">
           <div className="w-12 h-12 rounded-full bg-[#0d1117]/60 border border-[#21262d] text-[#58a6ff] flex items-center justify-center mx-auto">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
           </div>
           <h3 className="text-lg font-bold text-white">P&amp;L Explain &amp; Greek Attribution</h3>
           <p className="text-sm text-[#8b949e] max-w-md mx-auto">
