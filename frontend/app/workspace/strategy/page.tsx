@@ -64,6 +64,9 @@ function WorkspaceStrategyContent() {
   const buildRequest = useCallback((): StrategyLeg[] | null => {
     const s = parseFloat(spot);
     if (!isFinite(s) || s <= 0) return null;
+    const vol = parseFloat(volatility);
+    const rate = parseFloat(riskFreeRate);
+    const div = parseFloat(dividendYield);
     const legsOut: StrategyLeg[] = [];
     for (const l of legs) {
       const qty = parseFloat(l.quantity);
@@ -75,9 +78,9 @@ function WorkspaceStrategyContent() {
         strike,
         quantity: qty,
         expiry_date: expiryDate,
-        volatility: parseFloat(volatility) || 0.25,
-        risk_free_rate: parseFloat(riskFreeRate) || 0.05,
-        dividend_yield: parseFloat(dividendYield) || 0.0,
+        volatility: isFinite(vol) ? vol : 0.25,
+        risk_free_rate: isFinite(rate) ? rate : 0.05,
+        dividend_yield: isFinite(div) ? div : 0.0,
       });
     }
     return legsOut;
