@@ -566,7 +566,7 @@ export function ResultsPanel({
           <h3 className="text-xs font-extrabold text-[#58a6ff] uppercase tracking-wider mb-3">
             Analytical Greeks (Black-Scholes Closed-Form)
           </h3>
-          <div className="grid grid-cols-5 gap-2 text-center font-mono">
+           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center font-mono">
             <div className="bg-[#0d1117] p-3 rounded border border-[#21262d]">
               <span className="text-xs text-[#8b949e] block">Delta (&Delta;)</span>
               <span className="text-base font-bold text-white">

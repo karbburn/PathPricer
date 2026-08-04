@@ -604,7 +604,7 @@ export function InputPanel({
           {/* Seed Control (Randomize + Lock Button) */}
           <div>
             <label className="block text-xs text-[#8b949e] mb-1">RNG Seed</label>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 type="number"
                 value={inputs.seed}

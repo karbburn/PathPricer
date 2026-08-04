@@ -36,7 +36,7 @@ export function QuantChartShell({
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#21262d] pb-3">
         <div>
           <h3 className="text-sm font-extrabold text-[#58a6ff] uppercase tracking-wider flex items-center gap-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             {title}
           </h3>
           <p className="text-xs text-[#8b949e] font-mono mt-0.5">

@@ -181,11 +181,11 @@ function WorkspaceStrategyContent() {
                         <option value="put">Put</option>
                         <option value="stock">Stock</option>
                       </select>
-                      <button
-                        onClick={() => setLegs((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="text-[#f85149] text-xs font-mono px-2 hover:bg-[#21262d] rounded"
-                        aria-label="Remove leg"
-                      >
+                       <button
+                         onClick={() => setLegs((prev) => prev.filter((_, idx) => idx !== i))}
+                         className="text-[#f85149] text-xs font-mono px-2 min-h-[44px] sm:min-h-0 flex items-center justify-center hover:bg-[#21262d] rounded"
+                         aria-label="Remove leg"
+                       >
                         ✕
                       </button>
                     </div>
@@ -220,16 +220,16 @@ function WorkspaceStrategyContent() {
               })}
             </div>
             <div className="flex gap-2">
-              <button
-                onClick={() => legs.length < 10 && setLegs((prev) => [...prev, blankLeg()])}
-                className="flex-1 bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-1.5 rounded border border-[#30363d] transition-colors"
-              >
+               <button
+                 onClick={() => legs.length < 10 && setLegs((prev) => [...prev, blankLeg()])}
+                 className="flex-1 bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-2 min-h-[44px] sm:min-h-0 rounded border border-[#30363d] transition-colors"
+               >
                 + Add leg
               </button>
-              <button
-                onClick={() => setLegs([blankLeg()])}
-                className="bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-1.5 px-3 rounded border border-[#30363d] transition-colors"
-              >
+               <button
+                 onClick={() => setLegs([blankLeg()])}
+                 className="bg-[#21262d] hover:bg-[#30363d] text-[#e2e8f0] text-xs font-mono py-2 min-h-[44px] sm:min-h-0 px-3 rounded border border-[#30363d] transition-colors"
+               >
                 Reset
               </button>
             </div>
@@ -239,11 +239,11 @@ function WorkspaceStrategyContent() {
             <h2 className="text-xs font-bold text-[#8b949e] uppercase tracking-wider">Presets</h2>
             <div className="grid grid-cols-2 gap-2">
               {STRATEGY_PRESETS.map((p, i) => (
-                <button
-                  key={p.name}
-                  onClick={() => applyPreset(i)}
-                  className="text-left bg-[#0d1117] border border-[#21262d] hover:border-[#58a6ff] hover:bg-[#21262d]/40 rounded px-2.5 py-2 transition-colors"
-                >
+               <button
+                 key={p.name}
+                 onClick={() => applyPreset(i)}
+                 className="text-left bg-[#0d1117] border border-[#21262d] hover:border-[#58a6ff] hover:bg-[#21262d]/40 rounded px-2.5 py-2 min-h-[44px] sm:min-h-0 transition-colors"
+               >
                   <span className="text-xs font-mono text-white block">{p.name}</span>
                   <span className="text-[10px] text-[#8b949e] font-mono leading-tight block mt-0.5">{p.description}</span>
                 </button>
@@ -251,11 +251,11 @@ function WorkspaceStrategyContent() {
             </div>
           </div>
 
-          <button
-            onClick={runStrategy}
-            disabled={loading}
-            className="w-full bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-sm font-mono py-2.5 rounded border border-[#238636] transition-colors"
-          >
+           <button
+             onClick={runStrategy}
+             disabled={loading}
+             className="w-full bg-[#238636] hover:bg-[#2ea043] disabled:opacity-50 text-white text-sm font-mono py-3 min-h-[44px] rounded border border-[#238636] transition-colors"
+           >
             {loading ? "Pricing..." : "▶ Price Strategy"}
           </button>
 

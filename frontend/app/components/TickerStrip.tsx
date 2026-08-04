@@ -105,7 +105,7 @@ export function TickerStrip() {
   }, [watchlist]);
 
   return (
-    <div className="h-10 bg-[#0d1117] border-b border-[#21262d] flex items-center overflow-x-auto relative" style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain" }}>
+    <div className="min-h-[44px] bg-[#0d1117] border-b border-[#21262d] flex items-center overflow-x-auto relative" style={{ WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain" }}>
       <div className="flex items-center gap-6 px-4 whitespace-nowrap">
         {watchlist.map((ticker) => {
           const q = quotes[ticker.symbol];

@@ -27,6 +27,9 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Keyboard shortcuts"
       onClick={onClose}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
@@ -39,8 +42,9 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
           <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
             Keyboard Shortcuts
           </h2>
-          <button
+           <button
             onClick={onClose}
+            aria-label="Close shortcuts"
             className="text-[#8b949e] hover:text-white transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#58a6ff]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1117]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
