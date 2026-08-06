@@ -731,6 +731,9 @@ export const TICKER_DATABASE: TickerEntry[] = [
   { ticker: "BCH", name: "Bitcoin Cash", market: "CRYPTO" },
   { ticker: "USD1", name: "USD1", market: "CRYPTO" },
   { ticker: "USDE", name: "Ethena USDe", market: "CRYPTO" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "FERG", name: "Ferguson Enterprises", market: "US" },
 ];
 
 /**
