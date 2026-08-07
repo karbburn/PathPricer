@@ -19,11 +19,11 @@ const toc = [
   { id: "calibration", label: "13. Calibration" },
   { id: "validation", label: "14. Model Validation" },
   { id: "assumptions", label: "15. Assumptions" },
-  { id: "design", label: "16. Design FAQ" },
-  { id: "strategy", label: "17. Strategy Engine" },
-  { id: "stress", label: "18. Stress Testing" },
-  { id: "parity", label: "19. Parity Probes" },
-  { id: "hedging", label: "20. Hedging Comparison" },
+  { id: "strategy", label: "16. Strategy Engine" },
+  { id: "stress", label: "17. Stress Testing" },
+  { id: "parity", label: "18. Parity Probes" },
+  { id: "hedging", label: "19. Hedging Comparison" },
+  { id: "design", label: "20. Design FAQ" },
 ];
 
 function SectionCard({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) {
@@ -655,47 +655,8 @@ export default function DocsPage() {
         </div>
       </SectionCard>
 
-      {/* ════════════════════════════════════════════════════════════ 16. Cheat Sheet */}
-      <SectionCard id="design" title="16. Design Decisions FAQ">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs font-mono text-left">
-            <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
-              <tr><th className="p-2.5">Question</th>            <th className="p-2.5">Rationale</th></tr>
-            </thead>
-            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
-              {[
-                ["Why MC for something BS solves?", "Validation infrastructure for machinery meant to generalise to unsolvable cases"],
-                ["Why S_T as control, not BS price?", "BS is the benchmark; using it as control would be circular"],
-                ["Why exact GBM sampling?", "Closed-form terminal density makes Euler bias unnecessary"],
-                ["Why normal CI, not bootstrap?", "CLT applies cleanly to i.i.d. draws; bootstrap adds cost with no benefit"],
-                ["Why FD Greeks need CRN?", "Without CRN, bumps are swamped by MC noise, not sensitivity"],
-                ["Why continuous dividend yield?", "Free data lacks reliable ex-div schedules; explicitly named gap"],
-                ["Why close-to-close vol?", "Data quality across US, Indian, FX, and cryptocurrency tickers matters more than marginal efficiency"],
-                ["Why default_rng not RandomState?", "PCG64 is superior; avoids shared global state in concurrent backend"],
-                ["Why Newton-Raphson + Brent?", "NR fast near root; Brent handles near-zero-Vega without derivative"],
-                ["Why residual in P&L explain?", "Taylor expansion exact only for infinitesimal moves; residual = cross-Greeks + higher-order"],
-                ["Why vectorise the risk grid?", "625 cell-level loops dominate runtime; broadcast evaluates all at NumPy speed"],
-                ["Why RQMC instead of standard MC?", "O(N^{-1}) vs O(N^{-1/2}) convergence for smooth integrands; CI is heuristic"],
-                ["Why Fourier inversion for Heston?", "No closed-form density, but the characteristic function is closed form — fast, deterministic, no MC noise in Greeks"],
-                ["Why Volga w.r.t. √v₀, not v₀?", "Traders quote volatility; chain rule 4v₀·V″ + 2·V′ converts variance bumps"],
-                ["Why blend relative + absolute RMSE in calibration?", "Pure relative over-penalizes deep-OTM; the blend keeps ATM dominant while the smile stays shaped"],
-                ["Why reject calendar arbitrage at build?", "Total variance decreasing in T admits a riskless spread; rejecting keeps surfaces economically sane"],
-                ["Why not verify an implied rate by recomputing parity?", "It is a tautology — the parameter is defined as the parity-solver; it reproduces the spread by construction and never fails"],
-                ["Why analytic max profit/loss for strategies?", "Expiration payoff is piecewise-linear; extrema are exact at kinks/tails, and unbounded (∞) is reported correctly"],
-                ["Why are parity probes ATM-only?", "ATM quotes are the most liquid and least corrupted by deep-OTM noise — the cleanest rate/dividend signal"],
-              ].map(([q, a]) => (
-                <tr key={q}>
-                  <td className="p-2.5 font-bold text-white">{q}</td>
-                  <td className="p-2.5 text-[#79c0ff] leading-relaxed">{a}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </SectionCard>
-
-      {/* ════════════════════════════════════════════════════════════ 17. Strategy */}
-      <SectionCard id="strategy" title="17. Multi-Leg Strategy Engine">
+      {/* ════════════════════════════════════════════════════════════ 16. Strategy */}
+      <SectionCard id="strategy" title="16. Multi-Leg Strategy Engine">
         <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
           A strategy is a portfolio of 1–10 <strong>signed</strong> legs — a long has positive quantity, a short negative. Each option leg is priced by closed-form Black-Scholes; stock legs are valued at the forward-carried price{" "}
           <InlineMath math="Se^{-qT}" /> with <InlineMath math="\Delta = 1" />.
@@ -730,7 +691,7 @@ export default function DocsPage() {
       </SectionCard>
 
       {/* ════════════════════════════════════════════════════════════ 18. Stress */}
-      <SectionCard id="stress" title="18. Scenario Stress Testing">
+      <SectionCard id="stress" title="17. Scenario Stress Testing">
         <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
           Reprices an option under named market scenarios — <strong>2008 Crisis</strong> (−40% spot, +20 vol pts, +100 bp rates), <strong>COVID Crash</strong>, <strong>Vol Crush</strong>, <strong>Flash Crash</strong> — each defined as coordinate shifts in spot, vol, rate, and elapsed time:
         </p>
@@ -749,7 +710,7 @@ export default function DocsPage() {
       </SectionCard>
 
       {/* ════════════════════════════════════════════════════════════ 19. Parity */}
-      <SectionCard id="parity" title="19. Put-Call Parity Data-Quality Probes">
+      <SectionCard id="parity" title="18. Put-Call Parity Data-Quality Probes">
         <p className="text-sm text-[#8b949e] leading-relaxed mb-3">
           Put-call parity is the no-arbitrage identity <InlineMath math="C - P = S_0 e^{-qT} - K e^{-rT}" />. The probes run it <strong>in reverse</strong>: given market prices, what rate or dividend is the market implicitly assuming? Consistent quotes land near consensus values; a large divergence flags stale mids, crossed markets, or mis-priced dividends.
         </p>
@@ -773,7 +734,7 @@ export default function DocsPage() {
       </SectionCard>
 
       {/* ── Section 20: Hedging Comparison ── */}
-      <SectionCard id="hedging" title="20. Delta-Hedging Comparison">
+      <SectionCard id="hedging" title="19. Delta-Hedging Comparison">
         <p className="text-sm text-[#c9d1d9] mb-4">
           Benchmarks two hedging strategies across hundreds of simulated Heston paths: <strong>BS hedging</strong> (constant implied vol) versus <strong>Heston hedging</strong> (model-informed deltas that adapt to the current variance state). The hedger is <em>short</em> the option — receives premium at <InlineMath math="t=0" />, delta-hedges to expiry, and the hedging error reveals which strategy is more precise.
         </p>
@@ -833,6 +794,49 @@ export default function DocsPage() {
             <div className="text-sm text-[#79c0ff] font-mono"><InlineMath math="(1 - 1/R) \times 100\%" /></div>
             <div className="text-xs text-[#8b949e] mt-1">How much tighter the Heston distribution is</div>
           </div>
+        </div>
+      </SectionCard>
+
+      {/* ════════════════════════════════════════════════════════════ 20. Design FAQ */}
+      <SectionCard id="design" title="20. Design Decisions FAQ">
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs font-mono text-left">
+            <thead className="bg-[#0d1117] text-[#8b949e] border-b border-[#21262d]">
+              <tr><th className="p-2.5">Question</th>            <th className="p-2.5">Rationale</th></tr>
+            </thead>
+            <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
+              {[
+                ["Why MC for something BS solves?", "Validation infrastructure for machinery meant to generalise to unsolvable cases"],
+                ["Why S_T as control, not BS price?", "BS is the benchmark; using it as control would be circular"],
+                ["Why exact GBM sampling?", "Closed-form terminal density makes Euler bias unnecessary"],
+                ["Why normal CI, not bootstrap?", "CLT applies cleanly to i.i.d. draws; bootstrap adds cost with no benefit"],
+                ["Why FD Greeks need CRN?", "Without CRN, bumps are swamped by MC noise, not sensitivity"],
+                ["Why continuous dividend yield?", "Free data lacks reliable ex-div schedules; explicitly named gap"],
+                ["Why close-to-close vol?", "Data quality across US, Indian, FX, and cryptocurrency tickers matters more than marginal efficiency"],
+                ["Why default_rng not RandomState?", "PCG64 is superior; avoids shared global state in concurrent backend"],
+                ["Why Newton-Raphson + Brent?", "NR fast near root; Brent handles near-zero-Vega without derivative"],
+                ["Why residual in P&L explain?", "Taylor expansion exact only for infinitesimal moves; residual = cross-Greeks + higher-order"],
+                ["Why vectorise the risk grid?", "625 cell-level loops dominate runtime; broadcast evaluates all at NumPy speed"],
+                ["Why RQMC instead of standard MC?", "O(N^{-1}) vs O(N^{-1/2}) convergence for smooth integrands; CI is heuristic"],
+                ["Why Fourier inversion for Heston?", "No closed-form density, but the characteristic function is closed form — fast, deterministic, no MC noise in Greeks"],
+                ["Why Volga w.r.t. √v₀, not v₀?", "Traders quote volatility; chain rule 4v₀·V″ + 2·V′ converts variance bumps"],
+                ["Why blend relative + absolute RMSE in calibration?", "Pure relative over-penalizes deep-OTM; the blend keeps ATM dominant while the smile stays shaped"],
+                ["Why reject calendar arbitrage at build?", "Total variance decreasing in T admits a riskless spread; rejecting keeps surfaces economically sane"],
+                ["Why not verify an implied rate by recomputing parity?", "It is a tautology — the parameter is defined as the parity-solver; it reproduces the spread by construction and never fails"],
+                ["Why analytic max profit/loss for strategies?", "Expiration payoff is piecewise-linear; extrema are exact at kinks/tails, and unbounded (∞) is reported correctly"],
+                ["Why are parity probes ATM-only?", "ATM quotes are the most liquid and least corrupted by deep-OTM noise — the cleanest rate/dividend signal"],
+                ["Why hedge with expected avg variance, not spot v_t?", "Spot v_t overreacts to vol spikes and ignores mean reversion; E[v_avg] smooths the delta and produces a tighter error distribution"],
+                ["Why solve BS IV from the Heston price?", "Traders observe market IV and hedge with it — the fixed-IV BS strategy replicates this realistic scenario, not an artificial one"],
+                ["Why transaction costs at 5 bps default?", "A reasonable equity round-trip cost; zero TC makes both strategies look perfect, masking the practical rebalancing penalty"],
+                ["Why even n_paths for antithetic variates?", "Antithetic pairs (+Z, −Z) require pairing; odd counts would leave one unpaired path, breaking the variance-reduction guarantee"],
+              ].map(([q, a]) => (
+                <tr key={q}>
+                  <td className="p-2.5 font-bold text-white">{q}</td>
+                  <td className="p-2.5 text-[#79c0ff] leading-relaxed">{a}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </SectionCard>
 
