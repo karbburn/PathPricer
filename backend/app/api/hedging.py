@@ -6,16 +6,15 @@ POST /hedging/compare — Compare BS vs Heston delta-hedging.
 from __future__ import annotations
 
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 
 from ..engine.hedging_comparison import compare_hedging
 from ..engine.heston import HestonParams
-from ..schemas.hedging import HedgingCompareRequest
+from ..schemas.hedging import HedgingCompareRequest, HedgingCompareResponse
 
 router = APIRouter(prefix="/hedging", tags=["hedging"])
 
 
-@router.post("/compare")
+@router.post("/compare", response_model=HedgingCompareResponse)
 def hedging_compare(req: HedgingCompareRequest) -> dict:
     """Compare Black-Scholes vs Heston delta-hedging performance.
 

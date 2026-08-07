@@ -17,8 +17,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from .black_scholes import price_and_greeks as bs_price_and_greeks
-from .heston import HestonParams, heston_delta as _heston_delta_analytical
+from .black_scholes import price_and_greeks as bs_price_and_greeks, price as bs_price_fn
+from .heston import HestonParams, heston_delta as _heston_delta_analytical, price_european as heston_price_fn
 
 
 def _bs_delta(
@@ -73,6 +73,12 @@ def hedge_path(
 ) -> dict:
     """Delta-hedge a single simulated path.
 
+    The hedger is SHORT the option: receives premium at t=0, delta-hedges
+    to expiry, and the hedging error is:
+        error = cash_T + Delta_T * S_T - payoff
+    A positive error means the hedge over-performed (hedger profits).
+    A negative error means the hedge under-performed (hedger loses).
+
     Args:
         heston_delta_mode: 'spot' (current v_t) or 'average' (E[v] over remaining life).
     """
@@ -93,8 +99,6 @@ def hedge_path(
         else:
             delta0 = _heston_delta_analytical(S[0], K, T_remaining, r, q, heston_params, option_type)
 
-    from .black_scholes import price as bs_price_fn
-    from .heston import price_european as heston_price_fn
     if model == "bs":
         premium = bs_price_fn(S[0], K, T, r, q, sigma0, option_type)
     else:

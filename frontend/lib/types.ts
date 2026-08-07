@@ -622,7 +622,7 @@ export interface HedgingModelStats {
   variance: number;
   std: number;
   rmse: number;
-  max_drawdown: number;
+  max_abs_error: number;
   total_tc: number;
   errors: number[];
 }

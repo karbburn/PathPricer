@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -38,33 +38,22 @@ const DEFAULT_PARAMS = {
   seed: 42,
 };
 
-function buildHistogram(errors: number[], nBins: number = 40) {
-  if (errors.length === 0) return [];
-  const min = Math.min(...errors);
-  const max = Math.max(...errors);
-  const range = max - min || 1;
-  const binWidth = range / nBins;
-  const bins: { center: number; bs: number; heston: number }[] = [];
+function minOf(...arrs: number[][]): number {
+  let m = Infinity;
+  for (const arr of arrs) for (const v of arr) if (v < m) m = v;
+  return m;
+}
 
-  for (let i = 0; i < nBins; i++) {
-    bins.push({
-      center: min + (i + 0.5) * binWidth,
-      bs: 0,
-      heston: 0,
-    });
-  }
-
-  for (const e of errors) {
-    const idx = Math.min(Math.floor((e - min) / binWidth), nBins - 1);
-    bins[idx].bs += 1;
-  }
-  return bins;
+function maxOf(...arrs: number[][]): number {
+  let m = -Infinity;
+  for (const arr of arrs) for (const v of arr) if (v > m) m = v;
+  return m;
 }
 
 function mergeHistograms(bsErrors: number[], hestonErrors: number[], nBins: number = 40) {
   if (bsErrors.length === 0 || hestonErrors.length === 0) return [];
-  const allMin = Math.min(Math.min(...bsErrors), Math.min(...hestonErrors));
-  const allMax = Math.max(Math.max(...bsErrors), Math.max(...hestonErrors));
+  const allMin = minOf(bsErrors, hestonErrors);
+  const allMax = maxOf(bsErrors, hestonErrors);
   const range = allMax - allMin || 1;
   const binWidth = range / nBins;
 
@@ -89,15 +78,20 @@ export function HedgingComparisonChart() {
   const [error, setError] = useState<string | null>(null);
   const [params, setParams] = useState(DEFAULT_PARAMS);
   const [showForm, setShowForm] = useState(true);
+  const abortRef = useRef<AbortController | null>(null);
 
   const runComparison = async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     setLoading(true);
     setError(null);
     try {
-      const res = await postHedgingCompare(params as HedgingCompareRequest);
+      const res = await postHedgingCompare(params as HedgingCompareRequest, controller.signal);
       setResult(res);
       setShowForm(false);
     } catch (e: unknown) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : "Request failed");
     } finally {
       setLoading(false);
@@ -310,7 +304,7 @@ export function HedgingComparisonChart() {
                 </div>
                 <div>
                   <span className="text-[#8b949e] block">Max |Err|</span>
-                  <span className="text-white font-bold">{result.bs.max_drawdown.toFixed(4)}</span>
+                  <span className="text-white font-bold">{result.bs.max_abs_error.toFixed(4)}</span>
                 </div>
                 <div>
                   <span className="text-[#8b949e] block">Mean</span>
@@ -341,7 +335,7 @@ export function HedgingComparisonChart() {
                 </div>
                 <div>
                   <span className="text-[#8b949e] block">Max |Err|</span>
-                  <span className="text-white font-bold">{result.heston.max_drawdown.toFixed(4)}</span>
+                  <span className="text-white font-bold">{result.heston.max_abs_error.toFixed(4)}</span>
                 </div>
                 <div>
                   <span className="text-[#8b949e] block">Mean</span>

@@ -111,7 +111,7 @@ def compare_hedging(
             "variance": float(np.var(errors)),
             "std": float(np.std(errors)),
             "rmse": float(np.sqrt(np.mean(errors**2))),
-            "max_drawdown": float(np.max(np.abs(errors))),
+            "max_abs_error": float(np.max(np.abs(errors))),
             "total_tc": float(np.mean(tc)),
             "errors": errors.tolist(),
         }
@@ -122,7 +122,7 @@ def compare_hedging(
     variance_ratio = (
         bs_stats["variance"] / heston_stats["variance"]
         if heston_stats["variance"] > 1e-20
-        else float("inf")
+        else (1.0 if bs_stats["variance"] < 1e-20 else float("inf"))
     )
     variance_pct = (
         (1.0 - heston_stats["variance"] / bs_stats["variance"]) * 100.0

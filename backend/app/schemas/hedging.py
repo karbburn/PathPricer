@@ -40,7 +40,7 @@ class HedgingModelStats(BaseModel):
     variance: float
     std: float
     rmse: float
-    max_drawdown: float
+    max_abs_error: float
     total_tc: float
     errors: list[float]
 
@@ -71,6 +71,7 @@ class HedgingCompareResponse(BaseModel):
     heston: HedgingModelStats
     variance_ratio: float
     variance_pct_improvement: float
+    sigma_fixed: float
     sample_paths: list[SamplePath]
     config: dict
     timing_ms: TimingStats
