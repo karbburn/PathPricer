@@ -45,13 +45,16 @@ def _expected_avg_variance(v_t: float, params: HestonParams, T_remaining: float)
         return max(v_t, 1e-10)
     kappa = params.kappa
     theta = params.theta_v
-    if abs(kappa) < 1e-12:
-        # No mean reversion: v stays at v_t
-        return max(v_t, 1e-10)
-    # Integral of E[v_s] from 0 to T_rem:
-    # = theta * T_rem + (v_t - theta) * (1 - exp(-kappa * T_rem)) / kappa
-    integral = theta * T_remaining + (v_t - theta) * (1.0 - np.exp(-kappa * T_remaining)) / kappa
-    return max(integral / T_remaining, 1e-10)
+    x = kappa * T_remaining
+    if x < 1e-6:
+        # Taylor: (1 - exp(-x)) / x ≈ 1 - x/2 + x²/6  (avoids catastrophic cancellation)
+        factor = 1.0 - x / 2.0 + x * x / 6.0
+    elif abs(kappa) < 1e-12:
+        factor = 1.0
+    else:
+        factor = (1.0 - np.exp(-x)) / x
+    avg_v = theta + (v_t - theta) * factor
+    return max(avg_v, 1e-10)
 
 
 def hedge_path(

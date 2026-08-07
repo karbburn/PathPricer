@@ -51,7 +51,7 @@ def simulate_heston_paths(
         (S, v) arrays of shape (n_paths, n_steps + 1).
     """
     if antithetic and n_paths % 2 != 0:
-        n_paths += 1  # round up silently
+        raise ValueError("n_paths must be even when antithetic=True")
 
     rng = np.random.default_rng(seed)
     dt = T / n_steps

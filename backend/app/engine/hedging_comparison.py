@@ -52,6 +52,7 @@ def compare_hedging(
     ).implied_vol
 
     # Simulate paths under Heston (ground truth)
+    n_paths = n_simulations + (n_simulations % 2)  # ensure even for antithetic
     S, v = simulate_heston_paths(
         params=heston_params,
         S0=S0,
@@ -59,23 +60,23 @@ def compare_hedging(
         r=r,
         q=q,
         n_steps=n_rebalance,
-        n_paths=n_simulations,
+        n_paths=n_paths,
         seed=seed,
         antithetic=antithetic,
     )
 
     t_sim = time.perf_counter()
 
-    n_paths = S.shape[0]
-    bs_errors = np.empty(n_paths)
-    heston_errors = np.empty(n_paths)
-    bs_tc = np.empty(n_paths)
-    heston_tc = np.empty(n_paths)
+    actual_n_paths = S.shape[0]
+    bs_errors = np.empty(actual_n_paths)
+    heston_errors = np.empty(actual_n_paths)
+    bs_tc = np.empty(actual_n_paths)
+    heston_tc = np.empty(actual_n_paths)
 
-    n_sample = min(5, n_paths)
+    n_sample = min(5, actual_n_paths)
     sample_paths = []
 
-    for i in range(n_paths):
+    for i in range(actual_n_paths):
         bs_res = hedge_path(
             S=S[i], v=v[i], K=K, T=T, r=r, q=q,
             option_type=option_type, model="bs",
