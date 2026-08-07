@@ -304,6 +304,32 @@ def price_european(
     return float(call - discounted_spot + discounted_strike)
 
 
+def heston_delta(
+    S0: float,
+    K: float,
+    T: float,
+    r: float,
+    q: float,
+    params: HestonParams,
+    option_type: str = "call",
+) -> float:
+    """Analytical Heston delta via the stock-measure probability P1.
+
+    Delta = dCall/dS0 = e^{-qT} * P1 for calls.
+    For puts, delta = e^{-qT} * (P1 - 1) via put-call parity.
+    """
+    if T <= 1e-10:
+        if option_type == "call":
+            return 1.0 if S0 > K else 0.0
+        return -1.0 if S0 < K else 0.0
+
+    p1, _ = _integrate_fourier(params, S0, K, T, r, q)
+    disc = math.exp(-q * T)
+    if option_type == "call":
+        return float(disc * p1)
+    return float(disc * (p1 - 1.0))
+
+
 def price_and_greeks(
     S0: float,
     K: float,

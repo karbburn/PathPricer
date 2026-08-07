@@ -7,7 +7,7 @@ and wires dependency injection.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import market, pricing, quantitative, report, validation
+from .api import hedging, market, pricing, quantitative, report, validation
 from .core.config import settings
 
 app = FastAPI(title="PathPricer API", version="0.1.0")
@@ -35,3 +35,4 @@ app.include_router(pricing.router, prefix="/api/v1")
 app.include_router(quantitative.router, prefix="/api/v1")
 app.include_router(report.router, prefix="/api/v1")
 app.include_router(validation.router, prefix="/api/v1")
+app.include_router(hedging.router, prefix="/api/v1")
