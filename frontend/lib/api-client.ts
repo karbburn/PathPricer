@@ -28,6 +28,8 @@ import {
   HestonCalibrationResponse,
   ModelValidationResponse,
   ImpliedParityRequest,
+  HedgingCompareRequest,
+  HedgingCompareResponse,
   ImpliedRateResponse,
   ImpliedDividendResponse,
   StrategyRequest,
@@ -293,6 +295,13 @@ export async function postStressTest(
   signal?: AbortSignal
 ): Promise<StressTestResponse> {
   return postJson<StressTestResponse>(`${BASE_URL}/price/stress-test`, request, signal);
+}
+
+export async function postHedgingCompare(
+  request: HedgingCompareRequest,
+  signal?: AbortSignal
+): Promise<HedgingCompareResponse> {
+  return postJson<HedgingCompareResponse>(`${BASE_URL}/hedging/compare`, request, signal);
 }
 
 

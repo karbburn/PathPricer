@@ -17,6 +17,7 @@ const TerminalDistributionChart = dynamic(() => import("./TerminalDistributionCh
 const PayoffDiagram = dynamic(() => import("./PayoffDiagram").then(m => m.PayoffDiagram), { ssr: false });
 const ConvergenceChart = dynamic(() => import("./ConvergenceChart").then(m => m.ConvergenceChart), { ssr: false });
 const ComparisonChart = dynamic(() => import("./ComparisonChart").then(m => m.ComparisonChart), { ssr: false });
+const HedgingComparisonChart = dynamic(() => import("./HedgingComparisonChart").then(m => m.HedgingComparisonChart), { ssr: false });
 
 function ChartLoader() {
   return (
@@ -31,7 +32,7 @@ interface ChartTabContainerProps {
   fullResult: PricingFullResponse | null;
 }
 
-type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "risk_grid" | "vol_surface" | "greeks_surface" | "vol_term_structure" | "heston_calibration" | "model_validation";
+type ChartTab = "paths" | "distribution" | "payoff" | "convergence" | "comparison" | "hedging" | "risk_grid" | "vol_surface" | "greeks_surface" | "vol_term_structure" | "heston_calibration" | "model_validation";
 
 const TAB_LABELS: Record<ChartTab, { label: string; shortLabel?: string }> = {
   paths: { label: "Asset Paths" },
@@ -45,6 +46,7 @@ const TAB_LABELS: Record<ChartTab, { label: string; shortLabel?: string }> = {
   payoff: { label: "Payoff Diagram" },
   convergence: { label: "Empirical Convergence" },
   comparison: { label: "MC vs BS" },
+  hedging: { label: "BS vs Heston Hedge" },
 };
 
 const TAB_ICONS: Record<ChartTab, React.ReactNode> = {
@@ -59,6 +61,7 @@ const TAB_ICONS: Record<ChartTab, React.ReactNode> = {
   payoff: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
   convergence: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
   comparison: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8 7 4 3 0 7"/><polyline points="16 17 20 21 24 17"/><circle cx="4" cy="3" r="1"/><circle cx="20" cy="21" r="1"/></svg>,
+  hedging: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
 };
 
 export function ChartTabContainer({ request, fullResult }: ChartTabContainerProps) {
@@ -178,6 +181,8 @@ export function ChartTabContainer({ request, fullResult }: ChartTabContainerProp
             </div>
           )
         )}
+
+        {activeTab === "hedging" && <HedgingComparisonChart />}
       </div>
     </div>
   );

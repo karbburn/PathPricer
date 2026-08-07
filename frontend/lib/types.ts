@@ -596,3 +596,54 @@ export interface StressTestResponse {
   unrealized_risk: number;
 }
 
+// Hedging Comparison
+export interface HedgingCompareRequest {
+  S0: number;
+  K: number;
+  T: number;
+  r: number;
+  q: number;
+  option_type: "call" | "put";
+  heston_params: {
+    v0: number;
+    kappa: number;
+    theta_v: number;
+    sigma_v: number;
+    rho: number;
+  };
+  n_rebalance: number;
+  n_simulations: number;
+  tc_bps: number;
+  seed: number;
+}
+
+export interface HedgingModelStats {
+  mean: number;
+  variance: number;
+  std: number;
+  rmse: number;
+  max_drawdown: number;
+  total_tc: number;
+  errors: number[];
+}
+
+export interface HedgingSamplePath {
+  S: number[];
+  v: number[];
+  bs_delta: number[];
+  heston_delta: number[];
+  bs_portfolio: number[];
+  heston_portfolio: number[];
+}
+
+export interface HedgingCompareResponse {
+  bs: HedgingModelStats;
+  heston: HedgingModelStats;
+  variance_ratio: number;
+  variance_pct_improvement: number;
+  sigma_fixed: number;
+  sample_paths: HedgingSamplePath[];
+  config: Record<string, unknown>;
+  timing_ms: { simulation: number; hedging: number; total: number };
+}
+
