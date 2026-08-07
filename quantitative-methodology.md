@@ -29,6 +29,7 @@ A comprehensive technical reference for every mathematical model, numerical meth
 21. [Multi-Leg Strategy Pricing](#21-multi-leg-strategy-pricing)
 22. [Scenario Stress Testing](#22-scenario-stress-testing)
 23. [Put-Call Parity Data-Quality Probes](#23-put-call-parity-data-quality-probes)
+24. [Delta-Hedging Comparison](#24-delta-hedging-comparison)
 
 ---
 
@@ -668,3 +669,104 @@ It is tempting to "validate" an extraction by plugging the recovered $r$ or $q$ 
 ### 23.4 ATM Pair Selection
 
 The probes operate on a single call/put pair at the strike **nearest spot** (the ATM pair). Mids are used when a valid bid/ask exists, otherwise last price. This is deliberately an ATM-only probe: ATM quotes are the most liquid, most reliable, and least contaminated by the deep-wings noise that would corrupt a rate or dividend estimate.
+
+---
+
+## 24. Delta-Hedging Comparison
+
+This module benchmarks how well a delta-hedging strategy performs when the hedger uses the *correct* model (Heston with adaptive deltas) versus a *misspecified* model (Black-Scholes with fixed implied vol). The experiment runs $N$ parallel hedging simulations on paths generated under the true Heston dynamics, collecting error distributions that reveal the practical value of model-informed hedging.
+
+### 24.1 Setup and Notation
+
+Consider a short position in a European option. The hedger:
+
+1. Receives the premium $V_0$ at $t=0$.
+2. Holds a stock position $\Delta_t$ (the delta hedge) and a cash account.
+3. Rebalances at $n$ discrete time steps $t_1, t_2, \ldots, t_n = T$.
+4. At expiry, the hedging error is:
+
+$$\varepsilon = \text{cash}_T + \Delta_T \cdot S_T - \text{payoff}(S_T)$$
+
+A **positive** error means the hedge over-performed (hedger profits beyond what was needed to cover the payoff). A **negative** error means the hedge under-performed (hedger loses).
+
+### 24.2 Black-Scholes Hedging (Fixed Implied Vol)
+
+The BS hedger solves for the implied volatility $\sigma_{\text{IV}}$ from the Heston ATM price at $t=0$:
+
+$$\text{BS}_{\text{price}}(S_0, K, T, r, q, \sigma_{\text{IV}}) = V_0^{\text{Heston}}(S_0, K, T, r, q, \boldsymbol{\theta})$$
+
+and then uses that **constant** $\sigma_{\text{IV}}$ for every rebalance throughout the life of the option. The delta at each step is the standard Black-Scholes delta:
+
+$$\Delta_t^{\text{BS}} = e^{-q(T-t)} N(d_1), \quad d_1 = \frac{\ln(S_t/K) + (r - q + \tfrac{1}{2}\sigma_{\text{IV}}^2)(T-t)}{\sigma_{\text{IV}}\sqrt{T-t}}$$
+
+This is the realistic "market observer" scenario — a trader who quotes and hedges using the market-implied vol, unaware of the true variance dynamics.
+
+### 24.3 Heston Hedging (Model-Informed Deltas)
+
+The Heston hedger uses a delta derived from the model's own pricing engine. Two modes are available:
+
+**Spot mode** (instantaneous variance): Compute delta using the current variance $v_t$ directly. This overreacts to vol spikes because it ignores mean reversion.
+
+**Average mode** (expected average variance — the default and more realistic choice): The delta is the BS delta formula evaluated at $\sigma_h = \sqrt{\bar{v}_t}$, where $\bar{v}_t$ is the expected time-averaged variance over the remaining life:
+
+$$\bar{v}_t = \frac{1}{T-t}\int_t^T \mathbb{E}[v_s \mid v_t]\,ds$$
+
+Since $v$ follows a CIR process $dv = \kappa(\theta_v - v)\,dt + \sigma_v\sqrt{v}\,dW$, the conditional mean is:
+
+$$\mathbb{E}[v_s \mid v_t] = \theta_v + (v_t - \theta_v)e^{-\kappa(s-t)}$$
+
+Integrating:
+
+$$\bar{v}_t = \theta_v + (v_t - \theta_v)\cdot\frac{1 - e^{-\kappa(T-t)}}{\kappa(T-t)}$$
+
+The factor $f(x) = (1 - e^{-x})/x$ with $x = \kappa(T-t)$ smoothly transitions between:
+- $x \to 0$: $f(x) \to 1$ (short horizon, variance barely reverts — use current $v_t$)
+- $x \to \infty$: $f(x) \to 0$ (long horizon, variance reverts fully to $\theta_v$)
+
+For numerical stability when $x < 10^{-6}$, a Taylor expansion avoids catastrophic cancellation:
+
+$$f(x) \approx 1 - \frac{x}{2} + \frac{x^2}{6}$$
+
+The Heston delta for a call is:
+
+$$\Delta_t^{\text{Heston}} = e^{-q(T-t)} \cdot P_1$$
+
+where $P_1$ is the stock-measure probability from the Fourier-inversion pricing engine (§11). For a put, $\Delta_t^{\text{Heston}} = e^{-q(T-t)}(P_1 - 1)$.
+
+### 24.4 Path Simulation
+
+Paths are generated under the true Heston dynamics using Euler discretization with full truncation:
+
+$$v_{t+\Delta t} = \max\Big(0,\; v_t + \kappa(\theta_v - v_t)\Delta t + \sigma_v\sqrt{v_t}\sqrt{\Delta t}\,Z_v\Big)$$
+
+$$S_{t+\Delta t} = S_t \exp\Big((r - q - \tfrac{1}{2}v_t)\Delta t + \sqrt{v_t}\sqrt{\Delta t}\,Z_s\Big)$$
+
+where $(Z_s, Z_v)$ are correlated standard normals with $\text{Corr}(Z_s, Z_v) = \rho$, generated via Cholesky decomposition. Antithetic variates (using $+Z$ and $-Z$ pairs) halve the variance of the error distribution estimates for free.
+
+### 24.5 Self-Financing Portfolio Dynamics
+
+At each rebalance step $t_i$:
+
+1. **Cash accrues interest**: $\text{cash} \leftarrow \text{cash} \cdot e^{r\,\Delta t}$
+2. **Compute target delta** $\Delta^*$ using the chosen model
+3. **Trade**: $\delta_{\text{trade}} = \Delta^* - \Delta_{\text{current}}$
+4. **Transaction cost**: $\text{TC} = \text{tc\_rate} \cdot |\delta_{\text{trade}}| \cdot S_{t_i}$ (where $\text{tc\_rate} = \text{tc\_bps}/10{,}000$)
+5. **Update positions**: $\text{cash} \leftarrow \text{cash} - \delta_{\text{trade}} \cdot S_{t_i} - \text{TC}$, $\Delta \leftarrow \Delta^*$
+
+At expiry $T$, the hedging error is $\varepsilon = \text{cash}_T + \Delta_T S_T - \text{payoff}(S_T)$.
+
+### 24.6 Summary Statistics
+
+For each model, the following are computed over $N$ simulated paths:
+
+| Statistic | Formula | Interpretation |
+|---|---|---|
+| Mean error | $\bar{\varepsilon} = \frac{1}{N}\sum_i \varepsilon_i$ | Bias — a nonzero mean means systematic over/under-hedging |
+| Variance | $\text{Var}(\varepsilon) = \frac{1}{N}\sum_i (\varepsilon_i - \bar{\varepsilon})^2$ | Precision — lower is better |
+| RMSE | $\sqrt{\frac{1}{N}\sum_i \varepsilon_i^2}$ | Combined bias + variance |
+| Max absolute error | $\max_i |\varepsilon_i|$ | Worst-case loss |
+| Avg transaction cost | $\frac{1}{N}\sum_i \text{TC}_i$ | Cost of rebalancing |
+
+The **variance ratio** $R = \text{Var}(\varepsilon^{\text{BS}}) / \text{Var}(\varepsilon^{\text{Heston}})$ quantifies how much more precise Heston hedging is. When $R > 1$, the Heston-adaptive strategy has a tighter error distribution. The **percentage variance improvement** is $(1 - 1/R) \times 100\%$.
+
+Edge case: when both variances are near zero ($< 10^{-20}$), the ratio is set to $1.0$ (both strategies perform identically). When only the denominator is near zero but the numerator is not, the ratio is $\infty$ (Heston hedging is essentially perfect while BS is not).

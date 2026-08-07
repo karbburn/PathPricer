@@ -23,6 +23,7 @@ const toc = [
   { id: "strategy", label: "17. Strategy Engine" },
   { id: "stress", label: "18. Stress Testing" },
   { id: "parity", label: "19. Parity Probes" },
+  { id: "hedging", label: "20. Hedging Comparison" },
 ];
 
 function SectionCard({ id, title, children, className }: { id: string; title: string; children: React.ReactNode; className?: string }) {
@@ -769,6 +770,70 @@ export default function DocsPage() {
         <Callout title="Why the extracted value is never re-verified against parity" accent="red">
           Plugging the recovered <InlineMath math="r" /> or <InlineMath math="q" /> back into parity is a <strong>tautology</strong> — the parameter is defined as the value that makes the identity hold, so recomputation reproduces the spread by construction and can never fail. The real checks are the positivity guard and the divergence versus a reference rate/dividend. The probes are ATM-only because ATM quotes are the most liquid and least corrupted by deep-OTM noise.
         </Callout>
+      </SectionCard>
+
+      {/* ── Section 20: Hedging Comparison ── */}
+      <SectionCard id="hedging" title="20. Delta-Hedging Comparison">
+        <p className="text-sm text-[#c9d1d9] mb-4">
+          Benchmarks two hedging strategies across hundreds of simulated Heston paths: <strong>BS hedging</strong> (constant implied vol) versus <strong>Heston hedging</strong> (model-informed deltas that adapt to the current variance state). The hedger is <em>short</em> the option — receives premium at <InlineMath math="t=0" />, delta-hedges to expiry, and the hedging error reveals which strategy is more precise.
+        </p>
+
+        <h3 className="text-sm font-semibold text-[#58a6ff] mt-5 mb-2">Hedging Error</h3>
+        <div className="bg-[#0d1117] p-4 rounded border border-[#21262d] mb-4">
+          <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\varepsilon = \text{cash}_T + \Delta_T \cdot S_T - \text{payoff}(S_T)" /></div>
+          <div className="text-xs text-[#8b949e] mt-1">Positive = hedge over-performed (hedger profits); Negative = under-performed</div>
+        </div>
+
+        <h3 className="text-sm font-semibold text-[#58a6ff] mt-5 mb-2">BS Delta (Fixed IV)</h3>
+        <p className="text-sm text-[#c9d1d9] mb-2">
+          Solve for <InlineMath math="\sigma_{\text{IV}}" /> from the Heston ATM price at <InlineMath math="t=0" />, then use that constant vol for every rebalance:
+        </p>
+        <div className="bg-[#0d1117] p-4 rounded border border-[#21262d] mb-4">
+          <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\Delta_t^{\text{BS}} = e^{-q(T-t)} N(d_1), \quad d_1 = \frac{\ln(S_t/K) + (r - q + \tfrac{1}{2}\sigma_{\text{IV}}^2)(T-t)}{\sigma_{\text{IV}}\sqrt{T-t}}" /></div>
+        </div>
+
+        <h3 className="text-sm font-semibold text-[#58a6ff] mt-5 mb-2">Heston Delta (Expected Average Variance)</h3>
+        <p className="text-sm text-[#c9d1d9] mb-2">
+          The delta uses the BS formula evaluated at <InlineMath math="\sigma_h = \sqrt{\bar{v}_t}" />, where <InlineMath math="\bar{v}_t" /> is the expected time-averaged variance over the remaining life. For the CIR variance process:
+        </p>
+        <div className="bg-[#0d1117] p-4 rounded border border-[#21262d] mb-4">
+          <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\bar{v}_t = \theta_v + (v_t - \theta_v)\cdot\frac{1 - e^{-\kappa(T-t)}}{\kappa(T-t)}" /></div>
+          <div className="text-xs text-[#8b949e] mt-1">Taylor expansion for small <InlineMath math="\kappa(T-t)" />: <InlineMath math="f(x) \approx 1 - x/2 + x^2/6" /> avoids catastrophic cancellation</div>
+        </div>
+        <div className="bg-[#0d1117] p-4 rounded border border-[#21262d] mb-4">
+          <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\Delta_t^{\text{Heston}} = e^{-q(T-t)} \cdot P_1 \quad (\text{calls}), \qquad \Delta_t^{\text{Heston}} = e^{-q(T-t)}(P_1 - 1) \quad (\text{puts})" /></div>
+          <div className="text-xs text-[#8b949e] mt-1"><InlineMath math="P_1" /> is the stock-measure probability from the Heston Fourier-inversion engine (§11)</div>
+        </div>
+
+        <h3 className="text-sm font-semibold text-[#58a6ff] mt-5 mb-2">Transaction Costs</h3>
+        <div className="bg-[#0d1117] p-4 rounded border border-[#21262d] mb-4">
+          <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\text{TC} = \text{tc\_rate} \times |\delta_{\text{trade}}| \times S_t, \qquad \text{tc\_rate} = \text{tc\_bps} / 10{,}000" /></div>
+          <div className="text-xs text-[#8b949e] mt-1">Default: 5 bps. Applied at every rebalance step.</div>
+        </div>
+
+        <h3 className="text-sm font-semibold text-[#58a6ff] mt-5 mb-2">Summary Statistics</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="bg-[#0d1117] p-3 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Variance Ratio</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><InlineMath math="R = \text{Var}(\varepsilon^{\text{BS}}) / \text{Var}(\varepsilon^{\text{Heston}})" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">&gt;1 means Heston is more precise</div>
+          </div>
+          <div className="bg-[#0d1117] p-3 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">RMSE</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><InlineMath math="\sqrt{\frac{1}{N}\sum_i \varepsilon_i^2}" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">Combined bias + variance</div>
+          </div>
+          <div className="bg-[#0d1117] p-3 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Max Absolute Error</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><InlineMath math="\max_i |\varepsilon_i|" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">Worst-case loss across all paths</div>
+          </div>
+          <div className="bg-[#0d1117] p-3 rounded border border-[#21262d]">
+            <div className="font-semibold text-[#8b949e] text-xs mb-1 uppercase tracking-wider">Variance % Improvement</div>
+            <div className="text-sm text-[#79c0ff] font-mono"><InlineMath math="(1 - 1/R) \times 100\%" /></div>
+            <div className="text-xs text-[#8b949e] mt-1">How much tighter the Heston distribution is</div>
+          </div>
+        </div>
       </SectionCard>
 
       {/* ── Footer ── */}

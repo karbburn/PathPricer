@@ -13,9 +13,9 @@ Next.js 16 application with TypeScript, Tailwind CSS, and Recharts. Renders an i
 
 - **InputPanel** — Parameter controls, 4-market quote header, estimator selector (5 modes), RNG seed management, implied volatility solver trigger, P&L shift inputs, scenario stress-test controls
 - **ResultsPanel** — Price summary, analytical vs. finite-difference Greeks comparison, 5-estimator comparison table with relative efficiency, P&L attribution breakdown, stress-test scenarios, PDF/CSV download
-- **Charts** — Eleven specialized views: Asset Paths, 2D Risk Grid heatmap, SVI Vol Surface, Greeks Surface heatmap, Vol Term Structure, Heston Calibration, Model Validation, Terminal Distribution histogram, Payoff diagram, Log-log Convergence, and MC-vs-BS Comparison
+- **Charts** — Twelve specialized views: Asset Paths, 2D Risk Grid heatmap, SVI Vol Surface, Greeks Surface heatmap, Vol Term Structure, Heston Calibration, Model Validation, Terminal Distribution histogram, Payoff diagram, Log-log Convergence, MC-vs-BS Comparison, and **BS vs Heston Hedging Comparison** (dual histogram, stats, sample path deltas)
 
-The workspace runs in three modes — **Pricing**, **IV Solver** (implied volatility from market price), and **P&L Explain** (Greek attribution plus scenario stress tests).
+The workspace runs in three modes — **Pricing**, **IV Solver** (implied volatility from market price), and **P&L Explain** (Greek attribution plus scenario stress tests). The **Strategy** mode is a separate page for multi-leg pricing.
 
 ## Key Decisions
 

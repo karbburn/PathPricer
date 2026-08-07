@@ -6,12 +6,12 @@ An interactive option pricing platform that benchmarks Monte Carlo simulation te
 
 ## Executive Summary
 
-PathPricer prices European options using five simulation methods and compares them against the exact closed-form solution. It solves for implied volatility from market prices, attributes P&L to individual risk factors (Delta, Gamma, Vega, Theta, Rho), and visualizes how option prices change across a two-dimensional risk grid. It also fits **Heston stochastic-volatility** and **SVI volatility-surface** models to live option chains, calibrating and validating them against market quotes.
+PathPricer prices European options using five simulation methods and compares them against the exact closed-form solution. It solves for implied volatility from market prices, attributes P&L to individual risk factors (Delta, Gamma, Vega, Theta, Rho), and visualizes how option prices change across a two-dimensional risk grid. It also fits **Heston stochastic-volatility** and **SVI volatility-surface** models to live option chains, calibrating and validating them against market quotes. A **delta-hedging comparison** engine benchmarks Black-Scholes (fixed implied vol) against Heston (model-informed deltas) across hundreds of simulated paths, quantifying how much variance reduction a model-aware hedging strategy achieves.
 
 The application demonstrates proficiency across three areas rarely combined in a single project:
-- **Quantitative methods** — analytical pricing, Monte Carlo with variance reduction, finite-difference Greeks, root-finding, convergence analysis, stochastic-volatility pricing, surface fitting, calibration
+- **Quantitative methods** — analytical pricing, Monte Carlo with variance reduction, finite-difference Greeks, root-finding, convergence analysis, stochastic-volatility pricing, surface fitting, calibration, delta-hedging comparison
 - **Production engineering** — typed Python/FastAPI backend, Next.js 16 frontend with two-tier compute model, full test coverage
-- **Real desk workflows** — P&L attribution, implied volatility solving, risk grids, Heston calibration, volatility surface construction, PDF research reports
+- **Real desk workflows** — P&L attribution, implied volatility solving, risk grids, Heston calibration, volatility surface construction, delta-hedging strategy comparison, PDF research reports
 
 ---
 
@@ -120,6 +120,20 @@ Fits the five Heston parameters $(v_0, \kappa, \theta_v, \sigma_v, \rho)$ to obs
 
 Scores a calibrated Heston model against the same market quotes it was fitted to: price relative RMSE, price MAPE, implied-vol RMSE (NaN-robust), and a **market put-call parity** consistency check across the chain, alongside the Feller feasibility flag.
 
+### Delta-Hedging Comparison
+
+Benchmarks two hedging strategies across $N$ simulated Heston paths: **BS hedging** (constant implied vol solved from the Heston ATM price at $t=0$) versus **Heston hedging** (deltas that adapt to the current variance state via expected average variance over the remaining life). Each path runs a self-financing discrete delta-hedging simulation with configurable rebalance frequency and transaction costs.
+
+| Metric | What It Shows |
+|---|---|
+| **Hedging error distribution** | Histogram of $\text{cash}_T + \Delta_T S_T - \text{payoff}$ across paths — wider means less reliable |
+| **Variance ratio** | $\text{Var}(\text{BS errors}) / \text{Var}(\text{Heston errors})$ — >1 means Heston is more precise |
+| **RMSE** | Root mean squared error — overall hedging quality |
+| **Max absolute error** | Worst-case loss across all simulated paths |
+| **Transaction cost** | Average total TC per path in basis points |
+
+The Heston delta uses the analytical P1 probability from the Fourier-inversion pricing engine, with expected average variance $\mathbb{E}[v_{\text{avg}}]$ computed from the exact CIR conditional mean. A Taylor expansion guards against catastrophic cancellation when $\kappa T_{\text{rem}}$ is small.
+
 ### Market Data & Reports
 
 - Multi-tier yfinance fallback for US, Indian, FX, and cryptocurrency markets
@@ -152,7 +166,8 @@ PathPricer/
 │   │                     # pnl_explain, risk_grid, strategy, stress_test,
 │   │                     # heston, heston_calibration, vol_surface,
 │   │                     # greeks_surface, butterfly_arb, model_validation,
-│   │                     # implied_rate, implied_dividend, volatility
+│   │                     # implied_rate, implied_dividend, volatility,
+│   │                     # heston_simulator, hedging, hedging_comparison
 │   ├── api/              # REST routers (pricing, market, quant, report, validation)
 │   ├── core/             # Config, RNG factory, rate providers
 │   ├── schemas/          # Pydantic models (preview/full structurally distinct)
@@ -215,6 +230,7 @@ Open [http://localhost:3000](http://localhost:3000). API documentation at [http:
 | `/api/v1/quant/greeks-surface` | `POST` | A chosen Greek across strikes × expiries on the SVI surface |
 | `/api/v1/quant/heston-calibrate` | `POST` | Calibrate Heston params to market option prices |
 | `/api/v1/quant/model-validate` | `POST` | Validate calibrated Heston model vs market chain |
+| `/api/v1/hedging/compare` | `POST` | BS vs Heston delta-hedging comparison across N simulated paths |
 
 ---
 
@@ -223,6 +239,7 @@ Open [http://localhost:3000](http://localhost:3000). API documentation at [http:
 The test suite covers:
 - **pytest API smoke tests** across the pricing, quant (vol-surface, Heston calibration, model validation) and market endpoints
 - **Engine self-checks** (`python -m app.engine.test_*`): closed-form benchmark prices, finite-difference volga cross-check, parameter-recovery calibration, SVI parameter recovery, butterfly-arb detection, put-call parity extraction, and good-fit/mis-specified model validation
+- **Hedging unit tests** (`pytest backend/tests/test_hedging.py`): Heston path simulation, expected average variance, BS/Heston delta accuracy, hedging engine mechanics, hedging comparison statistics, edge cases (dividend yield, odd paths, variance ratio), portfolio values, hedging error sign convention
 - **Edge case coverage**: zero/negative volatility, past expiry, invalid option types, large $N$, deep ITM/OTM, extreme Heston parameters
 - **Put-call parity**: residual verification as a structural consistency check, plus implied-rate/implied-dividend recovery from parity
 - **Convergence slope**: empirical $n^{-1/2}$ regression on Monte Carlo standard error
@@ -232,6 +249,7 @@ The test suite covers:
 ```bash
 pytest                              # API smoke tests
 python -m app.engine.test_heston    # engine self-checks (per module)
+pytest backend/tests/test_hedging.py  # hedging unit tests (48 cases)
 cd frontend && npm run build        # TypeScript + production build
 ```
 
