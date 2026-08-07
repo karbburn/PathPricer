@@ -750,7 +750,7 @@ At each rebalance step $t_i$:
 1. **Cash accrues interest**: $\text{cash} \leftarrow \text{cash} \cdot e^{r\,\Delta t}$
 2. **Compute target delta** $\Delta^*$ using the chosen model
 3. **Trade**: $\delta_{\text{trade}} = \Delta^* - \Delta_{\text{current}}$
-4. **Transaction cost**: $\text{TC} = \text{tc\_rate} \cdot |\delta_{\text{trade}}| \cdot S_{t_i}$ (where $\text{tc\_rate} = \text{tc\_bps}/10{,}000$)
+4. **Transaction cost**: $\text{TC} = \tau \cdot |\delta_{\text{trade}}| \cdot S_{t_i}$ (where $\tau = B/10{,}000$ and $B$ is the transaction cost in basis points)
 5. **Update positions**: $\text{cash} \leftarrow \text{cash} - \delta_{\text{trade}} \cdot S_{t_i} - \text{TC}$, $\Delta \leftarrow \Delta^*$
 
 At expiry $T$, the hedging error is $\varepsilon = \text{cash}_T + \Delta_T S_T - \text{payoff}(S_T)$.

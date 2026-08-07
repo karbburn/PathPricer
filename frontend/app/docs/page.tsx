@@ -807,8 +807,8 @@ export default function DocsPage() {
 
         <h3 className="text-sm font-semibold text-[#58a6ff] mt-5 mb-2">Transaction Costs</h3>
         <div className="bg-[#0d1117] p-4 rounded border border-[#21262d] mb-4">
-          <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\text{TC} = \text{tc\_rate} \times |\delta_{\text{trade}}| \times S_t, \qquad \text{tc\_rate} = \text{tc\_bps} / 10{,}000" /></div>
-          <div className="text-xs text-[#8b949e] mt-1">Default: 5 bps. Applied at every rebalance step.</div>
+          <div className="text-sm text-[#79c0ff] font-mono"><BlockMath math="\text{TC} = \tau \cdot |\delta_{\text{trade}}| \cdot S_t, \qquad \tau = B / 10{,}000" /></div>
+          <div className="text-xs text-[#8b949e] mt-1">Default: 5 bps (<InlineMath math="B = 5" />). Applied at every rebalance step.</div>
         </div>
 
         <h3 className="text-sm font-semibold text-[#58a6ff] mt-5 mb-2">Summary Statistics</h3>
