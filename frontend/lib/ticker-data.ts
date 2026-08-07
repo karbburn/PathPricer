@@ -734,6 +734,9 @@ export const TICKER_DATABASE: TickerEntry[] = [
 
   // Newly added from Wikipedia/CoinGecko
   { ticker: "FERG", name: "Ferguson Enterprises", market: "US" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "GRAM", name: "Gram (prev. Toncoin)", market: "CRYPTO" },
 ];
 
 /**
