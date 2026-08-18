@@ -737,6 +737,10 @@ export const TICKER_DATABASE: TickerEntry[] = [
 
   // Newly added from Wikipedia/CoinGecko
   { ticker: "GRAM", name: "Gram (prev. Toncoin)", market: "CRYPTO" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "RDDT", name: "Reddit", market: "US" },
+  { ticker: "VMRK", name: "Vivmark Residential", market: "US" },
 ];
 
 /**
