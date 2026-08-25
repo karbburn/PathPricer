@@ -1,5 +1,16 @@
 {
   "framework": "nextjs",
   "buildCommand": "next build",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self' https://sourabhpradhan.in https://www.sourabhpradhan.in http://localhost:* https://*.vercel.app;"
+        }
+      ]
+    }
+  ]
 }
