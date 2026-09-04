@@ -1,46 +1,47 @@
 # PathPricer
 
-Monte Carlo option pricing platform with variance reduction techniques and Black-Scholes analytical benchmarks.
+> An interactive European option pricing platform that benchmarks Monte Carlo simulation techniques with 5 variance reduction estimators against analytical Black-Scholes prices, calibrates Heston stochastic volatility and SVI volatility surface models, and compares dynamic delta-hedging strategies.
 
-## What It Does
+## Overview
+PathPricer is a full-stack quantitative finance platform combining a high-performance Python engine (FastAPI, NumPy, SciPy) with a modern web interface (Next.js 16, TypeScript, Tailwind CSS, Recharts). It prices European call and put options, computes analytical and finite-difference Greeks, solves for implied volatility from market prices, performs P&L attribution (Taylor decomposition), fits volatility surfaces (SVI), calibrates stochastic volatility models (Heston), and benchmarks discrete delta-hedging strategies.
 
-PathPricer prices European call/put options via Monte Carlo simulation with 5 variance reduction estimators (Standard, Antithetic Variates, Control Variates, Combined, Randomized QMC/Sobol). It benchmarks results against Black-Scholes closed-form solutions, computes analytical and finite-difference Greeks, and provides convergence diagnostics.
+- **Website**: https://pathpricer.vercel.app
+- **Repository**: https://github.com/karbburn/PathPricer
+- **Preview Image**: https://pathpricer.vercel.app/pathpricer.png
 
-## Key Features
+## Pages & Capabilities
+- [/ (Market Overview)](https://pathpricer.vercel.app): Live quotes for 4 market regions (US, India, FX, Crypto), autocomplete ticker search, historical volatility, manual pricing inputs, and Put-Call Parity quote consistency diagnostics.
+- [/workspace (Pricing Workspace)](https://pathpricer.vercel.app/workspace): Resizable 3-column workspace for option pricing, Implied Volatility root-finding (Newton-Raphson / Brent), P&L attribution ("P&L Explain"), 2D parameter risk surface grid, and PDF/CSV reporting.
+- [/workspace/strategy (Strategy Builder)](https://pathpricer.vercel.app/workspace/strategy): Multi-leg option structure pricing (1-10 legs), 10 classic presets (straddles, strangles, spreads, iron condors, butterflies, covered call, protective put), portfolio Greeks, payoff diagram, and breakeven solving.
+- [/validation (Model Validation)](https://pathpricer.vercel.app/validation): Static CI benchmark summary showing quantitative test suite verification, edge-case coverage, and Greek validation results.
+- [/docs (Quantitative Methodology)](https://pathpricer.vercel.app/docs): Comprehensive documentation and mathematical formulation with KaTeX formulas (GBM, Black-Scholes, Monte Carlo estimators, Quasi-Monte Carlo Sobol, Common Random Numbers, Heston Fourier transform, SVI calibration, Delta-hedging variance).
 
-- 5 Monte Carlo estimators with variance reduction
-- Black-Scholes analytical benchmark
-- Analytical Greeks (Delta, Gamma, Vega, Theta, Rho)
-- Finite-difference Greeks with Common Random Numbers
-- Convergence analysis (slope, R², log-log)
-- Implied volatility solver (Newton-Raphson / Brent)
-- P&L attribution via Taylor decomposition (Delta, Gamma, Vega, Theta, Greeks)
-- Risk grid heatmap (underlying × volatility mesh)
-- Payoff diagram and terminal distribution charts
-- CSV and PDF report export
-- Live market data for US and Indian equities
+## Quantitative Pricing Methods
+1. **Black-Scholes-Merton**: Exact analytical call/put formula with closed-form Greeks (Delta, Gamma, Vega, Theta, Rho).
+2. **Standard Monte Carlo**: Vectorized pseudo-random normal paths, O(N^-1/2) convergence.
+3. **Antithetic Variates**: Negatively correlated path pairing (Z, -Z), 40-60% variance reduction for monotone payoffs.
+4. **Control Variates**: Terminal asset price S_T with analytical expectation as optimal control variate.
+5. **Combined Antithetic + Control Variates**: Maximum variance reduction; best-performing Monte Carlo estimator.
+6. **Randomized Quasi-Monte Carlo (RQMC)**: Scrambled Sobol low-discrepancy sequences (M=20 replications), achieving near O(N^-1) convergence.
+7. **Heston Stochastic Volatility Model**: Semi-analytical pricing via Carr-Madan Fourier inversion, calibrated via differential evolution / L-BFGS-B.
+8. **SVI (Stochastic Volatility Inspired)**: Raw SVI parameterization fitted slice-by-slice across expiries with butterfly arbitrage checks.
+9. **Delta-Hedging Strategy Comparison**: Simulates hundreds of continuous-time asset paths to benchmark standard Black-Scholes fixed-vol delta hedging against Heston model-aware delta hedging.
 
-## Pages
-
-- `/` — Markets: live quotes and ticker strip
-- `/workspace` — Workspace: option pricing, IV solver, P&L explain
-- `/validation` — Validation: CI coverage, edge cases, Greeks tests
-- `/docs` — Documentation: mathematical specification, method descriptions, convergence theory
-
-## API
-
-Backend is FastAPI at `https://pathpricer-backend.onrender.com`:
-
-- `POST /api/v1/price/full` — Full simulation with all estimators and Greeks
-- `POST /api/v1/price/preview` — Fast preview (≤10k paths)
-- `POST /api/v1/price/implied-vol` — Implied volatility solver
-- `POST /api/v1/price/pnl-explain` — P&L attribution decomposition
-- `POST /api/v1/price/risk-grid` — Risk grid heatmap data
-- `GET /api/v1/market/quote` — Live market quote
-- `POST /report/pdf` — PDF report generation
+## API Endpoints
+Backend API base URL: `https://pathpricer-backend.onrender.com`
+- `POST /api/v1/price/full` — Full simulation across all 5 estimators and Greeks
+- `POST /api/v1/price/preview` — Fast preview simulation (N <= 10k paths)
+- `POST /api/v1/price/implied-vol` — Implied volatility root solver (Brenner-Subrahmanyam init + Newton-Raphson + Brent)
+- `POST /api/v1/price/pnl-explain` — 1st and 2nd order Taylor P&L decomposition
+- `POST /api/v1/price/risk-grid` — 25x25 (625 point) broadcasted parameter risk surface
+- `POST /api/v1/strategy/price` — Multi-leg portfolio pricing, Greeks aggregation, payoff profile
+- `POST /api/v1/models/heston/calibrate` — Calibrate Heston model parameters to options chain
+- `POST /api/v1/models/svi/fit` — Fit SVI volatility surface slices to option quotes
+- `POST /api/v1/hedging/simulate` — Monte Carlo delta-hedging simulation comparing BS vs Heston
+- `GET /api/v1/market/quote` — Real-time quote retrieval across US, IN, FX, CRYPTO
+- `POST /report/pdf` — Publication-ready PDF research report generation
 
 ## Tech Stack
-
-- Frontend: Next.js 16, React 19, Tailwind CSS 4, Recharts, KaTeX
-- Backend: FastAPI, NumPy, SciPy, ReportLab
+- Frontend: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, Recharts, KaTeX
+- Backend: FastAPI, Python 3.12, NumPy, SciPy, ReportLab
 - Deployment: Vercel (frontend), Render (backend)

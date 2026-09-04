@@ -1,7 +1,14 @@
 import React from "react";
+import type { Metadata } from "next";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
 import { Lightbulb, CheckCircle2, AlertTriangle } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Quantitative Methodology & Mathematical Specification",
+  description:
+    "Complete mathematical reference for PathPricer: Geometric Brownian Motion, Black-Scholes benchmark, 5 Monte Carlo variance reduction estimators, Greeks, IV solver, and Heston calibration.",
+};
 
 const toc = [
   { id: "gbm", label: "1. GBM" },

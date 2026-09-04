@@ -12,5 +12,14 @@
       "sizes": "any",
       "type": "image/x-icon"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/pathpricer.png",
+      "sizes": "1728x910",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "PathPricer — Monte Carlo Option Pricing Platform"
+    }
   ]
 }

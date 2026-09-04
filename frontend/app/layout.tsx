@@ -43,13 +43,50 @@ export const metadata: Metadata = {
     title: "PathPricer — Monte Carlo Option Pricing",
     description:
       "European option pricing platform: Monte Carlo simulation with variance reduction, Black-Scholes benchmark, Greeks, and convergence diagnostics.",
+    images: [
+      {
+        url: "/pathpricer.png",
+        width: 1728,
+        height: 910,
+        alt: "PathPricer — Monte Carlo Option Pricing Platform",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "PathPricer — Monte Carlo Option Pricing",
     description:
       "European option pricing: Monte Carlo + Black-Scholes, 5 estimators, Greeks, implied vol solver.",
+    images: [
+      {
+        url: "/pathpricer.png",
+        width: 1728,
+        height: 910,
+        alt: "PathPricer — Monte Carlo Option Pricing Platform",
+      },
+    ],
   },
+  keywords: [
+    "option pricing",
+    "Monte Carlo simulation",
+    "Black-Scholes",
+    "Greeks",
+    "variance reduction",
+    "antithetic variates",
+    "control variates",
+    "Sobol sequence",
+    "implied volatility",
+    "Heston model",
+    "SVI volatility surface",
+    "delta hedging",
+    "P&L attribution",
+    "financial engineering",
+    "quantitative finance",
+  ],
+  authors: [{ name: "Sourabh Pradhan", url: "https://sourabhpradhan.in" }],
+  creator: "Sourabh Pradhan",
+  publisher: "PathPricer",
+  category: "finance",
   robots: {
     index: true,
     follow: true,
@@ -57,6 +94,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+  },
+  other: {
+    "geo.region": "US",
+    "format-detection": "telephone=no",
   },
 };
 
@@ -75,25 +116,50 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: "PathPricer",
-              applicationCategory: "FinanceApplication",
-              operatingSystem: "Web",
-              description:
-                "Monte Carlo option pricing platform with 5 variance reduction estimators, Black-Scholes benchmark, Greeks, implied volatility solver, and P&L attribution.",
-              url: SITE_URL,
-              offers: {
-                "@type": "Offer",
-                price: "0",
-                priceCurrency: "USD",
-              },
-              featureList: [
-                "Monte Carlo simulation with variance reduction",
-                "Black-Scholes analytical benchmark",
-                "Analytical and finite-difference Greeks",
-                "Implied volatility solver",
-                "P&L attribution via Taylor decomposition",
-                "CSV and PDF report export",
+              "@graph": [
+                {
+                  "@type": "SoftwareApplication",
+                  name: "PathPricer",
+                  applicationCategory: "FinanceApplication",
+                  operatingSystem: "Web",
+                  image: `${SITE_URL}/pathpricer.png`,
+                  screenshot: `${SITE_URL}/pathpricer.png`,
+                  description:
+                    "Monte Carlo option pricing platform with 5 variance reduction estimators, Black-Scholes benchmark, Greeks, implied volatility solver, and P&L attribution.",
+                  url: SITE_URL,
+                  author: {
+                    "@type": "Person",
+                    name: "Sourabh Pradhan",
+                    url: "https://sourabhpradhan.in",
+                  },
+                  offers: {
+                    "@type": "Offer",
+                    price: "0",
+                    priceCurrency: "USD",
+                  },
+                  featureList: [
+                    "Monte Carlo simulation with variance reduction",
+                    "Black-Scholes analytical benchmark",
+                    "Analytical and finite-difference Greeks",
+                    "Implied volatility solver",
+                    "P&L attribution via Taylor decomposition",
+                    "CSV and PDF report export",
+                    "Heston stochastic volatility calibration",
+                    "SVI volatility surface fitting",
+                    "Delta-hedging strategy comparison",
+                  ],
+                },
+                {
+                  "@type": "WebSite",
+                  name: "PathPricer",
+                  url: SITE_URL,
+                  description:
+                    "Interactive quantitative option pricing platform benchmarking Monte Carlo techniques against Black-Scholes analytical solutions.",
+                  publisher: {
+                    "@type": "Person",
+                    name: "Sourabh Pradhan",
+                  },
+                },
               ],
             }),
           }}

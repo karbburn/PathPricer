@@ -1,5 +1,7 @@
 # PathPricer — Frontend
 
+![PathPricer — Frontend](public/pathpricer.png)
+
 Next.js 16 application with TypeScript, Tailwind CSS, and Recharts. Renders an interactive pricing workspace with real-time controls, visual analytics, and export features.
 
 ## Pages

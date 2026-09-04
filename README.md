@@ -1,5 +1,7 @@
 # PathPricer
 
+![PathPricer Platform Preview](frontend/public/pathpricer.png)
+
 An interactive option pricing platform that benchmarks Monte Carlo simulation techniques against analytical Black-Scholes prices. Built with a Python quantitative engine (FastAPI, NumPy, SciPy) and a Bloomberg-style web frontend (Next.js, TypeScript, Tailwind CSS, Recharts).
 
 ---
