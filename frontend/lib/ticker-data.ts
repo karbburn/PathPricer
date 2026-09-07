@@ -741,6 +741,9 @@ export const TICKER_DATABASE: TickerEntry[] = [
   // Newly added from Wikipedia/CoinGecko
   { ticker: "RDDT", name: "Reddit", market: "US" },
   { ticker: "VMRK", name: "Vivmark Residential", market: "US" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "LTC", name: "Litecoin", market: "CRYPTO" },
 ];
 
 /**
