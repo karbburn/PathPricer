@@ -744,6 +744,9 @@ export const TICKER_DATABASE: TickerEntry[] = [
 
   // Newly added from Wikipedia/CoinGecko
   { ticker: "LTC", name: "Litecoin", market: "CRYPTO" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "NEAR", name: "NEAR Protocol", market: "CRYPTO" },
 ];
 
 /**
