@@ -21,7 +21,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://pathpricer.vercel.app/sitemap.xml",
-    host: "https://pathpricer.vercel.app",
+    sitemap: "https://pathpricer.sourabhpradhan.in/sitemap.xml",
+    host: "https://pathpricer.sourabhpradhan.in",
   };
 }

@@ -2,9 +2,9 @@
 
 > An interactive European option pricing platform that benchmarks Monte Carlo simulation techniques against analytical Black-Scholes prices, fits Heston stochastic-volatility and SVI volatility-surface models, and evaluates model-aware delta-hedging strategies.
 
-- Website: https://pathpricer.vercel.app
+- Website: https://pathpricer.sourabhpradhan.in
 - Codebase: https://github.com/karbburn/PathPricer
-- Social & OG Image: https://pathpricer.vercel.app/pathpricer.png
+- Social & OG Image: https://pathpricer.sourabhpradhan.in/pathpricer.png
 
 ---
 

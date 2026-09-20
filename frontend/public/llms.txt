@@ -5,16 +5,16 @@
 ## Overview
 PathPricer is a full-stack quantitative finance platform combining a high-performance Python engine (FastAPI, NumPy, SciPy) with a modern web interface (Next.js 16, TypeScript, Tailwind CSS, Recharts). It prices European call and put options, computes analytical and finite-difference Greeks, solves for implied volatility from market prices, performs P&L attribution (Taylor decomposition), fits volatility surfaces (SVI), calibrates stochastic volatility models (Heston), and benchmarks discrete delta-hedging strategies.
 
-- **Website**: https://pathpricer.vercel.app
+- **Website**: https://pathpricer.sourabhpradhan.in
 - **Repository**: https://github.com/karbburn/PathPricer
-- **Preview Image**: https://pathpricer.vercel.app/pathpricer.png
+- **Preview Image**: https://pathpricer.sourabhpradhan.in/pathpricer.png
 
 ## Pages & Capabilities
-- [/ (Market Overview)](https://pathpricer.vercel.app): Live quotes for 4 market regions (US, India, FX, Crypto), autocomplete ticker search, historical volatility, manual pricing inputs, and Put-Call Parity quote consistency diagnostics.
-- [/workspace (Pricing Workspace)](https://pathpricer.vercel.app/workspace): Resizable 3-column workspace for option pricing, Implied Volatility root-finding (Newton-Raphson / Brent), P&L attribution ("P&L Explain"), 2D parameter risk surface grid, and PDF/CSV reporting.
-- [/workspace/strategy (Strategy Builder)](https://pathpricer.vercel.app/workspace/strategy): Multi-leg option structure pricing (1-10 legs), 10 classic presets (straddles, strangles, spreads, iron condors, butterflies, covered call, protective put), portfolio Greeks, payoff diagram, and breakeven solving.
-- [/validation (Model Validation)](https://pathpricer.vercel.app/validation): Static CI benchmark summary showing quantitative test suite verification, edge-case coverage, and Greek validation results.
-- [/docs (Quantitative Methodology)](https://pathpricer.vercel.app/docs): Comprehensive documentation and mathematical formulation with KaTeX formulas (GBM, Black-Scholes, Monte Carlo estimators, Quasi-Monte Carlo Sobol, Common Random Numbers, Heston Fourier transform, SVI calibration, Delta-hedging variance).
+- [/ (Market Overview)](https://pathpricer.sourabhpradhan.in): Live quotes for 4 market regions (US, India, FX, Crypto), autocomplete ticker search, historical volatility, manual pricing inputs, and Put-Call Parity quote consistency diagnostics.
+- [/workspace (Pricing Workspace)](https://pathpricer.sourabhpradhan.in/workspace): Resizable 3-column workspace for option pricing, Implied Volatility root-finding (Newton-Raphson / Brent), P&L attribution ("P&L Explain"), 2D parameter risk surface grid, and PDF/CSV reporting.
+- [/workspace/strategy (Strategy Builder)](https://pathpricer.sourabhpradhan.in/workspace/strategy): Multi-leg option structure pricing (1-10 legs), 10 classic presets (straddles, strangles, spreads, iron condors, butterflies, covered call, protective put), portfolio Greeks, payoff diagram, and breakeven solving.
+- [/validation (Model Validation)](https://pathpricer.sourabhpradhan.in/validation): Static CI benchmark summary showing quantitative test suite verification, edge-case coverage, and Greek validation results.
+- [/docs (Quantitative Methodology)](https://pathpricer.sourabhpradhan.in/docs): Comprehensive documentation and mathematical formulation with KaTeX formulas (GBM, Black-Scholes, Monte Carlo estimators, Quasi-Monte Carlo Sobol, Common Random Numbers, Heston Fourier transform, SVI calibration, Delta-hedging variance).
 
 ## Quantitative Pricing Methods
 1. **Black-Scholes-Merton**: Exact analytical call/put formula with closed-form Greeks (Delta, Gamma, Vega, Theta, Rho).

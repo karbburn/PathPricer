@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     cors_allowed_origins: list[str] | str = [
         "http://localhost:3000",
+        "https://pathpricer.sourabhpradhan.in",
         "https://pathpricer.vercel.app",
         "https://pathpricer-backend.onrender.com",
         "https://sourabhpradhan.in",

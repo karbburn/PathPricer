@@ -25,7 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const SITE_URL = "https://pathpricer.vercel.app";
+const SITE_URL = "https://pathpricer.sourabhpradhan.in";
 
 export const metadata: Metadata = {
   title: {
