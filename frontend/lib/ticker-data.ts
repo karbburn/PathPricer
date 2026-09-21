@@ -747,6 +747,11 @@ export const TICKER_DATABASE: TickerEntry[] = [
 
   // Newly added from Wikipedia/CoinGecko
   { ticker: "NEAR", name: "NEAR Protocol", market: "CRYPTO" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "BE", name: "Bloom Energy", market: "US" },
+  { ticker: "P", name: "Everpure", market: "US" },
+  { ticker: "ILMN", name: "Illumina, Inc.", market: "US" },
 ];
 
 /**
