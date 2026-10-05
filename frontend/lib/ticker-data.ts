@@ -752,6 +752,9 @@ export const TICKER_DATABASE: TickerEntry[] = [
   { ticker: "BE", name: "Bloom Energy", market: "US" },
   { ticker: "P", name: "Everpure", market: "US" },
   { ticker: "ILMN", name: "Illumina, Inc.", market: "US" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "SUI", name: "Sui", market: "CRYPTO" },
 ];
 
 /**
