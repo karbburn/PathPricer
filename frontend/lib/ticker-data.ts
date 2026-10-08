@@ -755,6 +755,11 @@ export const TICKER_DATABASE: TickerEntry[] = [
 
   // Newly added from Wikipedia/CoinGecko
   { ticker: "SUI", name: "Sui", market: "CRYPTO" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "SKYD", name: "Paramount Skydance Corporation", market: "US" },
+  { ticker: "TWLO", name: "Twilio", market: "US" },
+  { ticker: "VYLR", name: "Vylor", market: "US" },
 ];
 
 /**
