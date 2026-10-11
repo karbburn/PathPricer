@@ -760,6 +760,9 @@ export const TICKER_DATABASE: TickerEntry[] = [
   { ticker: "SKYD", name: "Paramount Skydance Corporation", market: "US" },
   { ticker: "TWLO", name: "Twilio", market: "US" },
   { ticker: "VYLR", name: "Vylor", market: "US" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "BSE", name: "BSE", market: "IN" },
 ];
 
 /**
