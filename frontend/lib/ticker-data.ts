@@ -766,6 +766,9 @@ export const TICKER_DATABASE: TickerEntry[] = [
 
   // Newly added from Wikipedia/CoinGecko
   { ticker: "BTW", name: "Bitway", market: "CRYPTO" },
+
+  // Newly added from Wikipedia/CoinGecko
+  { ticker: "OKTA", name: "Okta, Inc.", market: "US" },
 ];
 
 /**
